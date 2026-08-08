@@ -256,10 +256,11 @@ export async function generateAiDiagnosis(params: {
     model,
     // A full 8-dimension structured response (diagnosis + strengths +
     // weaknesses + >=1 structured recommendation per dimension) plus the
-    // EXTENDED_THINKING_BUDGET_TOKENS budget needs more headroom than
-    // 16000: a production run truncated mid-array with fewer than 8
-    // dimensions, which our own schema then rejected as invalid.
-    max_tokens: 24000,
+    // EXTENDED_THINKING_BUDGET_TOKENS budget needs real headroom: one
+    // successful production run alone used 18638 output tokens, and a
+    // later run hit stop_reason "max_tokens" and was truncated at the
+    // previous 24000 ceiling (confirmed via analysis_jobs.error_message).
+    max_tokens: 32000,
     thinking: useAdaptiveThinking
       ? { type: "adaptive" }
       : { type: "enabled", budget_tokens: EXTENDED_THINKING_BUDGET_TOKENS },
