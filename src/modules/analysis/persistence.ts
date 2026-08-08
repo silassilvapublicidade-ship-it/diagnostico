@@ -23,7 +23,10 @@ import {
   toAnswerRows,
   type DiagnosisBriefing,
 } from "./briefing";
-import { buildDevelopmentFixtureResult } from "./development-fixture";
+import {
+  buildDevelopmentFixtureResult,
+  isDevelopmentFixturesEnabled,
+} from "./development-fixture";
 import type { ResultOrigin } from "./result-origin";
 
 const STORAGE_BUCKET = "analysis-assets";
@@ -86,7 +89,7 @@ function redirectWithError(message: string): never {
   redirect(`/app/diagnosticos/novo?erro=${encodeURIComponent(message)}`);
 }
 
-async function getNextResultSequence(analysisRequestId: string) {
+export async function getNextResultSequence(analysisRequestId: string) {
   const admin = createSupabaseAdminClient();
   const { count, error } = await admin
     .from("analysis_results")
@@ -100,7 +103,7 @@ async function getNextResultSequence(analysisRequestId: string) {
   return (count ?? 0) + 1;
 }
 
-async function persistDevelopmentResult(params: {
+export async function persistDevelopmentResult(params: {
   analysisRequestId: string;
   analysisJobId: string;
   profileType: ProfileType;
@@ -321,6 +324,9 @@ export async function createDiagnosisFromForm(formData: FormData) {
     redirectWithError("Nao foi possivel criar o diagnostico.");
   }
 
+  const fixturesEnabled = isDevelopmentFixturesEnabled(process.env);
+  let jobId: string | undefined;
+
   try {
     const answerRows = toAnswerRows(briefing).map((row) => ({
       analysis_request_id: request.id,
@@ -348,17 +354,11 @@ export async function createDiagnosisFromForm(formData: FormData) {
       .from("analysis_jobs")
       .insert({
         analysis_request_id: request.id,
-        status:
-          process.env.NODE_ENV === "development" &&
-          process.env.ENABLE_DEVELOPMENT_FIXTURES === "true"
-            ? "processing"
-            : "ready",
+        status: fixturesEnabled ? "processing" : "ready",
         attempt_number: 1,
-        trigger_reason:
-          process.env.NODE_ENV === "development" &&
-          process.env.ENABLE_DEVELOPMENT_FIXTURES === "true"
-            ? "development_fixture"
-            : "initial_submission",
+        trigger_reason: fixturesEnabled
+          ? "development_fixture"
+          : "initial_submission",
         started_at: new Date().toISOString(),
       })
       .select("id")
@@ -368,10 +368,9 @@ export async function createDiagnosisFromForm(formData: FormData) {
       throw jobError ?? new Error("Analysis job was not created.");
     }
 
-    if (
-      process.env.NODE_ENV === "development" &&
-      process.env.ENABLE_DEVELOPMENT_FIXTURES === "true"
-    ) {
+    jobId = job.id;
+
+    if (fixturesEnabled) {
       await persistDevelopmentResult({
         analysisRequestId: request.id,
         analysisJobId: job.id,
@@ -390,6 +389,17 @@ export async function createDiagnosisFromForm(formData: FormData) {
       }
     }
   } catch (error) {
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : "Nao foi possivel finalizar o envio.";
+
+    // Phase 2A has no cross-table transaction. A failure here can leave a
+    // partially written job/result behind; marking both the request and the
+    // job (when it already exists) as failed keeps that inconsistent state
+    // identifiable instead of leaving the job stuck at "processing" forever.
+    // Reprocessing must always insert a new job/result row rather than
+    // mutate this one, so history is never overwritten by a retry.
     await admin
       .from("analysis_requests")
       .update({
@@ -397,11 +407,18 @@ export async function createDiagnosisFromForm(formData: FormData) {
       })
       .eq("id", request.id);
 
-    redirectWithError(
-      error instanceof Error
-        ? error.message
-        : "Nao foi possivel finalizar o envio.",
-    );
+    if (jobId) {
+      await admin
+        .from("analysis_jobs")
+        .update({
+          status: "failed" satisfies AnalysisStatus,
+          error_message: errorMessage,
+          finished_at: new Date().toISOString(),
+        })
+        .eq("id", jobId);
+    }
+
+    redirectWithError(errorMessage);
   }
 
   redirect(`/app/diagnosticos/${request.id}`);

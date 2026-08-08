@@ -20,6 +20,15 @@ export type DevelopmentFixtureResult = {
   result: AnalysisCalculationResult;
 };
 
+export function isDevelopmentFixturesEnabled(env: {
+  NODE_ENV?: string;
+  ENABLE_DEVELOPMENT_FIXTURES?: string;
+}): boolean {
+  return (
+    env.NODE_ENV === "development" && env.ENABLE_DEVELOPMENT_FIXTURES === "true"
+  );
+}
+
 export function assertDevelopmentFixturesEnabled(env: {
   NODE_ENV?: string;
   ENABLE_DEVELOPMENT_FIXTURES?: string;
