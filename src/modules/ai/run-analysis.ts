@@ -4,7 +4,9 @@ import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 
 import {
   calculateAnalysisResult,
+  DIMENSIONS,
   type AnalysisCalculationResult,
+  type DimensionKey,
   type ProfileType,
 } from "@/domain/methodology-8d";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -101,6 +103,65 @@ function supportsAdaptiveThinking(model: string): boolean {
 // so it doesn't need a large deliberation budget on extended-thinking-only
 // models.
 const EXTENDED_THINKING_BUDGET_TOKENS = 4000;
+
+// The dimensions array's exact-length-8 requirement is a description hint
+// in the wire schema, not a grammar constraint the API enforces (confirmed
+// by inspecting the compiled JSON Schema): the model has produced 9 and,
+// once, 11+ entries despite explicit prompt instructions. Rather than
+// reject the whole response over noise, drop duplicate and unrecognized
+// dimension keys before validating -- this is lossless whenever the model
+// actually did produce all 8 real dimensions plus extras, and still fails
+// validation (correctly) if fewer than 8 valid, unique dimensions remain.
+const VALID_DIMENSION_KEYS = new Set<string>(DIMENSIONS);
+
+function dedupeDimensions(rawJson: unknown): unknown {
+  if (
+    typeof rawJson !== "object" ||
+    rawJson === null ||
+    !("dimensions" in rawJson) ||
+    !Array.isArray((rawJson as { dimensions: unknown }).dimensions)
+  ) {
+    return rawJson;
+  }
+
+  const dimensions = (rawJson as { dimensions: unknown[] }).dimensions;
+  const seen = new Set<DimensionKey>();
+  const deduped: unknown[] = [];
+
+  for (const entry of dimensions) {
+    const key =
+      typeof entry === "object" &&
+      entry !== null &&
+      "dimension" in entry &&
+      typeof (entry as { dimension: unknown }).dimension === "string"
+        ? (entry as { dimension: string }).dimension
+        : null;
+
+    if (
+      !key ||
+      !VALID_DIMENSION_KEYS.has(key) ||
+      seen.has(key as DimensionKey)
+    ) {
+      continue;
+    }
+
+    seen.add(key as DimensionKey);
+    deduped.push(entry);
+  }
+
+  if (deduped.length === dimensions.length) {
+    return rawJson;
+  }
+
+  console.error(
+    "[ai] dropped duplicate/unrecognized dimension entries:",
+    dimensions.length,
+    "->",
+    deduped.length,
+  );
+
+  return { ...rawJson, dimensions: deduped };
+}
 
 export class AiAnalysisError extends Error {}
 
@@ -317,7 +378,9 @@ export async function generateAiDiagnosis(params: {
     );
   }
 
-  const validation = aiDiagnosisOutputSchema.safeParse(rawJson);
+  const validation = aiDiagnosisOutputSchema.safeParse(
+    dedupeDimensions(rawJson),
+  );
 
   if (!validation.success) {
     console.error(

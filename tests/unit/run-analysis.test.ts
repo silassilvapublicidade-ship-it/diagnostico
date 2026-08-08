@@ -286,6 +286,63 @@ describe("generateAiDiagnosis", () => {
       }),
     ).rejects.toThrow(/JSON valido/);
   });
+
+  it("drops duplicate and unrecognized dimension entries instead of failing the whole response", async () => {
+    const request = seedRequestWithAsset(harness.store, "user-1");
+    const duplicatePositioning = aiOutputBusinessComplete.dimensions[0]!;
+    const unrecognizedEntry = {
+      ...duplicatePositioning,
+      dimension: "not_a_real_dimension",
+    };
+    const outputWithExtras = {
+      ...aiOutputBusinessComplete,
+      dimensions: [
+        ...aiOutputBusinessComplete.dimensions,
+        duplicatePositioning,
+        unrecognizedEntry,
+      ],
+    };
+    mockFinalMessage.mockResolvedValueOnce({
+      stop_reason: "end_turn",
+      stop_details: null,
+      usage: { input_tokens: 4200, output_tokens: 1800 },
+      content: [{ type: "text", text: JSON.stringify(outputWithExtras) }],
+    });
+
+    const generated = await generateAiDiagnosis({
+      requestId: request.id as string,
+      userId: "user-1",
+    });
+
+    expect(generated.result.includedDimensions).toHaveLength(8);
+    expect(generated.webPayload.executiveSummary).toBe(
+      aiOutputBusinessComplete.executive_summary,
+    );
+  });
+
+  it("still fails when fewer than 8 valid unique dimensions remain after dropping duplicates", async () => {
+    const request = seedRequestWithAsset(harness.store, "user-1");
+    const outputMissingOne = {
+      ...aiOutputBusinessComplete,
+      dimensions: [
+        ...aiOutputBusinessComplete.dimensions.slice(0, 7),
+        aiOutputBusinessComplete.dimensions[0]!,
+      ],
+    };
+    mockFinalMessage.mockResolvedValueOnce({
+      stop_reason: "end_turn",
+      stop_details: null,
+      usage: { input_tokens: 100, output_tokens: 50 },
+      content: [{ type: "text", text: JSON.stringify(outputMissingOne) }],
+    });
+
+    await expect(
+      generateAiDiagnosis({
+        requestId: request.id as string,
+        userId: "user-1",
+      }),
+    ).rejects.toThrow(/schema esperado/);
+  });
 });
 
 describe("runDiagnosisAnalysisAction", () => {
