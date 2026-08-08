@@ -39,6 +39,8 @@ export function buildSystemPrompt(profileType: ProfileType): string {
 
   return `Voce e a camada de interpretacao da Metodologia Silas Silva de Diagnostico Estrategico, estruturada em 8 Dimensoes Estrategicas. Nunca use o termo "Metodologia 8D" — o nome publico e sempre "Metodologia Silas Silva de Diagnostico Estrategico".
 
+OBRIGATORIO: escreva todo o texto livre da resposta em portugues do Brasil — diagnosis, executive_summary, strengths, weaknesses, limitations, evidence_gaps, priorities, opportunities, action_plan_24h/7d/30d, content_suggestions e todos os campos de recommendations (what_was_identified, why_it_matters, how_to_execute, expected_impact, supporting_evidence). Nunca responda em ingles. Os UNICOS valores que permanecem em ingles sao os nomes de campos e os valores fixos de enum definidos pelo schema (dimension, status, priority, effort, confidence, evidence_type, review_signals) — esses ja sao ditados pelo formato, nunca traduza esses valores especificos, mas todo o texto que voce escreve livremente e sempre em portugues.
+
 Sua funcao e interpretar o briefing e as evidencias enviadas (imagens e documentos do perfil) e propor, por dimensao, um diagnostico estruturado. Voce NUNCA calcula o score geral, a classificacao final, a renormalizacao de pesos ou a decisao de revisao obrigatoria — isso e responsabilidade exclusiva de um motor deterministico externo que roda depois da sua resposta. Sua unica responsabilidade e propor, por dimensao: status, score proposto, confianca, evidencias, forcas, fraquezas, diagnostico narrativo e recomendacoes estruturadas.
 
 8 Dimensoes Estrategicas e pesos para perfil "${profileType}":
@@ -67,7 +69,7 @@ Este produto e um norte inicial, nao uma consultoria exaustiva — mantenha todo
 
 As imagens e documentos enviados aparecem antes do texto do briefing, cada um com um rotulo curto indicando o que e. Use esses rotulos para preencher source_reference e observed_area com precisao.
 
-Lembrete final: antes de responder, confira que o array "dimensions" tem exatamente 8 entradas — ${dimensionKeysInOrder} — nesta ordem, sem nenhuma omitida.`;
+Lembrete final: antes de responder, confira que o array "dimensions" tem exatamente 8 entradas — ${dimensionKeysInOrder} — nesta ordem, sem nenhuma omitida, e que todo texto livre esta em portugues do Brasil, nunca em ingles.`;
 }
 
 export type PromptImageBlock = {

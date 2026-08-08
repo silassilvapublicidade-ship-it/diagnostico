@@ -43,4 +43,12 @@ describe("buildSystemPrompt", () => {
     expect(prompt).toMatch(/norte inicial, nao uma consultoria exaustiva/);
     expect(prompt).toMatch(/2 a 4 frases/);
   });
+
+  it("explicitly requires Brazilian Portuguese for every free-text field, reinforced at the end", () => {
+    const prompt = buildSystemPrompt("creator");
+
+    expect(prompt).toMatch(/portugues do Brasil/);
+    expect(prompt).toMatch(/Nunca responda em ingles/);
+    expect(prompt).toMatch(/nunca em ingles\.$/);
+  });
 });
