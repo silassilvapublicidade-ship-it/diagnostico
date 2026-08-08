@@ -2,55 +2,77 @@
 
 import { useMemo, useState } from "react";
 
-import { ASSET_TYPES } from "@/modules/assets/validation";
 import { submitDiagnosisAction } from "@/modules/analysis/actions";
 
+type ProfileType = "business" | "creator";
+
 const steps = [
-  "Sobre voce",
-  "Seu segmento",
   "Objetivo",
-  "Dificuldade",
   "Seu perfil",
+  "Apresentacao",
+  "Desafio",
+  "Instagram",
   "Evidencias",
 ];
 
-const assetLabels = {
-  profile_top: "Topo do perfil",
-  feed: "Feed",
-  highlights: "Destaques",
-  insights: "Insights",
-  stories: "Stories",
-  comments: "Comentarios",
-  other: "Outros",
-} as const;
-
 const MAIN_OBJECTIVE_OPTIONS = [
-  "Atrair mais clientes",
-  "Vender mais produtos ou servicos",
-  "Ser reconhecido como autoridade",
-  "Melhorar meu posicionamento profissional",
-  "Crescer como criador de conteudo",
-  "Conseguir parcerias e oportunidades",
-  "Organizar melhor minha comunicacao",
-  "Outro",
+  { emoji: "🚀", label: "Atrair mais clientes" },
+  { emoji: "⭐", label: "Ser visto como referencia" },
+  { emoji: "📈", label: "Crescer nas redes sociais" },
+  { emoji: "🤝", label: "Conseguir novas oportunidades" },
+  { emoji: "🎯", label: "Deixar meu perfil mais profissional" },
+  { emoji: "💡", label: "Criar conteudos melhores" },
+];
+
+const PROFILE_CARDS: {
+  id: string;
+  value: ProfileType;
+  emoji: string;
+  label: string;
+}[] = [
+  {
+    id: "business",
+    value: "business",
+    emoji: "🏢",
+    label: "Tenho uma empresa ou negocio",
+  },
+  {
+    id: "personal",
+    value: "creator",
+    emoji: "👤",
+    label: "Trabalho com minha imagem pessoal",
+  },
+  {
+    id: "content",
+    value: "creator",
+    emoji: "🎥",
+    label: "Produzo conteudo para internet",
+  },
 ];
 
 const MAIN_DIFFICULTY_OPTIONS = [
-  "Nao sei se meu perfil passa confianca",
-  "Tenho dificuldade de criar conteudo",
-  "Meu perfil nao deixa claro o que faco",
-  "Tenho poucos resultados atraves do Instagram",
-  "Sinto que meu conteudo nao representa meu valor",
-  "Tenho dificuldade de me diferenciar",
-  "Nao sei como transformar seguidores em oportunidades",
-  "Outro",
+  "Meu perfil nao mostra meu valor",
+  "Nao sei que conteudo criar",
+  "Tenho seguidores, mas poucos resultados",
+  "Minha comunicacao esta confusa",
+  "Quero me destacar dos concorrentes",
+  "Nao sei por onde comecar",
+];
+
+const EVIDENCE_FIELDS = [
+  { assetType: "profile_top", emoji: "📱", label: "Tela inicial do perfil" },
+  { assetType: "feed", emoji: "📸", label: "Feed" },
+  { assetType: "highlights", emoji: "⭐", label: "Destaques" },
+  { assetType: "insights", emoji: "📊", label: "Insights (opcional)" },
 ];
 
 export function NewDiagnosisForm() {
   const [step, setStep] = useState(0);
-  const [profileType, setProfileType] = useState<"business" | "creator">(
-    "business",
-  );
+  const [selectedProfileCardId, setSelectedProfileCardId] =
+    useState<string>("business");
+  const profileType =
+    PROFILE_CARDS.find((card) => card.id === selectedProfileCardId)?.value ??
+    "business";
   const progress = useMemo(
     () => Math.round(((step + 1) / steps.length) * 100),
     [step],
@@ -76,114 +98,96 @@ export function NewDiagnosisForm() {
       </div>
 
       <section className={step === 0 ? "space-y-5" : "hidden"}>
-        <div>
-          <h2 className="text-3xl font-semibold">Voce e...</h2>
-          <p className="mt-3 max-w-xl text-sm leading-6 text-graphite/64">
-            A escolha ajusta a leitura para o seu tipo de perfil.
-          </p>
-        </div>
+        <h2 className="text-3xl font-semibold">
+          O que voce quer melhorar no seu perfil?
+        </h2>
+        <EmojiCheckboxGroup
+          name="mainObjective"
+          options={MAIN_OBJECTIVE_OPTIONS}
+        />
+      </section>
 
-        <div className="grid gap-3 sm:grid-cols-2">
-          {[
-            ["business", "Negocio", "Perfil comercial, servico ou marca."],
-            [
-              "creator",
-              "Criador",
-              "Perfil autoral, especialista ou influencia.",
-            ],
-          ].map(([value, title, body]) => (
+      <section className={step === 1 ? "space-y-5" : "hidden"}>
+        <h2 className="text-3xl font-semibold">Qual e o seu perfil?</h2>
+        <div className="grid gap-3 sm:grid-cols-3">
+          {PROFILE_CARDS.map((card) => (
             <button
               className={`border p-5 text-left transition ${
-                profileType === value
+                selectedProfileCardId === card.id
                   ? "border-accent bg-white/70"
                   : "border-graphite/10 bg-white/35 hover:border-accent/40"
               }`}
-              key={value}
-              onClick={() => setProfileType(value as "business" | "creator")}
+              key={card.id}
+              onClick={() => setSelectedProfileCardId(card.id)}
               type="button"
             >
-              <span className="text-xl font-semibold">{title}</span>
-              <span className="mt-2 block text-sm leading-6 text-graphite/62">
-                {body}
+              <span className="text-2xl">{card.emoji}</span>
+              <span className="mt-3 block text-sm font-medium leading-6 text-graphite/76">
+                {card.label}
               </span>
             </button>
           ))}
         </div>
       </section>
 
-      <section className={step === 1 ? "space-y-5" : "hidden"}>
-        <h2 className="text-3xl font-semibold">
-          Conte rapidamente o que voce faz.
-        </h2>
+      <section className={step === 2 ? "space-y-5" : "hidden"}>
+        <h2 className="text-3xl font-semibold">Como voce se apresenta hoje?</h2>
         <TextArea
-          label="Nicho ou segmento"
+          label="Fale com suas palavras"
           name="niche"
-          placeholder="Exemplo: personal trainer especializado em emagrecimento e hipertrofia."
+          placeholder="Exemplo: sou personal trainer, ajudo pessoas a emagrecer e ganhar massa muscular."
           required
           rows={3}
         />
       </section>
 
-      <section className={step === 2 ? "space-y-5" : "hidden"}>
+      <section className={step === 3 ? "space-y-5" : "hidden"}>
         <h2 className="text-3xl font-semibold">
-          Qual seu principal objetivo hoje?
+          Qual e o seu maior desafio hoje?
         </h2>
         <CheckboxGroup
-          label="Selecione uma ou mais opcoes"
-          name="mainObjective"
-          options={MAIN_OBJECTIVE_OPTIONS}
-        />
-      </section>
-
-      <section className={step === 3 ? "space-y-5" : "hidden"}>
-        <h2 className="text-3xl font-semibold">Qual sua maior dificuldade?</h2>
-        <CheckboxGroup
-          label="Selecione uma ou mais opcoes"
           name="mainDifficulty"
           options={MAIN_DIFFICULTY_OPTIONS}
         />
       </section>
 
       <section className={step === 4 ? "space-y-5" : "hidden"}>
-        <h2 className="text-3xl font-semibold">Seu perfil.</h2>
+        <h2 className="text-3xl font-semibold">Envie seu perfil.</h2>
         <TextField
-          label="Link do Instagram"
+          label="Instagram"
           name="instagramUrl"
           placeholder="https://instagram.com/seuperfil"
           required
           type="url"
         />
-        <TextArea
-          label="Observacao (opcional)"
-          name="additionalNotes"
-          placeholder="Se quiser, conte algo que considera importante sobre seu momento atual."
-        />
       </section>
 
       <section className={step === 5 ? "space-y-5" : "hidden"}>
         <div>
-          <h2 className="text-3xl font-semibold">Evidencias do seu perfil.</h2>
+          <h2 className="text-3xl font-semibold">
+            Agora envie algumas imagens para nossa analise.
+          </h2>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-graphite/64">
-            O topo do perfil e obrigatorio. Feed, destaques e insights ajudam a
-            leitura a ficar mais completa. Os arquivos ficam em bucket privado,
-            com prazo inicial de retencao de 90 dias.
+            Nossa inteligencia analisa seu perfil a partir das informacoes e
+            materiais enviados. Os arquivos ficam em bucket privado, com prazo
+            inicial de retencao de 90 dias.
           </p>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          {ASSET_TYPES.map((assetType) => (
+          {EVIDENCE_FIELDS.map((field) => (
             <label
               className="border border-graphite/10 bg-white/40 p-4"
-              key={assetType}
+              key={field.assetType}
             >
               <span className="text-sm font-semibold">
-                {assetLabels[assetType]}
+                {field.emoji} {field.label}
               </span>
               <input
                 accept="image/png,image/jpeg,image/webp,application/pdf"
                 className="mt-3 block w-full text-sm text-graphite/60 file:mr-3 file:border-0 file:bg-graphite file:px-3 file:py-2 file:text-paper"
                 multiple
-                name={`asset_${assetType}`}
+                name={`asset_${field.assetType}`}
                 type="file"
               />
             </label>
@@ -288,34 +292,41 @@ function TextArea({
   );
 }
 
-function CheckboxGroup({
-  label,
+function CheckboxGroup({ name, options }: { name: string; options: string[] }) {
+  return (
+    <div className="grid gap-2 sm:grid-cols-2">
+      {options.map((option) => (
+        <label
+          className="flex items-start gap-3 border border-graphite/10 bg-white/40 p-3 text-sm leading-6 text-graphite/72"
+          key={option}
+        >
+          <input className="mt-1" name={name} type="checkbox" value={option} />
+          <span>{option}</span>
+        </label>
+      ))}
+    </div>
+  );
+}
+
+function EmojiCheckboxGroup({
   name,
   options,
 }: {
-  label: string;
   name: string;
-  options: string[];
+  options: { emoji: string; label: string }[];
 }) {
   return (
-    <fieldset className="space-y-3">
-      <legend className="text-sm text-graphite/70">{label}</legend>
-      <div className="grid gap-2 sm:grid-cols-2">
-        {options.map((option) => (
-          <label
-            className="flex items-start gap-3 border border-graphite/10 bg-white/40 p-3 text-sm leading-6 text-graphite/72"
-            key={option}
-          >
-            <input
-              className="mt-1"
-              name={name}
-              type="checkbox"
-              value={option}
-            />
-            <span>{option}</span>
-          </label>
-        ))}
-      </div>
-    </fieldset>
+    <div className="grid gap-3 sm:grid-cols-2">
+      {options.map((option) => (
+        <label
+          className="flex items-center gap-3 border border-graphite/10 bg-white/40 p-4 text-sm font-medium leading-6 text-graphite/76 transition has-[:checked]:border-accent has-[:checked]:bg-white/70"
+          key={option.label}
+        >
+          <input name={name} type="checkbox" value={option.label} />
+          <span className="text-xl">{option.emoji}</span>
+          <span>{option.label}</span>
+        </label>
+      ))}
+    </div>
   );
 }

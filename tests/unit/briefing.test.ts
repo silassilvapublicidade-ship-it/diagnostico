@@ -12,12 +12,8 @@ describe("briefing schema", () => {
       profileType: "business",
       instagramUrl: "https://instagram.com/acme",
       niche: "nutricao esportiva",
-      mainObjective: [
-        "Atrair mais clientes",
-        "Ser reconhecido como autoridade",
-      ],
-      mainDifficulty: ["Meu perfil nao deixa claro o que faco"],
-      additionalNotes: "",
+      mainObjective: ["Atrair mais clientes", "Ser visto como referencia"],
+      mainDifficulty: ["Meu perfil nao mostra meu valor"],
     });
 
     expect(parsed.profileType).toBe("business");
@@ -31,15 +27,12 @@ describe("briefing schema", () => {
       profileType: "creator",
       instagramUrl: "https://instagram.com/criador",
       niche: "gastronomia local",
-      mainObjective: ["Conseguir parcerias e oportunidades"],
-      mainDifficulty: ["Tenho dificuldade de me diferenciar"],
-      additionalNotes: "momento de reposicionamento",
+      mainObjective: ["Conseguir novas oportunidades"],
+      mainDifficulty: ["Quero me destacar dos concorrentes"],
     });
 
     expect(parsed.profileType).toBe("creator");
-    expect(parsed.mainObjective).toEqual([
-      "Conseguir parcerias e oportunidades",
-    ]);
+    expect(parsed.mainObjective).toEqual(["Conseguir novas oportunidades"]);
   });
 
   it("requires at least one selected objective", () => {
@@ -49,8 +42,7 @@ describe("briefing schema", () => {
         instagramUrl: "https://instagram.com/acme",
         niche: "nutricao esportiva",
         mainObjective: [],
-        mainDifficulty: ["Tenho dificuldade de criar conteudo"],
-        additionalNotes: "",
+        mainDifficulty: ["Nao sei que conteudo criar"],
       }),
     ).toThrow();
   });
@@ -63,7 +55,6 @@ describe("briefing schema", () => {
         niche: "nutricao esportiva",
         mainObjective: ["Atrair mais clientes"],
         mainDifficulty: [],
-        additionalNotes: "",
       }),
     ).toThrow();
   });

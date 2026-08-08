@@ -17,12 +17,11 @@ export default async function NewDiagnosisPage({ searchParams }: PageProps) {
           Novo diagnostico
         </p>
         <h1 className="text-4xl font-semibold leading-none sm:text-5xl">
-          Construa o contexto antes da conclusao.
+          Vamos entender seu momento.
         </h1>
         <p className="mt-5 max-w-2xl text-sm leading-6 text-graphite/64">
-          Vamos analisar seu perfil e identificar onde estao as maiores
-          oportunidades. Poucas perguntas e alguns screenshots ja sao
-          suficientes para comecar.
+          Antes de analisar seu perfil, precisamos conhecer alguns detalhes
+          sobre voce.
         </p>
       </header>
 
