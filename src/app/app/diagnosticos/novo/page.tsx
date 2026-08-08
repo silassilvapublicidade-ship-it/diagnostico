@@ -20,9 +20,9 @@ export default async function NewDiagnosisPage({ searchParams }: PageProps) {
           Construa o contexto antes da conclusao.
         </h1>
         <p className="mt-5 max-w-2xl text-sm leading-6 text-graphite/64">
-          O envio cria a base tecnica para a Metodologia Silas Silva de
-          Diagnostico Estrategico. Nesta fase, nenhum screenshot e interpretado
-          automaticamente pelo engine deterministico.
+          Vamos analisar seu perfil e identificar onde estao as maiores
+          oportunidades. Poucas perguntas e alguns screenshots ja sao
+          suficientes para comecar.
         </p>
       </header>
 

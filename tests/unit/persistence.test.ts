@@ -73,7 +73,7 @@ describe("createDiagnosisFromForm", () => {
       true,
     );
     expect(answers.map((row) => row.question_key)).toEqual(
-      expect.arrayContaining(["mainObjective", "segment", "authorityProofs"]),
+      expect.arrayContaining(["niche", "mainObjective", "mainDifficulty"]),
     );
 
     const assets = harness.store.analysis_assets ?? [];
@@ -90,7 +90,7 @@ describe("createDiagnosisFromForm", () => {
     expect(harness.store.analysis_results ?? []).toHaveLength(0);
   });
 
-  it("persists a creator briefing with creator-specific answers", async () => {
+  it("persists a creator briefing with the same simplified answers", async () => {
     await captureRedirectDigest(
       createDiagnosisFromForm(buildCreatorFormData()),
     );
@@ -101,17 +101,13 @@ describe("createDiagnosisFromForm", () => {
 
     const answers = harness.store.analysis_answers ?? [];
     expect(answers.map((row) => row.question_key)).toEqual(
-      expect.arrayContaining([
-        "niche",
-        "contentTerritory",
-        "desiredPartnerships",
-      ]),
+      expect.arrayContaining(["niche", "mainObjective", "mainDifficulty"]),
     );
   });
 
   it("redirects with an error and writes nothing when the briefing is invalid", async () => {
     const digest = await captureRedirectDigest(
-      createDiagnosisFromForm(buildBusinessFormData({ mainObjective: "" })),
+      createDiagnosisFromForm(buildBusinessFormData({ mainObjective: [] })),
     );
 
     expect(digest).toContain("/app/diagnosticos/novo?erro=");

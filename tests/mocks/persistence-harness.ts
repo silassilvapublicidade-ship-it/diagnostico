@@ -1,10 +1,19 @@
 import type { FakeStore } from "./supabase-fake";
 
-function toFormData(fields: Record<string, string>, assetFieldName: string) {
+function toFormData(
+  fields: Record<string, string | string[]>,
+  assetFieldName: string,
+) {
   const formData = new FormData();
 
   for (const [key, value] of Object.entries(fields)) {
-    formData.set(key, value);
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        formData.append(key, item);
+      }
+    } else {
+      formData.set(key, value);
+    }
   }
 
   formData.set(
@@ -15,20 +24,16 @@ function toFormData(fields: Record<string, string>, assetFieldName: string) {
   return formData;
 }
 
-export function buildBusinessFormData(overrides: Record<string, string> = {}) {
+export function buildBusinessFormData(
+  overrides: Record<string, string | string[]> = {},
+) {
   return toFormData(
     {
       profileType: "business",
       instagramUrl: "https://instagram.com/acme",
-      mainObjective: "atrair mais pacientes com clareza",
-      mainDifficulty: "o perfil comunica pouco valor hoje",
-      desiredCta: "agendar conversa",
-      segment: "nutricao",
-      mainOffer: "consulta online",
-      targetAudience: "mulheres com rotina intensa",
-      differentiators: "metodo acolhedor e pratico",
-      authorityProofs: "depoimentos e bastidores do processo",
-      currentContext: "conteudo educativo sem conversao clara",
+      niche: "nutricao esportiva",
+      mainObjective: ["Atrair mais clientes"],
+      mainDifficulty: ["Meu perfil nao deixa claro o que faco"],
       processingConsent: "on",
       ...overrides,
     },
@@ -36,20 +41,16 @@ export function buildBusinessFormData(overrides: Record<string, string> = {}) {
   );
 }
 
-export function buildCreatorFormData(overrides: Record<string, string> = {}) {
+export function buildCreatorFormData(
+  overrides: Record<string, string | string[]> = {},
+) {
   return toFormData(
     {
       profileType: "creator",
       instagramUrl: "https://instagram.com/criador",
-      mainObjective: "crescer e conseguir parcerias",
-      mainDifficulty: "bio e proposta comercial pouco claras",
-      desiredCta: "pedir midia kit",
       niche: "gastronomia local",
-      contentTerritory: "restaurantes acessiveis",
-      desiredAudience: "moradores de Belo Horizonte",
-      formats: "reels, listas e stories",
-      desiredPartnerships: "restaurantes e marcas locais",
-      perceivedIdentity: "voz direta e bem humorada",
+      mainObjective: ["Conseguir parcerias e oportunidades"],
+      mainDifficulty: ["Tenho dificuldade de me diferenciar"],
       processingConsent: "on",
       ...overrides,
     },
