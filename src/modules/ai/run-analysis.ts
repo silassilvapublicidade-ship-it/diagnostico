@@ -235,15 +235,23 @@ export async function generateAiDiagnosis(params: {
   const profileType = request.profile_type;
   const useAdaptiveThinking = supportsAdaptiveThinking(model);
 
+  // Built manually (schema only, no `.parse`) instead of passing
+  // zodOutputFormat(...) directly to output_config.format: the SDK's own
+  // `.parse` throws on any validation failure with no access to the raw
+  // text, which makes failures undebuggable (we only ever saw Zod's
+  // abstract issue list, never what the model actually produced). We
+  // validate ourselves below with safeParse, so the raw payload is always
+  // available to log when something doesn't validate.
+  const rawFormat = zodOutputFormat(aiDiagnosisOutputSchema);
+  const outputFormat = { type: rawFormat.type, schema: rawFormat.schema };
+
   const startedAt = Date.now();
   // Streamed rather than a single blocking call: the Anthropic SDK itself
   // refuses non-streaming requests it estimates at over ~10 minutes based on
   // max_tokens (this project hit that guard once max_tokens rose to 24000),
   // and the SDK's own docs recommend streaming for any large max_tokens
   // request regardless, since idle non-streaming connections risk being
-  // dropped by intermediate networks. output_config.format still validates
-  // and populates parsed_output on the final accumulated message, same as
-  // the non-streaming .parse() call this replaces.
+  // dropped by intermediate networks.
   const stream = client.messages.stream({
     model,
     // A full 8-dimension structured response (diagnosis + strengths +
@@ -257,13 +265,8 @@ export async function generateAiDiagnosis(params: {
       : { type: "enabled", budget_tokens: EXTENDED_THINKING_BUDGET_TOKENS },
     system: buildSystemPrompt(profileType),
     output_config: useAdaptiveThinking
-      ? {
-          effort: "medium",
-          format: zodOutputFormat(aiDiagnosisOutputSchema),
-        }
-      : {
-          format: zodOutputFormat(aiDiagnosisOutputSchema),
-        },
+      ? { effort: "medium", format: outputFormat }
+      : { format: outputFormat },
     messages: [
       {
         role: "user",
@@ -293,11 +296,42 @@ export async function generateAiDiagnosis(params: {
     );
   }
 
-  const parsed = response.parsed_output;
+  const textBlock = response.content.find((block) => block.type === "text");
 
-  if (!parsed) {
-    throw new AiAnalysisError("A saida da IA nao seguiu o schema esperado.");
+  if (!textBlock || textBlock.type !== "text") {
+    throw new AiAnalysisError("A IA nao retornou nenhum bloco de texto.");
   }
+
+  let rawJson: unknown;
+
+  try {
+    rawJson = JSON.parse(textBlock.text);
+  } catch (error) {
+    console.error("[ai] output was not valid JSON:", textBlock.text);
+    throw new AiAnalysisError(
+      `A saida da IA nao era um JSON valido: ${error instanceof Error ? error.message : String(error)}`,
+    );
+  }
+
+  const validation = aiDiagnosisOutputSchema.safeParse(rawJson);
+
+  if (!validation.success) {
+    console.error(
+      "[ai] output failed schema validation. Raw output:",
+      JSON.stringify(rawJson),
+      "Issues:",
+      validation.error.issues,
+    );
+    const issueSummary = validation.error.issues
+      .slice(0, 5)
+      .map((issue) => `${issue.path.join(".")}: ${issue.message}`)
+      .join("; ");
+    throw new AiAnalysisError(
+      `A saida da IA nao seguiu o schema esperado (${issueSummary}).`,
+    );
+  }
+
+  const parsed = validation.data;
 
   const domainInput = mapAiOutputToDomainInput({
     output: parsed,

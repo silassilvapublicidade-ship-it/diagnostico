@@ -128,8 +128,14 @@ export async function runDiagnosisAnalysisAction(formData: FormData) {
       .update({ status: "failed" satisfies AnalysisStatus })
       .eq("id", requestId);
 
+    // The customer never sees the raw technical error (schema validation
+    // dumps, SDK internals): the full detail stays in
+    // analysis_jobs.error_message for debugging, and only a short, generic
+    // message reaches the redirect.
     redirect(
-      `/app/diagnosticos/${requestId}?erro=${encodeURIComponent(errorMessage)}`,
+      `/app/diagnosticos/${requestId}?erro=${encodeURIComponent(
+        "Nao foi possivel concluir esta analise agora. Voce pode tentar novamente.",
+      )}`,
     );
   }
 

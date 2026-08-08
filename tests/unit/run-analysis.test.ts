@@ -102,7 +102,7 @@ function mockSuccessfulResponse() {
     stop_reason: "end_turn",
     stop_details: null,
     usage: { input_tokens: 4200, output_tokens: 1800 },
-    parsed_output: aiOutputBusinessComplete,
+    content: [{ type: "text", text: JSON.stringify(aiOutputBusinessComplete) }],
   });
 }
 
@@ -249,13 +249,17 @@ describe("generateAiDiagnosis", () => {
     ).rejects.toThrow(/truncada/);
   });
 
-  it("treats a null parsed_output (schema validation failure) as a job failure", async () => {
+  it("treats output that fails schema validation as a job failure, not a thrown SDK exception", async () => {
     const request = seedRequestWithAsset(harness.store, "user-1");
+    const invalidOutput = {
+      ...aiOutputBusinessComplete,
+      dimensions: aiOutputBusinessComplete.dimensions.slice(0, 6),
+    };
     mockFinalMessage.mockResolvedValueOnce({
       stop_reason: "end_turn",
       stop_details: null,
       usage: { input_tokens: 100, output_tokens: 50 },
-      parsed_output: null,
+      content: [{ type: "text", text: JSON.stringify(invalidOutput) }],
     });
 
     await expect(
@@ -264,6 +268,23 @@ describe("generateAiDiagnosis", () => {
         userId: "user-1",
       }),
     ).rejects.toThrow(/schema esperado/);
+  });
+
+  it("treats unparseable JSON text as a job failure with a clear message", async () => {
+    const request = seedRequestWithAsset(harness.store, "user-1");
+    mockFinalMessage.mockResolvedValueOnce({
+      stop_reason: "end_turn",
+      stop_details: null,
+      usage: { input_tokens: 100, output_tokens: 50 },
+      content: [{ type: "text", text: "not valid json" }],
+    });
+
+    await expect(
+      generateAiDiagnosis({
+        requestId: request.id as string,
+        userId: "user-1",
+      }),
+    ).rejects.toThrow(/JSON valido/);
   });
 });
 
