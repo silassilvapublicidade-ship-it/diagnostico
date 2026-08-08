@@ -1,5 +1,6 @@
 import type {
   AnalysisStatus,
+  ConfidenceLevel,
   ScoreClassification,
 } from "@/domain/methodology-8d";
 
@@ -70,4 +71,10 @@ export const CLASSIFICATION_COPY: Record<ScoreClassification, string> = {
   development: "Em desenvolvimento",
   consistent: "Consistente",
   reference: "Referencia",
+};
+
+export const CONFIDENCE_COPY: Record<ConfidenceLevel, string> = {
+  high: "Alta",
+  medium: "Media",
+  low: "Baixa",
 };
