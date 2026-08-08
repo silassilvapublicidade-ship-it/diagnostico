@@ -238,7 +238,12 @@ export async function generateAiDiagnosis(params: {
   const startedAt = Date.now();
   const response = await client.messages.parse({
     model,
-    max_tokens: 16000,
+    // A full 8-dimension structured response (diagnosis + strengths +
+    // weaknesses + >=1 structured recommendation per dimension) plus the
+    // EXTENDED_THINKING_BUDGET_TOKENS budget needs more headroom than
+    // 16000: a production run truncated mid-array with fewer than 8
+    // dimensions, which our own schema then rejected as invalid.
+    max_tokens: 24000,
     thinking: useAdaptiveThinking
       ? { type: "adaptive" }
       : { type: "enabled", budget_tokens: EXTENDED_THINKING_BUDGET_TOKENS },

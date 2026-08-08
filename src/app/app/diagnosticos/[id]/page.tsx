@@ -7,6 +7,8 @@ import { DIMENSION_LABELS } from "@/modules/analysis/labels";
 import { getDiagnosis } from "@/modules/analysis/persistence";
 import { CLASSIFICATION_COPY, STATUS_COPY } from "@/modules/analysis/status";
 
+import { AnalyzeButton } from "./analyze-button";
+
 type PageProps = {
   params: Promise<{ id: string }>;
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -65,20 +67,22 @@ export default async function DiagnosisDetailPage({
         </p>
       ) : null}
 
-      <form
-        action={runDiagnosisAnalysisAction}
-        className="flex items-center gap-4"
-      >
-        <input name="requestId" type="hidden" value={diagnosis.request.id} />
-        <button
-          className="bg-graphite px-5 py-3 text-sm font-semibold text-paper transition hover:bg-accent"
-          type="submit"
-        >
-          {result ? "Reprocessar analise" : "Analisar agora"}
-        </button>
-        {diagnosis.request.status === "processing" ? (
-          <span className="text-sm text-graphite/56">Processando...</span>
-        ) : null}
+      <form action={runDiagnosisAnalysisAction} className="flex flex-col gap-3">
+        <div className="flex items-center gap-4">
+          <input name="requestId" type="hidden" value={diagnosis.request.id} />
+          <AnalyzeButton hasResult={Boolean(result)} />
+          {diagnosis.request.status === "processing" ? (
+            <span className="text-sm text-graphite/56">
+              Ja existe uma analise em andamento.
+            </span>
+          ) : null}
+        </div>
+        <p className="max-w-md text-sm text-graphite/56">
+          A leitura pode levar alguns minutos, porque analisamos as evidencias
+          enviadas com cuidado. Nao feche esta pagina — o botao fica
+          desabilitado enquanto a analise roda e o resultado aparece aqui assim
+          que estiver pronto.
+        </p>
       </form>
 
       {isDevelopmentFixture ? (
