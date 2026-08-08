@@ -159,19 +159,28 @@ describe("cross-user read isolation", () => {
   });
 });
 
-describe("service role stays server-only", () => {
-  it("gates the admin Supabase client behind the server-only import", () => {
+describe("service role and Anthropic client stay server-only", () => {
+  it("gates the admin Supabase client and the Anthropic client behind the server-only import", () => {
     const adminSource = readFileSync(
       new URL("../../src/lib/supabase/admin.ts", import.meta.url),
       "utf8",
     );
+    const aiClientSource = readFileSync(
+      new URL("../../src/modules/ai/client.ts", import.meta.url),
+      "utf8",
+    );
 
     expect(adminSource).toContain('import "server-only"');
+    expect(aiClientSource).toContain('import "server-only"');
   });
 
   it("is never imported from a client component", () => {
     const srcDir = fileURLToPath(new URL("../../src", import.meta.url));
     const offenders: string[] = [];
+    const serverOnlyBoundaries = [
+      "@/lib/supabase/admin",
+      "@/modules/ai/client",
+    ];
 
     const walk = (dir: string) => {
       for (const entry of readdirSync(dir, { withFileTypes: true })) {
@@ -186,7 +195,7 @@ describe("service role stays server-only", () => {
         const content = readFileSync(fullPath, "utf8");
         if (
           content.includes('"use client"') &&
-          content.includes("@/lib/supabase/admin")
+          serverOnlyBoundaries.some((boundary) => content.includes(boundary))
         ) {
           offenders.push(fullPath);
         }

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 
 import {
   resolveFinalAnalysisStatus,
+  type AnalysisCalculationResult,
   type AnalysisStatus,
   type ProfileType,
 } from "@/domain/methodology-8d";
@@ -58,8 +59,15 @@ export type DiagnosisDetail = {
     scoring_version: string;
     result_version: string;
     result_origin: ResultOrigin;
+    is_test_analysis: boolean;
     normalized_result: unknown;
     generated_at: string;
+  } | null;
+  report: {
+    status: "blocked" | "generating" | "available" | "failed";
+    web_payload: unknown;
+    blocked_reason: string | null;
+    generated_at: string | null;
   } | null;
   assets: Array<{
     id: string;
@@ -103,14 +111,49 @@ export async function getNextResultSequence(analysisRequestId: string) {
   return (count ?? 0) + 1;
 }
 
-export async function persistDevelopmentResult(params: {
+export async function getNextAttemptNumber(analysisRequestId: string) {
+  const admin = createSupabaseAdminClient();
+  const { count, error } = await admin
+    .from("analysis_jobs")
+    .select("id", { count: "exact", head: true })
+    .eq("analysis_request_id", analysisRequestId);
+
+  if (error) {
+    throw error;
+  }
+
+  return (count ?? 0) + 1;
+}
+
+export type PersistAnalysisResultParams = {
   analysisRequestId: string;
   analysisJobId: string;
-  profileType: ProfileType;
-}) {
+  result: AnalysisCalculationResult;
+  resultOrigin: ResultOrigin;
+  rawOutput: unknown;
+  webPayload?: unknown;
+  isTestAnalysis?: boolean;
+  usage?: {
+    inputTokens?: number;
+    outputTokens?: number;
+    modelDurationMs?: number;
+    estimatedCostUsdCents?: number | null;
+  };
+};
+
+/**
+ * Shared by the development-fixture path and the real Anthropic path: inserts
+ * an immutable analysis_results row (never overwrites a prior one — see
+ * getNextResultSequence), its per-dimension analysis_scores, the
+ * analysis_reports row gating premium delivery on requires_review, then
+ * updates the job/request status via the same resolveFinalAnalysisStatus
+ * used everywhere else.
+ */
+export async function persistAnalysisResult(
+  params: PersistAnalysisResultParams,
+) {
   const admin = createSupabaseAdminClient();
-  const fixture = buildDevelopmentFixtureResult(params.profileType);
-  const result = fixture.result;
+  const { result } = params;
   const finalStatus = resolveFinalAnalysisStatus(result);
   const resultSequence = await getNextResultSequence(params.analysisRequestId);
 
@@ -129,18 +172,18 @@ export async function persistDevelopmentResult(params: {
       prompt_version: result.promptVersion,
       scoring_version: result.scoringVersion,
       result_version: result.resultVersion,
-      result_origin: fixture.origin,
+      result_origin: params.resultOrigin,
       model_provider: result.modelProvider,
       model_name: result.modelName,
       weights_snapshot: result.weightsSnapshot,
-      raw_output: {
-        origin: fixture.origin,
-        fixture_kind: fixture.fixtureKind,
-        warning:
-          "Development fixture. The deterministic engine did not interpret screenshots or briefing.",
-      },
+      raw_output: params.rawOutput,
       normalized_result: result,
       generated_at: result.generatedAt,
+      input_tokens: params.usage?.inputTokens ?? null,
+      output_tokens: params.usage?.outputTokens ?? null,
+      model_duration_ms: params.usage?.modelDurationMs ?? null,
+      estimated_cost_usd_cents: params.usage?.estimatedCostUsdCents ?? null,
+      is_test_analysis: params.isTestAnalysis ?? false,
     })
     .select("id")
     .single();
@@ -178,11 +221,11 @@ export async function persistDevelopmentResult(params: {
     report_version: "web-initial@0.1.0",
     web_payload: result.requiresReview
       ? null
-      : {
+      : (params.webPayload ?? {
           score: result.score,
           score_kind: result.scoreKind,
-          result_origin: fixture.origin,
-        },
+          result_origin: params.resultOrigin,
+        }),
     blocked_reason: result.requiresReview
       ? "requires_review blocked automatic report delivery"
       : null,
@@ -222,9 +265,30 @@ export async function persistDevelopmentResult(params: {
 
   return {
     result,
-    resultOrigin: fixture.origin satisfies ResultOrigin,
+    resultOrigin: params.resultOrigin,
     finalStatus,
   };
+}
+
+export async function persistDevelopmentResult(params: {
+  analysisRequestId: string;
+  analysisJobId: string;
+  profileType: ProfileType;
+}) {
+  const fixture = buildDevelopmentFixtureResult(params.profileType);
+
+  return persistAnalysisResult({
+    analysisRequestId: params.analysisRequestId,
+    analysisJobId: params.analysisJobId,
+    result: fixture.result,
+    resultOrigin: fixture.origin,
+    rawOutput: {
+      origin: fixture.origin,
+      fixture_kind: fixture.fixtureKind,
+      warning:
+        "Development fixture. The deterministic engine did not interpret screenshots or briefing.",
+    },
+  });
 }
 
 async function persistUploads(params: {
@@ -459,11 +523,25 @@ export async function getDiagnosis(
   const { data: results } = await supabase
     .from("analysis_results")
     .select(
-      "id, result_sequence, score_kind, score, confidence, requires_review, review_reasons, methodology_version, scoring_version, result_version, result_origin, normalized_result, generated_at",
+      "id, result_sequence, score_kind, score, confidence, requires_review, review_reasons, methodology_version, scoring_version, result_version, result_origin, is_test_analysis, normalized_result, generated_at",
     )
     .eq("analysis_request_id", id)
     .order("result_sequence", { ascending: false })
     .limit(1);
+
+  const latestResult = (results?.[0] ?? null) as DiagnosisDetail["result"];
+  let report: DiagnosisDetail["report"] = null;
+
+  if (latestResult) {
+    const { data: reports } = await supabase
+      .from("analysis_reports")
+      .select("status, web_payload, blocked_reason, generated_at")
+      .eq("analysis_result_id", latestResult.id)
+      .order("created_at", { ascending: false })
+      .limit(1);
+
+    report = (reports?.[0] ?? null) as DiagnosisDetail["report"];
+  }
 
   const { data: assets } = await supabase
     .from("analysis_assets")
@@ -473,7 +551,8 @@ export async function getDiagnosis(
 
   return {
     request: request as DiagnosisDetail["request"],
-    result: (results?.[0] ?? null) as DiagnosisDetail["result"],
+    result: latestResult,
+    report,
     assets: (assets ?? []) as DiagnosisDetail["assets"],
   };
 }

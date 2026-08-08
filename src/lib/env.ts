@@ -12,6 +12,8 @@ const rawServerEnvSchema = z.object({
   ENABLE_DEVELOPMENT_FIXTURES: z.enum(["true", "false"]).optional(),
   OPENAI_MODEL_PROVIDER: z.string().min(1).default("not_integrated"),
   OPENAI_MODEL_NAME: z.string().min(1).default("not_integrated"),
+  ANTHROPIC_API_KEY: z.string().min(1).optional(),
+  ANTHROPIC_MODEL: z.string().min(1).default("claude-sonnet-5"),
   MERCADO_PAGO_PUBLIC_KEY: z.string().min(1).optional(),
   MERCADO_PAGO_ACCESS_TOKEN: z.string().min(1).optional(),
 });
@@ -30,6 +32,8 @@ export type ServerEnv = {
   ENABLE_DEVELOPMENT_FIXTURES: boolean;
   OPENAI_MODEL_PROVIDER: string;
   OPENAI_MODEL_NAME: string;
+  ANTHROPIC_API_KEY: string | undefined;
+  ANTHROPIC_MODEL: string;
   MERCADO_PAGO_PUBLIC_KEY: string | undefined;
   MERCADO_PAGO_ACCESS_TOKEN: string | undefined;
 };
@@ -61,6 +65,8 @@ export function getServerEnv(): ServerEnv {
       env.ENABLE_DEVELOPMENT_FIXTURES === "true",
     OPENAI_MODEL_PROVIDER: env.OPENAI_MODEL_PROVIDER,
     OPENAI_MODEL_NAME: env.OPENAI_MODEL_NAME,
+    ANTHROPIC_API_KEY: env.ANTHROPIC_API_KEY,
+    ANTHROPIC_MODEL: env.ANTHROPIC_MODEL,
     MERCADO_PAGO_PUBLIC_KEY: env.MERCADO_PAGO_PUBLIC_KEY,
     MERCADO_PAGO_ACCESS_TOKEN: env.MERCADO_PAGO_ACCESS_TOKEN,
   };

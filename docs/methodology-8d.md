@@ -84,3 +84,16 @@ For the approved `business_complete` fixture:
 ## Report delivery gate
 
 A premium report cannot be delivered as completed while `requires_review` is true. The result may be stored, but final report delivery must be blocked.
+
+## AI as the interpretation layer (Phase 2B)
+
+The Anthropic API (`src/modules/ai/`) interprets briefing and evidence and
+proposes a structured reading per dimension — nothing in this document
+changes because of that. The AI receives the weights and rules documented
+above and must follow them, but it never computes the weighted score, the
+renormalization, the classification, the confidence, or `requires_review`
+directly; those stay the exclusive responsibility of the deterministic
+engine (`calculateAnalysisResult`) described here. The AI's only extra
+degree of freedom is proposing `review_signals` (qualitative observations
+like sensitive content or a briefing/evidence contradiction) — the engine
+still decides whether they add up to `requires_review`.

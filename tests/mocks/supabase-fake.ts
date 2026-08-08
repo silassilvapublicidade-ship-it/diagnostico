@@ -6,10 +6,21 @@ export type FakeStore = Record<string, FakeRow[] | undefined> & {
   __storage?: Array<{ bucket: string; path: string }>;
   __storageShouldFail?: boolean;
   __insertFaults?: Record<string, string>;
+  __storageFiles?: Record<string, { data: BlobPart; type: string }>;
 };
 
 export function createFakeStore(): FakeStore {
   return {};
+}
+
+export function seedStorageFile(
+  store: FakeStore,
+  bucket: string,
+  path: string,
+  content: { data: BlobPart; type: string },
+) {
+  store.__storageFiles ??= {};
+  store.__storageFiles[`${bucket}/${path}`] = content;
 }
 
 export function seedRow(store: FakeStore, table: string, row: FakeRow) {
@@ -57,6 +68,21 @@ const RLS_SELECT_POLICIES: Record<
     }
     const request = (store.analysis_requests ?? []).find(
       (candidate) => candidate.id === row.analysis_request_id,
+    );
+    return request?.user_id === userId;
+  },
+  analysis_reports: (row, store, userId) => {
+    if (row.status !== "available") {
+      return false;
+    }
+    const result = (store.analysis_results ?? []).find(
+      (candidate) => candidate.id === row.analysis_result_id,
+    );
+    if (!result || result.requires_review === true) {
+      return false;
+    }
+    const request = (store.analysis_requests ?? []).find(
+      (candidate) => candidate.id === result.analysis_request_id,
     );
     return request?.user_id === userId;
   },
@@ -221,28 +247,45 @@ function createQueryBuilder(table: string, store: FakeStore, mode: ClientMode) {
   return builder;
 }
 
+function createFakeStorageApi(store: FakeStore) {
+  return {
+    from(bucket: string) {
+      return {
+        upload(path: string) {
+          if (store.__storageShouldFail) {
+            return Promise.resolve({
+              data: null,
+              error: new Error("Simulated storage failure"),
+            });
+          }
+          store.__storage ??= [];
+          store.__storage.push({ bucket, path });
+          return Promise.resolve({ data: { path }, error: null });
+        },
+        download(path: string) {
+          const file = store.__storageFiles?.[`${bucket}/${path}`];
+          if (!file) {
+            return Promise.resolve({
+              data: null,
+              error: new Error("Object not found"),
+            });
+          }
+          return Promise.resolve({
+            data: new Blob([file.data], { type: file.type }),
+            error: null,
+          });
+        },
+      };
+    },
+  };
+}
+
 export function createFakeAdminClient(store: FakeStore) {
   return {
     from(table: string) {
       return createQueryBuilder(table, store, { kind: "admin" });
     },
-    storage: {
-      from(bucket: string) {
-        return {
-          upload(path: string) {
-            if (store.__storageShouldFail) {
-              return Promise.resolve({
-                data: null,
-                error: new Error("Simulated storage failure"),
-              });
-            }
-            store.__storage ??= [];
-            store.__storage.push({ bucket, path });
-            return Promise.resolve({ data: { path }, error: null });
-          },
-        };
-      },
-    },
+    storage: createFakeStorageApi(store),
   };
 }
 
@@ -251,5 +294,6 @@ export function createFakeServerClient(store: FakeStore, userId: string) {
     from(table: string) {
       return createQueryBuilder(table, store, { kind: "rls", userId });
     },
+    storage: createFakeStorageApi(store),
   };
 }

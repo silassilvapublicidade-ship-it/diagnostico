@@ -12,6 +12,13 @@ const resultOriginMigration = readFileSync(
   ),
   "utf8",
 );
+const aiResultMetadataMigration = readFileSync(
+  new URL(
+    "../../supabase/migrations/0005_add_ai_result_metadata.sql",
+    import.meta.url,
+  ),
+  "utf8",
+);
 
 describe("initial Supabase migration", () => {
   it("declares the expected enums, tables, function, triggers, indexes, and policies", () => {
@@ -151,6 +158,27 @@ describe("initial Supabase migration", () => {
     );
     expect(resultOriginMigration).toContain(
       "alter column result_origin set not null",
+    );
+  });
+
+  it("adds nullable AI usage/cost metadata and a non-null is_test_analysis flag", () => {
+    for (const column of [
+      "input_tokens integer",
+      "output_tokens integer",
+      "model_duration_ms integer",
+      "estimated_cost_usd_cents integer",
+    ]) {
+      expect(aiResultMetadataMigration).toContain(`add column ${column},`);
+    }
+
+    expect(aiResultMetadataMigration).toContain(
+      "add column is_test_analysis boolean not null default false;",
+    );
+    expect(aiResultMetadataMigration).toContain(
+      "check (input_tokens is null or input_tokens >= 0)",
+    );
+    expect(aiResultMetadataMigration).toContain(
+      "check (output_tokens is null or output_tokens >= 0)",
     );
   });
 });
