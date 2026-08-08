@@ -15,6 +15,12 @@ type PageProps = {
 };
 
 export const dynamic = "force-dynamic";
+// The "Analisar agora" Server Action on this page calls Anthropic and can
+// take several minutes (observed ~3 min in production). Sets the timeout
+// for all Server Actions on this page — Vercel plan limits still apply and
+// may cap this lower; see docs/architecture.md for the platform-timeout
+// risk this doesn't fully eliminate.
+export const maxDuration = 300;
 
 export default async function DiagnosisDetailPage({
   params,

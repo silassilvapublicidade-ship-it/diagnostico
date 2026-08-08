@@ -20,7 +20,14 @@ const harness = vi.hoisted(() => ({
 
 const aiClientHarness = vi.hoisted(() => ({ model: "claude-sonnet-5" }));
 
-const mockParse = vi.hoisted(() => vi.fn());
+const mockFinalMessage = vi.hoisted(() => vi.fn());
+const mockStream = vi.hoisted(() =>
+  vi.fn<
+    (params: Record<string, unknown>) => {
+      finalMessage: typeof mockFinalMessage;
+    }
+  >(() => ({ finalMessage: mockFinalMessage })),
+);
 
 vi.mock("@/lib/supabase/admin", async () => {
   const { createFakeAdminClient } = await import("../mocks/supabase-fake");
@@ -47,7 +54,7 @@ vi.mock("@/modules/auth/session", () => ({
 }));
 
 vi.mock("@/modules/ai/client", () => ({
-  createAnthropicClient: () => ({ messages: { parse: mockParse } }),
+  createAnthropicClient: () => ({ messages: { stream: mockStream } }),
   getAnthropicModel: () => aiClientHarness.model,
 }));
 
@@ -90,8 +97,8 @@ function seedRequestWithAsset(
   return request;
 }
 
-function mockSuccessfulParse() {
-  mockParse.mockResolvedValueOnce({
+function mockSuccessfulResponse() {
+  mockFinalMessage.mockResolvedValueOnce({
     stop_reason: "end_turn",
     stop_details: null,
     usage: { input_tokens: 4200, output_tokens: 1800 },
@@ -111,7 +118,8 @@ beforeEach(() => {
   }
   harness.userId = "user-1";
   aiClientHarness.model = "claude-sonnet-5";
-  mockParse.mockReset();
+  mockStream.mockClear();
+  mockFinalMessage.mockReset();
 });
 
 afterEach(() => {
@@ -128,7 +136,7 @@ describe("generateAiDiagnosis", () => {
         userId: "user-2",
       }),
     ).rejects.toBeInstanceOf(AiAnalysisError);
-    expect(mockParse).not.toHaveBeenCalled();
+    expect(mockStream).not.toHaveBeenCalled();
   });
 
   it("never calls Anthropic and throws when there is no usable evidence", async () => {
@@ -145,12 +153,12 @@ describe("generateAiDiagnosis", () => {
         userId: "user-1",
       }),
     ).rejects.toThrow(/Nenhuma evidencia/);
-    expect(mockParse).not.toHaveBeenCalled();
+    expect(mockStream).not.toHaveBeenCalled();
   });
 
   it("maps a successful structured response into a domain result, web payload, and usage", async () => {
     const request = seedRequestWithAsset(harness.store, "user-1");
-    mockSuccessfulParse();
+    mockSuccessfulResponse();
 
     const generated = await generateAiDiagnosis({
       requestId: request.id as string,
@@ -171,14 +179,17 @@ describe("generateAiDiagnosis", () => {
   it("uses adaptive thinking and effort for an adaptive-capable model (claude-sonnet-5)", async () => {
     aiClientHarness.model = "claude-sonnet-5";
     const request = seedRequestWithAsset(harness.store, "user-1");
-    mockSuccessfulParse();
+    mockSuccessfulResponse();
 
     await generateAiDiagnosis({
       requestId: request.id as string,
       userId: "user-1",
     });
 
-    const callArgs = mockParse.mock.calls[0]![0];
+    const callArgs = mockStream.mock.calls[0]![0] as {
+      thinking: unknown;
+      output_config: { effort?: string };
+    };
     expect(callArgs.thinking).toEqual({ type: "adaptive" });
     expect(callArgs.output_config.effort).toBe("medium");
   });
@@ -186,14 +197,17 @@ describe("generateAiDiagnosis", () => {
   it("uses extended thinking without effort for an extended-only model (claude-haiku-4-5-20251001)", async () => {
     aiClientHarness.model = "claude-haiku-4-5-20251001";
     const request = seedRequestWithAsset(harness.store, "user-1");
-    mockSuccessfulParse();
+    mockSuccessfulResponse();
 
     await generateAiDiagnosis({
       requestId: request.id as string,
       userId: "user-1",
     });
 
-    const callArgs = mockParse.mock.calls[0]![0];
+    const callArgs = mockStream.mock.calls[0]![0] as {
+      thinking: unknown;
+      output_config: { effort?: string };
+    };
     expect(callArgs.thinking).toEqual({
       type: "enabled",
       budget_tokens: 6000,
@@ -203,7 +217,7 @@ describe("generateAiDiagnosis", () => {
 
   it("treats stop_reason 'refusal' as a job failure, never a persisted result", async () => {
     const request = seedRequestWithAsset(harness.store, "user-1");
-    mockParse.mockResolvedValueOnce({
+    mockFinalMessage.mockResolvedValueOnce({
       stop_reason: "refusal",
       stop_details: { category: "cyber" },
       usage: { input_tokens: 100, output_tokens: 0 },
@@ -220,7 +234,7 @@ describe("generateAiDiagnosis", () => {
 
   it("treats stop_reason 'max_tokens' as a job failure", async () => {
     const request = seedRequestWithAsset(harness.store, "user-1");
-    mockParse.mockResolvedValueOnce({
+    mockFinalMessage.mockResolvedValueOnce({
       stop_reason: "max_tokens",
       stop_details: null,
       usage: { input_tokens: 100, output_tokens: 16000 },
@@ -237,7 +251,7 @@ describe("generateAiDiagnosis", () => {
 
   it("treats a null parsed_output (schema validation failure) as a job failure", async () => {
     const request = seedRequestWithAsset(harness.store, "user-1");
-    mockParse.mockResolvedValueOnce({
+    mockFinalMessage.mockResolvedValueOnce({
       stop_reason: "end_turn",
       stop_details: null,
       usage: { input_tokens: 100, output_tokens: 50 },
@@ -265,7 +279,7 @@ describe("runDiagnosisAnalysisAction", () => {
     expect(digest).toContain("/app/diagnosticos");
     expect(digest).not.toContain(`/app/diagnosticos/${request.id}`);
     expect(harness.store.analysis_jobs ?? []).toHaveLength(0);
-    expect(mockParse).not.toHaveBeenCalled();
+    expect(mockStream).not.toHaveBeenCalled();
   });
 
   it("does not start a second run while one is already processing", async () => {
@@ -283,12 +297,12 @@ describe("runDiagnosisAnalysisAction", () => {
 
     expect(digest).toContain(`/app/diagnosticos/${request.id}`);
     expect(harness.store.analysis_jobs ?? []).toHaveLength(1);
-    expect(mockParse).not.toHaveBeenCalled();
+    expect(mockStream).not.toHaveBeenCalled();
   });
 
   it("creates the first job as attempt 1 with no parent", async () => {
     const request = seedRequestWithAsset(harness.store, "user-1");
-    mockSuccessfulParse();
+    mockSuccessfulResponse();
 
     await captureRedirectDigest(
       runDiagnosisAnalysisAction(buildFormData(request.id as string)),
@@ -309,7 +323,7 @@ describe("runDiagnosisAnalysisAction", () => {
       attempt_number: 1,
       trigger_reason: "initial_submission",
     });
-    mockSuccessfulParse();
+    mockSuccessfulResponse();
 
     await captureRedirectDigest(
       runDiagnosisAnalysisAction(buildFormData(request.id as string)),
@@ -325,7 +339,7 @@ describe("runDiagnosisAnalysisAction", () => {
 
   it("persists analysis_results/scores/reports with tokens and is_test_analysis on success", async () => {
     const request = seedRequestWithAsset(harness.store, "user-1");
-    mockSuccessfulParse();
+    mockSuccessfulResponse();
 
     const digest = await captureRedirectDigest(
       runDiagnosisAnalysisAction(buildFormData(request.id as string)),
@@ -359,7 +373,7 @@ describe("runDiagnosisAnalysisAction", () => {
 
   it("marks the job and request failed and keeps retry available when the AI call fails", async () => {
     const request = seedRequestWithAsset(harness.store, "user-1");
-    mockParse.mockRejectedValueOnce(new Error("Simulated API outage"));
+    mockFinalMessage.mockRejectedValueOnce(new Error("Simulated API outage"));
 
     const digest = await captureRedirectDigest(
       runDiagnosisAnalysisAction(buildFormData(request.id as string)),

@@ -236,7 +236,15 @@ export async function generateAiDiagnosis(params: {
   const useAdaptiveThinking = supportsAdaptiveThinking(model);
 
   const startedAt = Date.now();
-  const response = await client.messages.parse({
+  // Streamed rather than a single blocking call: the Anthropic SDK itself
+  // refuses non-streaming requests it estimates at over ~10 minutes based on
+  // max_tokens (this project hit that guard once max_tokens rose to 24000),
+  // and the SDK's own docs recommend streaming for any large max_tokens
+  // request regardless, since idle non-streaming connections risk being
+  // dropped by intermediate networks. output_config.format still validates
+  // and populates parsed_output on the final accumulated message, same as
+  // the non-streaming .parse() call this replaces.
+  const stream = client.messages.stream({
     model,
     // A full 8-dimension structured response (diagnosis + strengths +
     // weaknesses + >=1 structured recommendation per dimension) plus the
@@ -269,6 +277,7 @@ export async function generateAiDiagnosis(params: {
       },
     ],
   });
+  const response = await stream.finalMessage();
   const modelDurationMs = Date.now() - startedAt;
 
   if (response.stop_reason === "refusal") {
