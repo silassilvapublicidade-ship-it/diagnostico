@@ -35,4 +35,12 @@ describe("buildSystemPrompt", () => {
     );
     expect(prompt).toMatch(/nunca porque voce gostaria de ter mais dados/);
   });
+
+  it("asks for exactly one recommendation per dimension and a concise, bounded read", () => {
+    const prompt = buildSystemPrompt("business");
+
+    expect(prompt).toMatch(/EXATAMENTE 1 recomendacao/);
+    expect(prompt).toMatch(/norte inicial, nao uma consultoria exaustiva/);
+    expect(prompt).toMatch(/2 a 4 frases/);
+  });
 });

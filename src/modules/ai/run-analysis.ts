@@ -95,9 +95,12 @@ function supportsAdaptiveThinking(model: string): boolean {
   );
 }
 
-// Leaves comfortable headroom under max_tokens (16000) for the structured
-// JSON response itself on extended-thinking-only models.
-const EXTENDED_THINKING_BUDGET_TOKENS = 6000;
+// Reasoning time before the model starts writing the response — real
+// wall-clock latency, not just token cost. Kept modest on purpose: the
+// product is a lightweight directional guide, not an exhaustive analysis,
+// so it doesn't need a large deliberation budget on extended-thinking-only
+// models.
+const EXTENDED_THINKING_BUDGET_TOKENS = 4000;
 
 export class AiAnalysisError extends Error {}
 

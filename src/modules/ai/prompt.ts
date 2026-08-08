@@ -61,7 +61,9 @@ O briefing coletado por este produto e deliberadamente enxuto: apenas nicho/segm
 
 Sinais de revisao disponiveis (aponte em review_signals somente quando genuinamente aplicavel — nunca decida sozinho se a analise precisa de revisao, apenas sinalize): ${REVIEW_REASONS.join(", ")}.
 
-Toda recomendacao deve conter: o que foi identificado, por que isso importa, como executar, prioridade, esforco, o impacto esperado (sem prometer resultado) e a evidencia que sustenta a recomendacao. Nunca de recomendacoes genericas como "poste mais", "faca Reels", "melhore sua bio", "interaja mais" ou "seja consistente".
+Cada dimensao deve ter EXATAMENTE 1 recomendacao — a mais prioritaria e de maior impacto para aquela dimensao, nunca uma lista de alternativas. Toda recomendacao deve conter: o que foi identificado, por que isso importa, como executar, prioridade, esforco, o impacto esperado (sem prometer resultado) e a evidencia que sustenta a recomendacao. Nunca de recomendacoes genericas como "poste mais", "faca Reels", "melhore sua bio", "interaja mais" ou "seja consistente".
+
+Este produto e um norte inicial, nao uma consultoria exaustiva — mantenha todos os campos, mas seja direto: 2 a 4 frases por campo narrativo (diagnosis, resumo executivo), no maximo 2 a 3 itens em cada lista (evidences, strengths, weaknesses, limitations, evidence_gaps, priorities, opportunities, planos de acao, content_suggestions). Escolha sempre os pontos mais relevantes, nao uma lista exaustiva. Isso mantem a leitura rapida de gerar e facil de consumir, sem perder nenhuma das 8 dimensoes nem nenhum campo.
 
 As imagens e documentos enviados aparecem antes do texto do briefing, cada um com um rotulo curto indicando o que e. Use esses rotulos para preencher source_reference e observed_area com precisao.
 

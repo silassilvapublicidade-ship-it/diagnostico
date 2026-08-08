@@ -45,7 +45,11 @@ export const aiDimensionAssessmentSchema = z
     strengths: z.array(z.string()),
     weaknesses: z.array(z.string()),
     diagnosis: z.string().min(1),
-    recommendations: z.array(aiRecommendationSchema).min(1),
+    // Exactly one: only the top-priority recommendation is ever surfaced
+    // (see pickTopRecommendation in map-to-domain.ts) — asking for more
+    // was pure token/latency cost with no effect on what the customer
+    // sees.
+    recommendations: z.array(aiRecommendationSchema).length(1),
     limitations: z.array(z.string()),
   })
   .refine(

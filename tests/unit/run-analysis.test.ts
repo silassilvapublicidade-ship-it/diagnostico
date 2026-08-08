@@ -210,7 +210,7 @@ describe("generateAiDiagnosis", () => {
     };
     expect(callArgs.thinking).toEqual({
       type: "enabled",
-      budget_tokens: 6000,
+      budget_tokens: 4000,
     });
     expect(callArgs.output_config.effort).toBeUndefined();
   });
