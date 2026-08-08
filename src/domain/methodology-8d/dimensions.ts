@@ -14,13 +14,13 @@ export function assertCompleteDimensionSet(dimensions: DimensionKey[]): void {
 
   if (unique.size !== DIMENSIONS.length) {
     throw new Error(
-      "Analysis must include each Methodology 8D dimension once.",
+      "Analysis must include each strategic diagnosis dimension once.",
     );
   }
 
   for (const dimension of DIMENSIONS) {
     if (!unique.has(dimension)) {
-      throw new Error(`Missing Methodology 8D dimension: ${dimension}.`);
+      throw new Error(`Missing strategic diagnosis dimension: ${dimension}.`);
     }
   }
 }

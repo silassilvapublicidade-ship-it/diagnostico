@@ -11,7 +11,7 @@ import { businessCompleteFixture } from "../fixtures/business_complete";
 import { creatorCompleteFixture } from "../fixtures/creator_complete";
 import { creatorLowEvidenceFixture } from "../fixtures/creator_low_evidence";
 
-describe("Methodology 8D scoring", () => {
+describe("Strategic diagnosis scoring", () => {
   it("uses business weights", () => {
     expect(getWeights("business")).toEqual(BUSINESS_WEIGHTS);
   });

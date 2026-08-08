@@ -6,7 +6,7 @@ import {
 } from "../../src/domain/methodology-8d";
 import { creatorLowEvidenceFixture } from "../fixtures/creator_low_evidence";
 
-describe("Methodology 8D Zod schemas", () => {
+describe("Strategic diagnosis Zod schemas", () => {
   it("validates approved golden fixture input", () => {
     expect(() =>
       analysisCalculationInputSchema.parse(creatorLowEvidenceFixture),

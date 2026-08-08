@@ -1,13 +1,20 @@
-# Methodology 8D
+# Metodologia Silas Silva de Diagnostico Estrategico
 
-Official name: Methodology 8D of Strategic Diagnosis.
+Official product language:
+
+- product: Diagnostico Estrategico de Perfil;
+- methodology: Metodologia Silas Silva de Diagnostico Estrategico;
+- structure: 8 Dimensoes Estrategicas.
+
+The internal folder and package-style identifier `methodology-8d` is a legacy
+technical identifier. It must not be used in public product copy.
 
 ## Profile types
 
 - `business`
 - `creator`
 
-## Dimensions
+## 8 Dimensoes Estrategicas
 
 1. `positioning`
 2. `first_impression`

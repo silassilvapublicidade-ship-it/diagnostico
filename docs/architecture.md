@@ -8,7 +8,7 @@ This project starts as a Next.js App Router application with the product domain 
 - Strict TypeScript.
 - Tailwind CSS foundation.
 - Environment validation.
-- Deterministic Methodology 8D domain services.
+- Deterministic services for the 8 Dimensoes Estrategicas.
 - Zod schemas.
 - Golden tests for the three approved scenarios.
 - Local Supabase schema migration with RLS.
@@ -18,7 +18,8 @@ No OpenAI, Mercado Pago, checkout, webhook, PDF, admin, production deployment, o
 ## Module boundaries
 
 - `src/app`: route tree and minimal visual foundation.
-- `src/domain/methodology-8d`: pure deterministic rules.
+- `src/domain/methodology-8d`: pure deterministic rules. This is a legacy
+  internal identifier and must not appear in public product copy.
 - `src/modules/analysis`: future orchestration boundary for requests, jobs, and results.
 - `src/modules/assets`: asset retention and upload policy constants.
 - `src/modules/auth`: access activation strategy.

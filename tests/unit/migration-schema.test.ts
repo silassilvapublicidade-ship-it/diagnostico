@@ -5,6 +5,13 @@ const migration = readFileSync(
   new URL("../../supabase/migrations/0001_initial_schema.sql", import.meta.url),
   "utf8",
 );
+const resultOriginMigration = readFileSync(
+  new URL(
+    "../../supabase/migrations/0004_add_analysis_result_origin.sql",
+    import.meta.url,
+  ),
+  "utf8",
+);
 
 describe("initial Supabase migration", () => {
   it("declares the expected enums, tables, function, triggers, indexes, and policies", () => {
@@ -131,6 +138,19 @@ describe("initial Supabase migration", () => {
     );
     expect(migration).toContain(
       "(status = 'evaluated' and score is not null)\n    or (status = 'insufficient_evidence' and score is null)",
+    );
+  });
+
+  it("adds typed result origin for fixture, AI, and human-reviewed results", () => {
+    expect(resultOriginMigration).toContain("create type public.result_origin");
+    expect(resultOriginMigration).toContain("'ai_generated'");
+    expect(resultOriginMigration).toContain("'development_fixture'");
+    expect(resultOriginMigration).toContain("'human_reviewed'");
+    expect(resultOriginMigration).toContain(
+      "add column result_origin public.result_origin",
+    );
+    expect(resultOriginMigration).toContain(
+      "alter column result_origin set not null",
     );
   });
 });

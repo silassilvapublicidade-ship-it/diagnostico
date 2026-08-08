@@ -1,6 +1,6 @@
 # Database
 
-The initial schema is local only and lives in `supabase/migrations/0001_initial_schema.sql`.
+The schema lives in `supabase/migrations/`.
 
 ## Result versioning
 
@@ -12,10 +12,20 @@ Each result stores:
 - `prompt_version`
 - `scoring_version`
 - `result_version`
+- `result_origin`
 - `model_provider`
 - `model_name`
 - `weights_snapshot`
 - `generated_at`
+
+`result_origin` is a typed enum with:
+
+- `ai_generated`
+- `development_fixture`
+- `human_reviewed`
+
+It is intentionally not stored only in JSON metadata, so fixture, AI-generated,
+and human-reviewed results remain queryable and auditable.
 
 ## Asset retention
 

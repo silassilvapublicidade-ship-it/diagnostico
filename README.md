@@ -1,6 +1,6 @@
 # Diagnostico Estrategico de Perfil
 
-Fundacao tecnica da plataforma de diagnostico estrategico de perfis baseada na Metodologia 8D.
+Fundacao tecnica da plataforma privada de diagnostico estrategico de perfis baseada na Metodologia Silas Silva de Diagnostico Estrategico.
 
 ## Fase atual
 
@@ -11,7 +11,7 @@ Fase 1 tecnica:
 - Tailwind CSS;
 - lint, format e Vitest;
 - validacao de env com Zod;
-- dominio deterministico da Metodologia 8D;
+- dominio deterministico das 8 Dimensoes Estrategicas;
 - fixtures golden;
 - migration local Supabase com RLS inicial;
 - fundacao visual minima.
@@ -31,6 +31,6 @@ npm run build
 ## Documentacao
 
 - `docs/architecture.md`
-- `docs/methodology-8d.md`
+- `docs/methodology-8d.md` (identificador tecnico legado)
 - `docs/database.md`
 - `docs/security.md`

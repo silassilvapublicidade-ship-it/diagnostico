@@ -4,7 +4,8 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Diagnostico Estrategico de Perfil",
-  description: "Fundacao tecnica da Metodologia 8D de Diagnostico Estrategico.",
+  description:
+    "Diagnostico privado pela Metodologia Silas Silva de Diagnostico Estrategico.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
