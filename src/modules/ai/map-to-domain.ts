@@ -71,7 +71,11 @@ function mapDimension(dimension: AiDimensionAssessment): DimensionAssessment {
     return { ...base, status: "insufficient_evidence" };
   }
 
-  return { ...base, status: "evaluated", score: dimension.proposed_score };
+  // The output schema's refine() guarantees proposed_score is non-null
+  // whenever status is "evaluated" — a null score here would already have
+  // made parsed_output null, which run-analysis.ts treats as a job failure
+  // before this mapping ever runs.
+  return { ...base, status: "evaluated", score: dimension.proposed_score! };
 }
 
 export function mapAiOutputToDomainInput(params: {

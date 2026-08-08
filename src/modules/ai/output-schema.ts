@@ -3,6 +3,7 @@ import { z } from "zod";
 import {
   confidenceLevelSchema,
   dimensionKeySchema,
+  dimensionStatusSchema,
   evidenceTypeSchema,
   reviewReasonSchema,
 } from "@/domain/methodology-8d";
@@ -25,33 +26,39 @@ export const aiRecommendationSchema = z.object({
   supporting_evidence: z.string().min(1),
 });
 
-const aiDimensionBaseSchema = z.object({
-  dimension: dimensionKeySchema,
-  confidence: confidenceLevelSchema,
-  evidences: z.array(aiEvidenceSchema),
-  evidence_gaps: z.array(z.string()),
-  strengths: z.array(z.string()),
-  weaknesses: z.array(z.string()),
-  diagnosis: z.string().min(1),
-  recommendations: z.array(aiRecommendationSchema).min(1),
-  limitations: z.array(z.string()),
-});
-
-export const aiEvaluatedDimensionSchema = aiDimensionBaseSchema.extend({
-  status: z.literal("evaluated"),
-  proposed_score: z.number().int().min(0).max(100),
-});
-
-export const aiInsufficientEvidenceDimensionSchema =
-  aiDimensionBaseSchema.extend({
-    status: z.literal("insufficient_evidence"),
-    proposed_score: z.null(),
-  });
-
-export const aiDimensionAssessmentSchema = z.discriminatedUnion("status", [
-  aiEvaluatedDimensionSchema,
-  aiInsufficientEvidenceDimensionSchema,
-]);
+// A flat object rather than a discriminatedUnion on `status`: the union
+// roughly doubled the compiled grammar size for structured output (each of
+// the two branches repeated the full evidences/recommendations shape),
+// which Anthropic rejected with a 400 ("compiled grammar is too large") on
+// claude-haiku-4-5. The evaluated/insufficient_evidence score invariant is
+// still enforced below via refine — that check, like min/max/int, is
+// stripped from the JSON Schema sent to the API but still verified
+// client-side by the SDK, so parsed_output is still null on a violation.
+export const aiDimensionAssessmentSchema = z
+  .object({
+    dimension: dimensionKeySchema,
+    status: dimensionStatusSchema,
+    proposed_score: z.number().int().min(0).max(100).nullable(),
+    confidence: confidenceLevelSchema,
+    evidences: z.array(aiEvidenceSchema),
+    evidence_gaps: z.array(z.string()),
+    strengths: z.array(z.string()),
+    weaknesses: z.array(z.string()),
+    diagnosis: z.string().min(1),
+    recommendations: z.array(aiRecommendationSchema).min(1),
+    limitations: z.array(z.string()),
+  })
+  .refine(
+    (value) =>
+      value.status === "evaluated"
+        ? value.proposed_score !== null
+        : value.proposed_score === null,
+    {
+      message:
+        "proposed_score must be set for evaluated dimensions and null for insufficient_evidence dimensions.",
+      path: ["proposed_score"],
+    },
+  );
 
 export const aiDiagnosisOutputSchema = z.object({
   dimensions: z.array(aiDimensionAssessmentSchema).length(8),
