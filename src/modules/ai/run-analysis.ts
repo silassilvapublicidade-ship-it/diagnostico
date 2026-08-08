@@ -71,6 +71,34 @@ function estimateCostUsdCents(
   return Math.round(dollars * 100);
 }
 
+// Anthropic's thinking API has two incompatible shapes depending on model
+// generation: "adaptive only" models (Sonnet 5, Opus 5, Fable 5, Mythos,
+// Opus 4.6+, Sonnet 4.6) reject `thinking.type: "enabled"`, while "extended
+// only" models (Haiku 4.5, Sonnet 4.5, Opus 4.5, earlier Claude 4) reject
+// `thinking.type: "adaptive"`. `output_config.effort` is only accepted by
+// the adaptive-capable family. See
+// https://platform.claude.com/docs/en/build-with-claude/thinking-troubleshooting#supported-models
+const ADAPTIVE_THINKING_MODEL_PATTERNS = [
+  /sonnet-5/,
+  /opus-5/,
+  /fable-5/,
+  /mythos/,
+  /opus-4-8/,
+  /opus-4-7/,
+  /opus-4-6/,
+  /sonnet-4-6/,
+];
+
+function supportsAdaptiveThinking(model: string): boolean {
+  return ADAPTIVE_THINKING_MODEL_PATTERNS.some((pattern) =>
+    pattern.test(model),
+  );
+}
+
+// Leaves comfortable headroom under max_tokens (16000) for the structured
+// JSON response itself on extended-thinking-only models.
+const EXTENDED_THINKING_BUDGET_TOKENS = 6000;
+
 export class AiAnalysisError extends Error {}
 
 type AnalysisAnswerRow = { question_key: string; answer: unknown };
@@ -205,17 +233,24 @@ export async function generateAiDiagnosis(params: {
   const client = createAnthropicClient();
   const model = getAnthropicModel();
   const profileType = request.profile_type;
+  const useAdaptiveThinking = supportsAdaptiveThinking(model);
 
   const startedAt = Date.now();
   const response = await client.messages.parse({
     model,
     max_tokens: 16000,
-    thinking: { type: "adaptive" },
+    thinking: useAdaptiveThinking
+      ? { type: "adaptive" }
+      : { type: "enabled", budget_tokens: EXTENDED_THINKING_BUDGET_TOKENS },
     system: buildSystemPrompt(profileType),
-    output_config: {
-      effort: "medium",
-      format: zodOutputFormat(aiDiagnosisOutputSchema),
-    },
+    output_config: useAdaptiveThinking
+      ? {
+          effort: "medium",
+          format: zodOutputFormat(aiDiagnosisOutputSchema),
+        }
+      : {
+          format: zodOutputFormat(aiDiagnosisOutputSchema),
+        },
     messages: [
       {
         role: "user",

@@ -18,6 +18,8 @@ const harness = vi.hoisted(() => ({
   userId: "user-1" as string | null,
 }));
 
+const aiClientHarness = vi.hoisted(() => ({ model: "claude-sonnet-5" }));
+
 const mockParse = vi.hoisted(() => vi.fn());
 
 vi.mock("@/lib/supabase/admin", async () => {
@@ -46,7 +48,7 @@ vi.mock("@/modules/auth/session", () => ({
 
 vi.mock("@/modules/ai/client", () => ({
   createAnthropicClient: () => ({ messages: { parse: mockParse } }),
-  getAnthropicModel: () => "claude-sonnet-5",
+  getAnthropicModel: () => aiClientHarness.model,
 }));
 
 const BUCKET = "analysis-assets";
@@ -108,6 +110,7 @@ beforeEach(() => {
     delete (harness.store as Record<string, unknown>)[key];
   }
   harness.userId = "user-1";
+  aiClientHarness.model = "claude-sonnet-5";
   mockParse.mockReset();
 });
 
@@ -163,6 +166,39 @@ describe("generateAiDiagnosis", () => {
     expect(generated.usage.inputTokens).toBe(4200);
     expect(generated.usage.outputTokens).toBe(1800);
     expect(generated.usage.estimatedCostUsdCents).not.toBeNull();
+  });
+
+  it("uses adaptive thinking and effort for an adaptive-capable model (claude-sonnet-5)", async () => {
+    aiClientHarness.model = "claude-sonnet-5";
+    const request = seedRequestWithAsset(harness.store, "user-1");
+    mockSuccessfulParse();
+
+    await generateAiDiagnosis({
+      requestId: request.id as string,
+      userId: "user-1",
+    });
+
+    const callArgs = mockParse.mock.calls[0]![0];
+    expect(callArgs.thinking).toEqual({ type: "adaptive" });
+    expect(callArgs.output_config.effort).toBe("medium");
+  });
+
+  it("uses extended thinking without effort for an extended-only model (claude-haiku-4-5-20251001)", async () => {
+    aiClientHarness.model = "claude-haiku-4-5-20251001";
+    const request = seedRequestWithAsset(harness.store, "user-1");
+    mockSuccessfulParse();
+
+    await generateAiDiagnosis({
+      requestId: request.id as string,
+      userId: "user-1",
+    });
+
+    const callArgs = mockParse.mock.calls[0]![0];
+    expect(callArgs.thinking).toEqual({
+      type: "enabled",
+      budget_tokens: 6000,
+    });
+    expect(callArgs.output_config.effort).toBeUndefined();
   });
 
   it("treats stop_reason 'refusal' as a job failure, never a persisted result", async () => {
