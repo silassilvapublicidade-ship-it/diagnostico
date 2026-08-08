@@ -25,4 +25,14 @@ describe("buildSystemPrompt", () => {
 
     expect(prompt).toMatch(/Nunca use o termo "Metodologia 8D"/);
   });
+
+  it("clarifies the minimal briefing is complete by design and forbids incomplete_briefing for missing business metrics", () => {
+    const prompt = buildSystemPrompt("creator");
+
+    expect(prompt).toMatch(/deliberadamente enxuto/);
+    expect(prompt).toMatch(
+      /nunca trate a ausencia delas como motivo de revisao/,
+    );
+    expect(prompt).toMatch(/nunca porque voce gostaria de ter mais dados/);
+  });
 });
