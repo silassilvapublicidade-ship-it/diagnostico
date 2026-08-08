@@ -51,4 +51,12 @@ describe("buildSystemPrompt", () => {
     expect(prompt).toMatch(/Nunca responda em ingles/);
     expect(prompt).toMatch(/nunca em ingles\.$/);
   });
+
+  it("demands a concrete, copy-pasteable solution in how_to_execute instead of vague advice", () => {
+    const prompt = buildSystemPrompt("business");
+
+    expect(prompt).toMatch(/Regra critica para how_to_execute/);
+    expect(prompt).toMatch(/EXEMPLO REAL e pronto de uso/);
+    expect(prompt).toMatch(/sem precisar imaginar o que fazer/);
+  });
 });

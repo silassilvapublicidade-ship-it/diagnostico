@@ -62,6 +62,11 @@ export default async function DiagnosisDetailPage({
       ? webPayloadSchema.safeParse(diagnosis.report.web_payload)
       : null;
   const webPayload = parsedWebPayload?.success ? parsedWebPayload.data : null;
+  const profileTopAsset = diagnosis.assets.find(
+    (asset) =>
+      asset.asset_type === "profile_top" &&
+      asset.mime_type.startsWith("image/"),
+  );
 
   return (
     <div className="space-y-10">
@@ -128,6 +133,28 @@ export default async function DiagnosisDetailPage({
         />
         <Metric label="Evidencias" value={String(diagnosis.assets.length)} />
       </section>
+
+      {profileTopAsset ? (
+        <section className="flex flex-col gap-4 border border-graphite/10 bg-white/40 p-4 sm:flex-row sm:items-start">
+          {/* eslint-disable-next-line @next/next/no-img-element -- private,
+              per-owner evidence served through our own authenticated route,
+              not a static/remote asset next/image can optimize. */}
+          <img
+            alt="Topo do perfil enviado como evidencia"
+            className="w-full max-w-[240px] rounded border border-graphite/10"
+            src={`/app/diagnosticos/${diagnosis.request.id}/assets/${profileTopAsset.id}`}
+          />
+          <div>
+            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-graphite/46">
+              Perfil enviado
+            </p>
+            <p className="mt-2 max-w-md text-sm leading-6 text-graphite/64">
+              Topo do perfil enviado como evidencia — foto e bio ficam aqui como
+              referencia enquanto voce le o diagnostico.
+            </p>
+          </div>
+        </section>
+      ) : null}
 
       {result ? (
         <>
