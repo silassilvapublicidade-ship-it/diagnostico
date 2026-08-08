@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-paper text-graphite">
@@ -6,9 +8,12 @@ export default function Home() {
           <p className="font-mono text-xs uppercase tracking-[0.24em] text-graphite/60">
             Diagnostico Estrategico de Perfil
           </p>
-          <p className="rounded-full border border-accent/35 px-3 py-1 font-mono text-xs uppercase tracking-[0.16em] text-accent">
+          <Link
+            className="rounded-full border border-accent/35 px-3 py-1 font-mono text-xs uppercase tracking-[0.16em] text-accent transition hover:bg-accent/10"
+            href="/entrar"
+          >
             Area privada
-          </p>
+          </Link>
         </header>
 
         <div className="grid gap-10 py-16 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
@@ -27,6 +32,12 @@ export default function Home() {
               posicionamento, autoridade, conteudo, conversao e os sinais que
               orientam a proxima decisao.
             </p>
+            <Link
+              className="mt-6 inline-block bg-graphite px-5 py-3 text-sm font-semibold text-paper transition hover:bg-accent"
+              href="/cadastro"
+            >
+              Comecar diagnostico
+            </Link>
           </div>
         </div>
 
