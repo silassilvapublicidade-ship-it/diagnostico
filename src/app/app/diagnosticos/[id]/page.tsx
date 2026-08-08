@@ -1,9 +1,15 @@
 import { notFound } from "next/navigation";
 
-import { analysisCalculationResultSchema } from "@/domain/methodology-8d";
+import {
+  analysisCalculationResultSchema,
+  type ReviewReason,
+} from "@/domain/methodology-8d";
 import { webPayloadSchema } from "@/modules/ai/map-to-domain";
 import { runDiagnosisAnalysisAction } from "@/modules/analysis/actions";
-import { DIMENSION_LABELS } from "@/modules/analysis/labels";
+import {
+  DIMENSION_LABELS,
+  REVIEW_REASON_LABELS,
+} from "@/modules/analysis/labels";
 import { getDiagnosis } from "@/modules/analysis/persistence";
 import { CLASSIFICATION_COPY, STATUS_COPY } from "@/modules/analysis/status";
 
@@ -247,11 +253,13 @@ export default async function DiagnosisDetailPage({
           </section>
 
           {result.reviewReasons.length > 0 ? (
-            <section className="border border-red-900/20 bg-white/45 p-6">
-              <h2 className="text-2xl font-semibold">Motivos de revisao</h2>
-              <ul className="mt-4 space-y-2 text-sm text-graphite/68">
+            <section className="border-l-2 border-accent bg-white/50 px-5 py-4">
+              <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent">
+                Pontos de atencao desta leitura
+              </p>
+              <ul className="mt-3 space-y-2 text-sm leading-6 text-graphite/68">
                 {result.reviewReasons.map((reason) => (
-                  <li key={reason}>{reason}</li>
+                  <li key={reason}>{REVIEW_REASON_LABELS[reason] ?? reason}</li>
                 ))}
               </ul>
             </section>
@@ -269,7 +277,13 @@ export default async function DiagnosisDetailPage({
           </p>
           {diagnosis.request.review_reasons?.length ? (
             <p className="mt-4 text-sm text-red-900">
-              Motivos: {diagnosis.request.review_reasons.join(", ")}
+              Motivos:{" "}
+              {diagnosis.request.review_reasons
+                .map(
+                  (reason) =>
+                    REVIEW_REASON_LABELS[reason as ReviewReason] ?? reason,
+                )
+                .join(", ")}
             </p>
           ) : null}
         </section>

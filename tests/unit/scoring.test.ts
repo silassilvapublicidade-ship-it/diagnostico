@@ -103,4 +103,36 @@ describe("Strategic diagnosis scoring", () => {
     expect(resolveFinalAnalysisStatus(result)).toBe("completed");
     expect(() => assertReportCanBeCompleted(result)).not.toThrow();
   });
+
+  it("does not block delivery for informational-only review signals (the product is a directional guide, not a guarantee)", () => {
+    const result = calculateAnalysisResult({
+      ...businessCompleteFixture,
+      reviewSignals: ["no_relationship_evidence", "unclear_bio_link"],
+    });
+
+    expect(result.requiresReview).toBe(false);
+    expect(result.reviewReasons).toEqual([
+      "no_relationship_evidence",
+      "unclear_bio_link",
+    ]);
+    expect(resolveFinalAnalysisStatus(result)).toBe("completed");
+    expect(() => assertReportCanBeCompleted(result)).not.toThrow();
+  });
+
+  it("still blocks delivery when a critical review signal is present, even with a complete evidence base", () => {
+    const result = calculateAnalysisResult({
+      ...businessCompleteFixture,
+      reviewSignals: ["no_relationship_evidence", "sensitive_content"],
+    });
+
+    expect(result.requiresReview).toBe(true);
+    expect(result.reviewReasons).toEqual([
+      "no_relationship_evidence",
+      "sensitive_content",
+    ]);
+    expect(resolveFinalAnalysisStatus(result)).toBe("requires_review");
+    expect(() => assertReportCanBeCompleted(result)).toThrow(
+      /requires_review is true/,
+    );
+  });
 });

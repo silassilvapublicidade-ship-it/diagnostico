@@ -1,3 +1,4 @@
+import { BLOCKING_REVIEW_REASONS } from "./constants";
 import type {
   AnalysisCalculationResult,
   AnalysisStatus,
@@ -5,6 +6,8 @@ import type {
   DimensionAssessment,
   ReviewReason,
 } from "./types";
+
+const BLOCKING_REASON_SET = new Set<ReviewReason>(BLOCKING_REVIEW_REASONS);
 
 export function detectRequiresReview(
   dimensions: DimensionAssessment[],
@@ -24,8 +27,18 @@ export function detectRequiresReview(
     reviewReasons.add("low_global_confidence_on_critical_analysis");
   }
 
+  // The product is a lightweight directional guide, not a guarantee of a
+  // fully-confident result: only a reason serious enough to be worth
+  // holding for human review (see BLOCKING_REVIEW_REASONS) blocks
+  // delivery. Every other proposed signal is still reported in
+  // reviewReasons — surfaced to the customer as a limitation on the
+  // delivered report — but never blocks it on its own.
+  const requiresReview = Array.from(reviewReasons).some((reason) =>
+    BLOCKING_REASON_SET.has(reason),
+  );
+
   return {
-    requiresReview: reviewReasons.size > 0,
+    requiresReview,
     reviewReasons: Array.from(reviewReasons),
   };
 }

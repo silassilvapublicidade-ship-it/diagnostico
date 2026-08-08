@@ -89,6 +89,24 @@ export const REVIEW_REASONS = [
   "no_relationship_evidence",
 ] as const satisfies readonly ReviewReason[];
 
+// Reasons serious enough to hold delivery for a human to look before the
+// customer sees anything: structural data insufficiency (too few evaluable
+// dimensions, low confidence across an incomplete read) and AI-signaled
+// safety/harm concerns (sensitive content, reputational or privacy risk, a
+// commercial recommendation that could cause real harm, or the AI's own
+// output failing structural validation). Every other reason describes a
+// normal limitation of a lightweight directional read, not a reason to
+// block delivery — see detectRequiresReview in review.ts.
+export const BLOCKING_REVIEW_REASONS = [
+  "fewer_than_5_evaluable_dimensions",
+  "low_global_confidence_on_critical_analysis",
+  "sensitive_content",
+  "reputational_risk",
+  "privacy_risk",
+  "harmful_commercial_recommendation_risk",
+  "structural_validation_failed",
+] as const satisfies readonly ReviewReason[];
+
 export const BUSINESS_WEIGHTS = {
   positioning: 16,
   first_impression: 14,
