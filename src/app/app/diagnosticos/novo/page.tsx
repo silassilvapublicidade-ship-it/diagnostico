@@ -1,4 +1,5 @@
 import { NewDiagnosisForm } from "./new-diagnosis-form";
+import { deliverySteps, diagnosticDimensions } from "../../method-content";
 
 type PageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -20,25 +21,55 @@ export default async function NewDiagnosisPage({ searchParams }: PageProps) {
               Briefing para encontrar o gargalo.
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-7 text-cream/70">
-              Uma sessao curta, guiada e objetiva para separar percepcao de
-              evidencia antes da leitura estrategica.
+              Uma sessao curta para reunir contexto e materiais antes da leitura
+              nas 8 dimensoes estrategicas.
             </p>
           </div>
           <div className="rounded-lg border border-accent/35 bg-accent/10 p-5">
-            <p className="kicker text-accent">Ritmo</p>
+            <p className="kicker text-accent">Entrada certa</p>
             <p className="mt-3 text-sm leading-6 text-cream/72">
-              Primeiro contexto. Depois evidencias. O diagnostico fica mais
-              forte quando o que voce diz conversa com as imagens enviadas.
+              O diagnostico fica mais forte quando objetivo, perfil, evidencias
+              visuais e link conversam entre si.
             </p>
           </div>
         </div>
         <div className="hairline mt-8" />
-        <div className="mt-5 grid gap-3 text-xs font-black uppercase tracking-[0.12em] text-cream/58 sm:grid-cols-5">
-          {["Entender", "Priorizar", "Corrigir", "Construir", "Medir"].map(
-            (step) => (
-              <span key={step}>{step}</span>
-            ),
-          )}
+        <div className="mt-5">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <p className="kicker text-accent">8 Dimensoes avaliadas</p>
+            <p className="font-mono text-[10px] font-black uppercase tracking-[0.16em] text-cream/42">
+              score + confianca + evidencia
+            </p>
+          </div>
+          <div className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+            {diagnosticDimensions.map((dimension, index) => (
+              <div
+                className="grid grid-cols-[2rem_2.7rem_1fr] items-center rounded-lg border border-white/10 bg-white/[0.035] px-3 py-2.5 text-xs uppercase text-cream/68"
+                key={dimension.code}
+              >
+                <span className="font-mono text-[10px] font-black text-accent">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <span className="font-mono text-[10px] font-black text-cream/34">
+                  {dimension.code}
+                </span>
+                <span className="font-black tracking-[0.08em]">
+                  {dimension.label}
+                </span>
+              </div>
+            ))}
+          </div>
+          <div className="mt-5 flex flex-wrap items-center gap-2 text-[10px] font-black uppercase tracking-[0.12em] text-cream/46">
+            <span className="text-accent">Fluxo</span>
+            {deliverySteps.map((step) => (
+              <span
+                className="rounded-full border border-white/10 px-2.5 py-1"
+                key={step}
+              >
+                {step}
+              </span>
+            ))}
+          </div>
         </div>
       </header>
 

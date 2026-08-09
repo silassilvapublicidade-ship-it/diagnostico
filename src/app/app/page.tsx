@@ -3,6 +3,8 @@ import Link from "next/link";
 import { listDiagnoses } from "@/modules/analysis/persistence";
 import { STATUS_COPY } from "@/modules/analysis/status";
 
+import { deliverySteps, diagnosticDimensions } from "./method-content";
+
 export const dynamic = "force-dynamic";
 
 export default async function AppHomePage() {
@@ -18,27 +20,50 @@ export default async function AppHomePage() {
             Diagnostico que encontra o gargalo.
           </h1>
           <p className="mt-6 max-w-2xl text-base leading-7 text-cream/72 sm:text-lg sm:leading-8">
-            Envie contexto e evidencias para receber uma leitura orientada por
-            metodo: entender, priorizar, corrigir, construir e medir.
+            Envie contexto e evidencias para receber uma leitura em 8 dimensoes
+            estrategicas, com score, confianca e proximo movimento separados com
+            clareza.
           </p>
         </div>
 
-        <div className="method-strip mt-10 border-t border-white/12 pt-5">
-          {["ENTENDER", "PRIORIZAR", "CORRIGIR", "CONSTRUIR", "MEDIR"].map(
-            (step, index) => (
+        <div className="mt-10 border-t border-white/12 pt-5">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <p className="kicker text-accent">Mapa de leitura 8D</p>
+            <p className="font-mono text-[10px] font-black uppercase tracking-[0.16em] text-cream/42">
+              evidencia antes de opiniao
+            </p>
+          </div>
+          <div className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+            {diagnosticDimensions.map((dimension, index) => (
               <div
                 className="rounded-lg border border-white/10 bg-white/[0.035] p-3"
-                key={step}
+                key={dimension.code}
               >
-                <p className="font-mono text-[10px] text-accent">
-                  {String(index + 1).padStart(2, "0")}
-                </p>
-                <p className="mt-2 text-xs font-black uppercase tracking-[0.14em] text-cream">
-                  {step}
+                <div className="flex items-center justify-between gap-3">
+                  <p className="font-mono text-[10px] font-black text-accent">
+                    {String(index + 1).padStart(2, "0")}
+                  </p>
+                  <p className="font-mono text-[10px] font-black text-cream/34">
+                    {dimension.code}
+                  </p>
+                </div>
+                <p className="mt-3 text-xs font-black uppercase tracking-[0.12em] text-cream">
+                  {dimension.label}
                 </p>
               </div>
-            ),
-          )}
+            ))}
+          </div>
+          <div className="mt-5 flex flex-wrap items-center gap-2 text-[10px] font-black uppercase tracking-[0.12em] text-cream/46">
+            <span className="text-accent">Fluxo</span>
+            {deliverySteps.map((step) => (
+              <span
+                className="rounded-full border border-white/10 px-2.5 py-1"
+                key={step}
+              >
+                {step}
+              </span>
+            ))}
+          </div>
         </div>
       </section>
 
