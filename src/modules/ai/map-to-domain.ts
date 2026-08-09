@@ -12,9 +12,11 @@ import {
 import { AI_PROMPT_VERSION } from "./prompt";
 import {
   aiRecommendationSchema,
+  aiStrategicDiagnosisSchema,
   type AiDiagnosisOutput,
   type AiDimensionAssessment,
   type AiRecommendation,
+  type AiStrategicDiagnosis,
 } from "./output-schema";
 
 const RECOMMENDATION_PRIORITY_ORDER: Record<
@@ -36,8 +38,16 @@ function pickTopRecommendation(
   )[0];
 }
 
-function formatRecommendation(recommendation: AiRecommendation): string {
-  return `${recommendation.how_to_execute} (prioridade ${recommendation.priority}, esforco ${recommendation.effort}) — ${recommendation.why_it_matters}`;
+function formatRecommendation(
+  recommendation: AiRecommendation,
+  strategicDiagnosis: AiStrategicDiagnosis,
+): string {
+  return [
+    recommendation.how_to_execute,
+    `Exemplo aplicado: ${strategicDiagnosis.practical_example}`,
+    `Primeiro passo: ${strategicDiagnosis.next_step}`,
+    `(prioridade ${recommendation.priority}, esforco ${recommendation.effort}) — ${recommendation.why_it_matters}`,
+  ].join(" ");
 }
 
 function mapDimension(dimension: AiDimensionAssessment): DimensionAssessment {
@@ -52,7 +62,7 @@ function mapDimension(dimension: AiDimensionAssessment): DimensionAssessment {
 
   const topRecommendation = pickTopRecommendation(dimension.recommendations);
   const safeRecommendation = topRecommendation
-    ? formatRecommendation(topRecommendation)
+    ? formatRecommendation(topRecommendation, dimension.strategic_diagnosis)
     : "Nenhuma recomendacao estruturada foi retornada para esta dimensao.";
 
   const base = {
@@ -99,6 +109,7 @@ export const webPayloadDimensionSchema = z.object({
   dimension: dimensionKeySchema,
   status: dimensionStatusSchema,
   diagnosis: z.string(),
+  strategicDiagnosis: aiStrategicDiagnosisSchema.optional(),
   strengths: z.array(z.string()),
   weaknesses: z.array(z.string()),
   recommendations: z.array(aiRecommendationSchema),
@@ -120,6 +131,7 @@ export type WebPayloadDimension = {
   dimension: AiDimensionAssessment["dimension"];
   status: AiDimensionAssessment["status"];
   diagnosis: string;
+  strategicDiagnosis: AiStrategicDiagnosis;
   strengths: string[];
   weaknesses: string[];
   recommendations: AiRecommendation[];
@@ -151,6 +163,7 @@ export function extractWebPayload(output: AiDiagnosisOutput): WebPayload {
       dimension: dimension.dimension,
       status: dimension.status,
       diagnosis: dimension.diagnosis,
+      strategicDiagnosis: dimension.strategic_diagnosis,
       strengths: dimension.strengths,
       weaknesses: dimension.weaknesses,
       recommendations: dimension.recommendations,

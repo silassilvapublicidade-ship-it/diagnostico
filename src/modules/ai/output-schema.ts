@@ -26,6 +26,15 @@ export const aiRecommendationSchema = z.object({
   supporting_evidence: z.string().min(1),
 });
 
+export const aiStrategicDiagnosisSchema = z.object({
+  problem: z.string().min(20),
+  evidence: z.string().min(20),
+  consequence: z.string().min(20),
+  correction: z.string().min(20),
+  practical_example: z.string().min(20),
+  next_step: z.string().min(20),
+});
+
 // A flat object rather than a discriminatedUnion on `status`: the union
 // roughly doubled the compiled grammar size for structured output (each of
 // the two branches repeated the full evidences/recommendations shape),
@@ -45,6 +54,7 @@ export const aiDimensionAssessmentSchema = z
     strengths: z.array(z.string()),
     weaknesses: z.array(z.string()),
     diagnosis: z.string().min(1),
+    strategic_diagnosis: aiStrategicDiagnosisSchema,
     // Exactly one: only the top-priority recommendation is ever surfaced
     // (see pickTopRecommendation in map-to-domain.ts) — asking for more
     // was pure token/latency cost with no effect on what the customer
@@ -79,5 +89,6 @@ export const aiDiagnosisOutputSchema = z.object({
 
 export type AiEvidence = z.infer<typeof aiEvidenceSchema>;
 export type AiRecommendation = z.infer<typeof aiRecommendationSchema>;
+export type AiStrategicDiagnosis = z.infer<typeof aiStrategicDiagnosisSchema>;
 export type AiDimensionAssessment = z.infer<typeof aiDimensionAssessmentSchema>;
 export type AiDiagnosisOutput = z.infer<typeof aiDiagnosisOutputSchema>;

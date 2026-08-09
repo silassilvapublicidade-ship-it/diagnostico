@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { DIMENSIONS } from "@/domain/methodology-8d";
-import { buildSystemPrompt } from "@/modules/ai/prompt";
+import { AI_PROMPT_VERSION, buildSystemPrompt } from "@/modules/ai/prompt";
 
 describe("buildSystemPrompt", () => {
   it("explicitly requires exactly 8 dimension entries, one per dimension key", () => {
@@ -58,5 +58,16 @@ describe("buildSystemPrompt", () => {
     expect(prompt).toMatch(/Regra critica para how_to_execute/);
     expect(prompt).toMatch(/EXEMPLO REAL e pronto de uso/);
     expect(prompt).toMatch(/sem precisar imaginar o que fazer/);
+  });
+
+  it("uses the diagnostic prompt version and demands strategic execution fields", () => {
+    const prompt = buildSystemPrompt("creator");
+
+    expect(AI_PROMPT_VERSION).toBe("silas-diagnostic-prompt@0.2.0");
+    expect(prompt).toMatch(/estrategista senior/);
+    expect(prompt).toMatch(/100 perfis diferentes/);
+    expect(prompt).toContain("strategic_diagnosis.problem");
+    expect(prompt).toContain("strategic_diagnosis.practical_example");
+    expect(prompt).toContain("strategic_diagnosis.next_step");
   });
 });

@@ -4,7 +4,10 @@ import {
   analysisCalculationInputSchema,
   calculateAnalysisResult,
 } from "../../src/domain/methodology-8d";
-import { mapAiOutputToDomainInput } from "../../src/modules/ai/map-to-domain";
+import {
+  extractWebPayload,
+  mapAiOutputToDomainInput,
+} from "../../src/modules/ai/map-to-domain";
 import { AI_PROMPT_VERSION } from "../../src/modules/ai/prompt";
 import { aiOutputBusinessComplete } from "../fixtures/ai-output-business-complete";
 import { aiOutputCreatorComplete } from "../fixtures/ai-output-creator-complete";
@@ -142,5 +145,35 @@ describe("mapAiOutputToDomainInput", () => {
     expect(reference?.evidenceType).toBe("declared");
     expect(reference?.sourceReference).toContain("bio");
     expect(reference?.confidence).toBe("high");
+  });
+
+  it("maps strategic execution into the safe recommendation surfaced by the deterministic result", () => {
+    const input = mapAiOutputToDomainInput({
+      output: aiOutputBusinessComplete,
+      profileType: "business",
+      modelProvider: "anthropic",
+      modelName: "claude-sonnet-5",
+    });
+    const positioning = input.dimensions.find(
+      (dimension) => dimension.dimension === "positioning",
+    );
+
+    expect(positioning?.safeRecommendation).toContain("Exemplo aplicado:");
+    expect(positioning?.safeRecommendation).toContain("Primeiro passo:");
+  });
+
+  it("preserves the strategic diagnosis in the web payload", () => {
+    const payload = extractWebPayload(aiOutputCreatorComplete);
+    const positioning = payload.dimensions.find(
+      (dimension) => dimension.dimension === "positioning",
+    );
+
+    expect(positioning?.strategicDiagnosis.problem).toBe(
+      aiOutputCreatorComplete.dimensions[0]!.strategic_diagnosis.problem,
+    );
+    expect(positioning?.strategicDiagnosis.practical_example).toBe(
+      aiOutputCreatorComplete.dimensions[0]!.strategic_diagnosis
+        .practical_example,
+    );
   });
 });

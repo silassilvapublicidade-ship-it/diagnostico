@@ -1,5 +1,10 @@
 import type { AiDiagnosisOutput } from "../../src/modules/ai/output-schema";
 
+type AiDimensionFixture = Omit<
+  AiDiagnosisOutput["dimensions"][number],
+  "strategic_diagnosis"
+>;
+
 function recommendation(
   overrides: Partial<
     AiDiagnosisOutput["dimensions"][number]["recommendations"][number]
@@ -20,8 +25,40 @@ function recommendation(
   };
 }
 
+function strategicDiagnosis(
+  dimension: AiDimensionFixture,
+): AiDiagnosisOutput["dimensions"][number]["strategic_diagnosis"] {
+  const primaryEvidence =
+    dimension.evidences[0]?.source_reference ??
+    dimension.evidence_gaps[0] ??
+    "evidencias ausentes";
+  const recommendation = dimension.recommendations[0]!;
+  const gaps =
+    dimension.evidence_gaps.length > 0
+      ? ` Lacunas relevantes: ${dimension.evidence_gaps.slice(0, 2).join(", ")}.`
+      : "";
+
+  return {
+    problem: dimension.diagnosis,
+    evidence: `Identificado a partir de ${primaryEvidence}.${gaps}`,
+    consequence: recommendation.why_it_matters,
+    correction: recommendation.how_to_execute,
+    practical_example: recommendation.how_to_execute,
+    next_step: `Executar primeiro: ${recommendation.how_to_execute}`,
+  };
+}
+
+function withStrategicDiagnosis(
+  dimensions: AiDimensionFixture[],
+): AiDiagnosisOutput["dimensions"] {
+  return dimensions.map((dimension) => ({
+    ...dimension,
+    strategic_diagnosis: strategicDiagnosis(dimension),
+  }));
+}
+
 export const aiOutputCreatorLowEvidence = {
-  dimensions: [
+  dimensions: withStrategicDiagnosis([
     {
       dimension: "positioning",
       status: "evaluated",
@@ -271,7 +308,7 @@ export const aiOutputCreatorLowEvidence = {
         "Oportunidades priorizadas exigiriam inferencia sem suporte.",
       ],
     },
-  ],
+  ]),
   executive_summary:
     "O briefing e as evidencias enviadas ainda nao sustentam uma leitura completa e confiavel do perfil.",
   priorities: [

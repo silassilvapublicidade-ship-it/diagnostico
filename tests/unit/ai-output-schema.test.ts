@@ -74,13 +74,39 @@ describe("AI diagnosis output schema", () => {
     expect(() => aiDiagnosisOutputSchema.parse(broken)).toThrow();
   });
 
-  it("requires at least one recommendation per dimension", () => {
+  it("requires exactly one recommendation per dimension", () => {
     const broken = structuredClone(aiOutputBusinessComplete) as Record<
       string,
       unknown
     >;
     const dimensions = broken.dimensions as Array<Record<string, unknown>>;
     dimensions[0]!.recommendations = [];
+
+    expect(() => aiDiagnosisOutputSchema.parse(broken)).toThrow();
+  });
+
+  it("requires a strategic diagnosis contract for each dimension", () => {
+    const broken = structuredClone(aiOutputBusinessComplete) as Record<
+      string,
+      unknown
+    >;
+    const dimensions = broken.dimensions as Array<Record<string, unknown>>;
+    delete dimensions[0]!.strategic_diagnosis;
+
+    expect(() => aiDiagnosisOutputSchema.parse(broken)).toThrow();
+  });
+
+  it("rejects a too-short practical example", () => {
+    const broken = structuredClone(aiOutputBusinessComplete) as Record<
+      string,
+      unknown
+    >;
+    const dimensions = broken.dimensions as Array<Record<string, unknown>>;
+    const strategicDiagnosis = dimensions[0]!.strategic_diagnosis as Record<
+      string,
+      unknown
+    >;
+    strategicDiagnosis.practical_example = "Melhorar CTA";
 
     expect(() => aiDiagnosisOutputSchema.parse(broken)).toThrow();
   });
