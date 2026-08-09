@@ -10,47 +10,66 @@ export default async function AppHomePage() {
   const latest = diagnoses[0];
 
   return (
-    <div className="space-y-10">
-      <section className="max-w-3xl">
-        <p className="mb-4 font-mono text-xs uppercase tracking-[0.2em] text-accent">
-          Area privada
-        </p>
-        <h1 className="text-5xl font-semibold leading-[0.96] sm:text-6xl">
-          Uma leitura estrategica, sem pressa e sem achismo.
-        </h1>
-        <p className="mt-6 max-w-2xl text-lg leading-8 text-graphite/68">
-          Envie contexto e evidencias para estruturar o Diagnostico Estrategico
-          de Perfil. Nesta fase, resultados automaticos aparecem apenas quando o
-          fixture de desenvolvimento estiver habilitado.
-        </p>
+    <div className="space-y-8">
+      <section className="dark-panel relative overflow-hidden p-6 text-cream sm:p-9 lg:p-10">
+        <div className="max-w-4xl">
+          <p className="kicker text-accent">Sala estrategica privada</p>
+          <h1 className="display-title mt-5 max-w-4xl text-5xl leading-[0.9] sm:text-6xl lg:text-7xl">
+            Diagnostico que encontra o gargalo.
+          </h1>
+          <p className="mt-6 max-w-2xl text-base leading-7 text-cream/72 sm:text-lg sm:leading-8">
+            Envie contexto e evidencias para receber uma leitura orientada por
+            metodo: entender, priorizar, corrigir, construir e medir.
+          </p>
+        </div>
+
+        <div className="method-strip mt-10 border-t border-white/12 pt-5">
+          {["ENTENDER", "PRIORIZAR", "CORRIGIR", "CONSTRUIR", "MEDIR"].map(
+            (step, index) => (
+              <div
+                className="border border-white/10 bg-white/[0.035] p-3"
+                key={step}
+              >
+                <p className="font-mono text-[10px] text-accent">
+                  {String(index + 1).padStart(2, "0")}
+                </p>
+                <p className="mt-2 text-xs font-black uppercase tracking-[0.14em] text-cream">
+                  {step}
+                </p>
+              </div>
+            ),
+          )}
+        </div>
       </section>
 
-      <div className="grid gap-4 md:grid-cols-[1.2fr_0.8fr]">
+      <div className="grid gap-4 md:grid-cols-[1.25fr_0.75fr]">
         <Link
-          className="group border border-graphite/10 bg-white/45 p-6 transition hover:border-accent/40 hover:bg-white/70"
+          className="lux-panel group p-6 transition hover:border-accent/60 sm:p-7"
           href="/app/diagnosticos/novo"
         >
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent">
-            Novo diagnostico
-          </p>
-          <h2 className="mt-8 text-3xl font-semibold leading-tight">
-            Comecar por briefing e evidencias.
+          <p className="kicker text-accent">Novo diagnostico</p>
+          <h2 className="mt-8 max-w-xl text-3xl font-black leading-tight sm:text-4xl">
+            Iniciar uma sessao guiada de briefing e evidencias.
           </h2>
-          <p className="mt-4 text-sm leading-6 text-graphite/62">
-            O fluxo guia o envio em etapas e registra consentimento, retencao e
-            assets privados.
+          <p className="mt-4 max-w-2xl text-sm leading-6 text-graphite/66">
+            O fluxo conduz a coleta sem parecer formulario frio: objetivo,
+            perfil, desafio, link e materiais visuais para sustentar o
+            diagnostico.
           </p>
+          <span className="mt-7 inline-flex items-center gap-2 text-sm font-black text-accent">
+            Comecar agora <span aria-hidden="true">-&gt;</span>
+          </span>
         </Link>
 
         <Link
-          className="border border-graphite/10 bg-white/35 p-6 transition hover:border-accent/40 hover:bg-white/70"
+          className="border border-graphite bg-graphite p-6 text-paper transition hover:border-accent sm:p-7"
           href="/app/diagnosticos"
         >
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-graphite/46">
-            Meus diagnosticos
+          <p className="kicker text-accent">Meus diagnosticos</p>
+          <p className="display-title mt-8 text-7xl leading-none text-paper">
+            {diagnoses.length}
           </p>
-          <p className="mt-8 text-5xl font-semibold">{diagnoses.length}</p>
-          <p className="mt-3 text-sm text-graphite/62">
+          <p className="mt-3 text-sm text-paper/62">
             {diagnoses.length === 1
               ? "diagnostico criado"
               : "diagnosticos criados"}
@@ -59,13 +78,11 @@ export default async function AppHomePage() {
       </div>
 
       {latest ? (
-        <section className="border-t border-graphite/10 pt-6">
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-graphite/46">
-            Ultimo movimento
-          </p>
+        <section className="border-y border-graphite/14 py-6">
+          <p className="kicker text-graphite/46">Ultimo movimento</p>
           <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <h2 className="text-2xl font-semibold">
+              <h2 className="text-3xl font-black">
                 {STATUS_COPY[latest.status].title}
               </h2>
               <p className="mt-2 max-w-xl text-sm leading-6 text-graphite/64">
@@ -73,7 +90,7 @@ export default async function AppHomePage() {
               </p>
             </div>
             <Link
-              className="text-sm font-semibold text-accent"
+              className="action-secondary"
               href={`/app/diagnosticos/${latest.id}`}
             >
               Abrir diagnostico

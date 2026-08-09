@@ -10,10 +10,8 @@ export default async function UpdatePasswordPage({ searchParams }: PageProps) {
 
   return (
     <section>
-      <p className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-accent">
-        Nova senha
-      </p>
-      <h2 className="text-4xl font-semibold leading-none">
+      <p className="kicker mb-3 text-accent">Nova senha</p>
+      <h2 className="display-title text-4xl leading-[0.92]">
         Defina um novo acesso.
       </h2>
       <p className="mt-4 leading-7 text-graphite/68">
@@ -22,25 +20,25 @@ export default async function UpdatePasswordPage({ searchParams }: PageProps) {
       </p>
 
       {error ? (
-        <p className="mt-6 border-l-2 border-red-700 bg-white/50 px-4 py-3 text-sm text-red-900">
+        <p className="mt-6 border-l-4 border-accent bg-white/70 px-4 py-3 text-sm font-semibold text-graphite">
           {error}
         </p>
       ) : null}
 
       <form action={updatePasswordAction} className="mt-8 space-y-4">
         <label className="block">
-          <span className="text-sm text-graphite/70">Nova senha</span>
+          <span className="text-sm font-semibold text-graphite/70">
+            Nova senha
+          </span>
           <input
-            className="mt-2 w-full border border-graphite/14 bg-white/70 px-4 py-3 outline-none transition focus:border-accent"
+            className="form-control mt-2"
             minLength={6}
             name="password"
             required
             type="password"
           />
         </label>
-        <button className="w-full bg-graphite px-5 py-3 text-sm font-semibold text-paper transition hover:bg-accent">
-          Atualizar senha
-        </button>
+        <button className="action-primary w-full">Atualizar senha</button>
       </form>
     </section>
   );

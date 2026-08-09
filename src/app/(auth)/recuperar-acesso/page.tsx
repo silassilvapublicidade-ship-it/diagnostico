@@ -13,10 +13,8 @@ export default async function RecoverAccessPage({ searchParams }: PageProps) {
 
   return (
     <section>
-      <p className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-accent">
-        Recuperar acesso
-      </p>
-      <h2 className="text-4xl font-semibold leading-none">
+      <p className="kicker mb-3 text-accent">Recuperar acesso</p>
+      <h2 className="display-title text-4xl leading-[0.92]">
         Reabra sua area privada.
       </h2>
       <p className="mt-4 leading-7 text-graphite/68">
@@ -25,29 +23,27 @@ export default async function RecoverAccessPage({ searchParams }: PageProps) {
       </p>
 
       {error ? (
-        <p className="mt-6 border-l-2 border-red-700 bg-white/50 px-4 py-3 text-sm text-red-900">
+        <p className="mt-6 border-l-4 border-accent bg-white/70 px-4 py-3 text-sm font-semibold text-graphite">
           {error}
         </p>
       ) : null}
       {sent ? (
-        <p className="mt-6 border-l-2 border-accent bg-white/50 px-4 py-3 text-sm text-graphite/72">
+        <p className="mt-6 border-l-4 border-accent bg-white/70 px-4 py-3 text-sm font-semibold text-graphite">
           Se o email existir, o link de recuperacao sera enviado.
         </p>
       ) : null}
 
       <form action={requestPasswordResetAction} className="mt-8 space-y-4">
         <label className="block">
-          <span className="text-sm text-graphite/70">Email</span>
+          <span className="text-sm font-semibold text-graphite/70">Email</span>
           <input
-            className="mt-2 w-full border border-graphite/14 bg-white/70 px-4 py-3 outline-none transition focus:border-accent"
+            className="form-control mt-2"
             name="email"
             required
             type="email"
           />
         </label>
-        <button className="w-full bg-graphite px-5 py-3 text-sm font-semibold text-paper transition hover:bg-accent">
-          Enviar link
-        </button>
+        <button className="action-primary w-full">Enviar link</button>
       </form>
 
       <p className="mt-6 text-sm text-graphite/64">

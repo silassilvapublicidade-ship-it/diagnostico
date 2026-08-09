@@ -16,36 +16,36 @@ const steps = [
 ];
 
 const MAIN_OBJECTIVE_OPTIONS = [
-  { emoji: "🚀", label: "Atrair mais clientes" },
-  { emoji: "⭐", label: "Ser visto como referencia" },
-  { emoji: "📈", label: "Crescer nas redes sociais" },
-  { emoji: "🤝", label: "Conseguir novas oportunidades" },
-  { emoji: "🎯", label: "Deixar meu perfil mais profissional" },
-  { emoji: "💡", label: "Criar conteudos melhores" },
+  { marker: "CLI", label: "Atrair mais clientes" },
+  { marker: "REF", label: "Ser visto como referencia" },
+  { marker: "ALC", label: "Crescer nas redes sociais" },
+  { marker: "OPR", label: "Conseguir novas oportunidades" },
+  { marker: "PRO", label: "Deixar meu perfil mais profissional" },
+  { marker: "CON", label: "Criar conteudos melhores" },
 ];
 
 const PROFILE_CARDS: {
   id: string;
   value: ProfileType;
-  emoji: string;
+  marker: string;
   label: string;
 }[] = [
   {
     id: "business",
     value: "business",
-    emoji: "🏢",
+    marker: "NEG",
     label: "Tenho uma empresa ou negocio",
   },
   {
     id: "personal",
     value: "creator",
-    emoji: "👤",
+    marker: "IMG",
     label: "Trabalho com minha imagem pessoal",
   },
   {
     id: "content",
     value: "creator",
-    emoji: "🎥",
+    marker: "MID",
     label: "Produzo conteudo para internet",
   },
 ];
@@ -60,10 +60,10 @@ const MAIN_DIFFICULTY_OPTIONS = [
 ];
 
 const EVIDENCE_FIELDS = [
-  { assetType: "profile_top", emoji: "📱", label: "Tela inicial do perfil" },
-  { assetType: "feed", emoji: "📸", label: "Feed" },
-  { assetType: "highlights", emoji: "⭐", label: "Destaques" },
-  { assetType: "insights", emoji: "📊", label: "Insights (opcional)" },
+  { assetType: "profile_top", marker: "TOPO", label: "Tela inicial do perfil" },
+  { assetType: "feed", marker: "FEED", label: "Feed" },
+  { assetType: "highlights", marker: "DEST", label: "Destaques" },
+  { assetType: "insights", marker: "DADO", label: "Insights (opcional)" },
 ];
 
 export function NewDiagnosisForm() {
@@ -82,47 +82,56 @@ export function NewDiagnosisForm() {
     <form action={submitDiagnosisAction} className="space-y-8" noValidate>
       <input name="profileType" type="hidden" value={profileType} />
 
-      <div>
-        <div className="h-1 bg-graphite/10">
+      <div className="border border-graphite/10 bg-white/44 p-4">
+        <div className="h-2 bg-graphite/10">
           <div
-            className="h-1 bg-accent transition-all"
+            className="h-2 bg-accent transition-all"
             style={{ width: `${progress}%` }}
           />
         </div>
         <div className="mt-4 flex items-center justify-between gap-4">
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent">
-            {steps[step]}
+          <p className="kicker text-accent">{steps[step]}</p>
+          <p className="font-mono text-sm font-black text-graphite">
+            {progress}%
           </p>
-          <p className="text-sm text-graphite/54">{progress}%</p>
         </div>
       </div>
 
-      <section className={step === 0 ? "space-y-5" : "hidden"}>
-        <h2 className="text-3xl font-semibold">
-          O que voce quer melhorar no seu perfil?
-        </h2>
-        <EmojiCheckboxGroup
+      <section className={step === 0 ? "space-y-6" : "hidden"}>
+        <StepHeading
+          eyebrow="Primeira decisao"
+          title="O que voce quer destravar no seu perfil?"
+        />
+        <MarkerCheckboxGroup
           name="mainObjective"
           options={MAIN_OBJECTIVE_OPTIONS}
         />
       </section>
 
-      <section className={step === 1 ? "space-y-5" : "hidden"}>
-        <h2 className="text-3xl font-semibold">Qual e o seu perfil?</h2>
+      <section className={step === 1 ? "space-y-6" : "hidden"}>
+        <StepHeading eyebrow="Tipo de leitura" title="Qual e o seu perfil?" />
         <div className="grid gap-3 sm:grid-cols-3">
           {PROFILE_CARDS.map((card) => (
             <button
-              className={`border p-5 text-left transition ${
+              className={`min-h-36 border p-5 text-left transition ${
                 selectedProfileCardId === card.id
-                  ? "border-accent bg-white/70"
-                  : "border-graphite/10 bg-white/35 hover:border-accent/40"
+                  ? "border-accent bg-graphite text-paper"
+                  : "border-graphite/12 bg-white/46 text-graphite hover:border-accent/70 hover:bg-white/82"
               }`}
               key={card.id}
               onClick={() => setSelectedProfileCardId(card.id)}
               type="button"
             >
-              <span className="text-2xl">{card.emoji}</span>
-              <span className="mt-3 block text-sm font-medium leading-6 text-graphite/76">
+              <span
+                className={`choice-marker ${
+                  selectedProfileCardId === card.id
+                    ? "border-accent bg-accent text-ink"
+                    : ""
+                }`}
+              >
+                {card.marker}
+              </span>
+              <span className="mt-5 block text-base font-black leading-6">
                 {card.label}
               </span>
             </button>
@@ -130,29 +139,33 @@ export function NewDiagnosisForm() {
         </div>
       </section>
 
-      <section className={step === 2 ? "space-y-5" : "hidden"}>
-        <h2 className="text-3xl font-semibold">Como voce se apresenta hoje?</h2>
+      <section className={step === 2 ? "space-y-6" : "hidden"}>
+        <StepHeading
+          eyebrow="Posicionamento atual"
+          title="Como voce se apresenta hoje?"
+        />
         <TextArea
           label="Fale com suas palavras"
           name="niche"
           placeholder="Exemplo: sou personal trainer, ajudo pessoas a emagrecer e ganhar massa muscular."
           required
-          rows={3}
+          rows={4}
         />
       </section>
 
-      <section className={step === 3 ? "space-y-5" : "hidden"}>
-        <h2 className="text-3xl font-semibold">
-          Qual e o seu maior desafio hoje?
-        </h2>
+      <section className={step === 3 ? "space-y-6" : "hidden"}>
+        <StepHeading
+          eyebrow="Gargalo percebido"
+          title="Qual e o seu maior desafio hoje?"
+        />
         <CheckboxGroup
           name="mainDifficulty"
           options={MAIN_DIFFICULTY_OPTIONS}
         />
       </section>
 
-      <section className={step === 4 ? "space-y-5" : "hidden"}>
-        <h2 className="text-3xl font-semibold">Envie seu perfil.</h2>
+      <section className={step === 4 ? "space-y-6" : "hidden"}>
+        <StepHeading eyebrow="Origem da leitura" title="Envie seu perfil." />
         <TextField
           label="Instagram"
           name="instagramUrl"
@@ -162,11 +175,12 @@ export function NewDiagnosisForm() {
         />
       </section>
 
-      <section className={step === 5 ? "space-y-5" : "hidden"}>
+      <section className={step === 5 ? "space-y-6" : "hidden"}>
         <div>
-          <h2 className="text-3xl font-semibold">
-            Agora envie algumas imagens para nossa analise.
-          </h2>
+          <StepHeading
+            eyebrow="Provas visuais"
+            title="Agora envie as evidencias para analise."
+          />
           <p className="mt-3 max-w-2xl text-sm leading-6 text-graphite/64">
             Nossa inteligencia analisa seu perfil a partir das informacoes e
             materiais enviados. Os arquivos ficam em bucket privado, com prazo
@@ -176,16 +190,14 @@ export function NewDiagnosisForm() {
 
         <div className="grid gap-4 sm:grid-cols-2">
           {EVIDENCE_FIELDS.map((field) => (
-            <label
-              className="border border-graphite/10 bg-white/40 p-4"
-              key={field.assetType}
-            >
-              <span className="text-sm font-semibold">
-                {field.emoji} {field.label}
+            <label className="lux-panel block p-4" key={field.assetType}>
+              <span className="flex items-center gap-3 text-sm font-black">
+                <span className="choice-marker">{field.marker}</span>
+                {field.label}
               </span>
               <input
                 accept="image/png,image/jpeg,image/webp,application/pdf"
-                className="mt-3 block w-full text-sm text-graphite/60 file:mr-3 file:border-0 file:bg-graphite file:px-3 file:py-2 file:text-paper"
+                className="mt-4 block w-full text-sm text-graphite/60 file:mr-3 file:border-0 file:bg-graphite file:px-3 file:py-2 file:text-paper file:transition hover:file:bg-accent hover:file:text-ink"
                 multiple
                 name={`asset_${field.assetType}`}
                 type="file"
@@ -194,9 +206,9 @@ export function NewDiagnosisForm() {
           ))}
         </div>
 
-        <label className="flex gap-3 border border-graphite/10 bg-white/45 p-5 text-sm leading-6 text-graphite/72">
+        <label className="choice-card flex gap-3 p-5 text-sm leading-6 text-graphite/72">
           <input
-            className="mt-1"
+            className="mt-1 accent-accent"
             name="processingConsent"
             required
             type="checkbox"
@@ -208,14 +220,14 @@ export function NewDiagnosisForm() {
           </span>
         </label>
 
-        <button className="bg-graphite px-6 py-3 text-sm font-semibold text-paper transition hover:bg-accent">
+        <button className="action-primary w-full sm:w-auto">
           Enviar diagnostico
         </button>
       </section>
 
-      <div className="flex items-center justify-between border-t border-graphite/10 pt-5">
+      <div className="flex items-center justify-between border-t border-graphite/12 pt-5">
         <button
-          className="text-sm text-graphite/60 transition hover:text-accent disabled:opacity-30"
+          className="action-secondary disabled:cursor-not-allowed disabled:opacity-30"
           disabled={step === 0}
           onClick={() => setStep((current) => Math.max(0, current - 1))}
           type="button"
@@ -224,7 +236,7 @@ export function NewDiagnosisForm() {
         </button>
         {step < steps.length - 1 ? (
           <button
-            className="bg-graphite px-5 py-3 text-sm font-semibold text-paper transition hover:bg-accent"
+            className="action-primary"
             onClick={() =>
               setStep((current) => Math.min(steps.length - 1, current + 1))
             }
@@ -235,6 +247,17 @@ export function NewDiagnosisForm() {
         ) : null}
       </div>
     </form>
+  );
+}
+
+function StepHeading({ eyebrow, title }: { eyebrow: string; title: string }) {
+  return (
+    <div>
+      <p className="kicker text-graphite/42">{eyebrow}</p>
+      <h2 className="mt-3 text-3xl font-black leading-tight sm:text-4xl">
+        {title}
+      </h2>
+    </div>
   );
 }
 
@@ -253,9 +276,9 @@ function TextField({
 }) {
   return (
     <label className="block">
-      <span className="text-sm text-graphite/70">{label}</span>
+      <span className="text-sm font-semibold text-graphite/70">{label}</span>
       <input
-        className="mt-2 w-full border border-graphite/14 bg-white/70 px-4 py-3 outline-none transition focus:border-accent"
+        className="form-control mt-2"
         name={name}
         placeholder={placeholder}
         required={required}
@@ -280,9 +303,9 @@ function TextArea({
 }) {
   return (
     <label className="block">
-      <span className="text-sm text-graphite/70">{label}</span>
+      <span className="text-sm font-semibold text-graphite/70">{label}</span>
       <textarea
-        className="mt-2 w-full resize-y border border-graphite/14 bg-white/70 px-4 py-3 outline-none transition focus:border-accent"
+        className="form-control mt-2 resize-y"
         name={name}
         placeholder={placeholder}
         required={required}
@@ -294,37 +317,47 @@ function TextArea({
 
 function CheckboxGroup({ name, options }: { name: string; options: string[] }) {
   return (
-    <div className="grid gap-2 sm:grid-cols-2">
-      {options.map((option) => (
-        <label
-          className="flex items-start gap-3 border border-graphite/10 bg-white/40 p-3 text-sm leading-6 text-graphite/72"
-          key={option}
-        >
-          <input className="mt-1" name={name} type="checkbox" value={option} />
-          <span>{option}</span>
+    <div className="grid gap-3 sm:grid-cols-2">
+      {options.map((option, index) => (
+        <label className="choice-card flex items-start gap-3 p-4" key={option}>
+          <input
+            className="mt-1 accent-accent"
+            name={name}
+            type="checkbox"
+            value={option}
+          />
+          <span className="choice-marker">
+            {String(index + 1).padStart(2, "0")}
+          </span>
+          <span className="text-sm font-semibold leading-6">{option}</span>
         </label>
       ))}
     </div>
   );
 }
 
-function EmojiCheckboxGroup({
+function MarkerCheckboxGroup({
   name,
   options,
 }: {
   name: string;
-  options: { emoji: string; label: string }[];
+  options: { marker: string; label: string }[];
 }) {
   return (
     <div className="grid gap-3 sm:grid-cols-2">
       {options.map((option) => (
         <label
-          className="flex items-center gap-3 border border-graphite/10 bg-white/40 p-4 text-sm font-medium leading-6 text-graphite/76 transition has-[:checked]:border-accent has-[:checked]:bg-white/70"
+          className="choice-card flex min-h-20 items-center gap-4 p-4"
           key={option.label}
         >
-          <input name={name} type="checkbox" value={option.label} />
-          <span className="text-xl">{option.emoji}</span>
-          <span>{option.label}</span>
+          <input
+            className="accent-accent"
+            name={name}
+            type="checkbox"
+            value={option.label}
+          />
+          <span className="choice-marker">{option.marker}</span>
+          <span className="text-sm font-black leading-6">{option.label}</span>
         </label>
       ))}
     </div>

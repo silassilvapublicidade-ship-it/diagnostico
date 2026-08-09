@@ -2,14 +2,14 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-paper text-graphite">
+    <main className="min-h-screen bg-ink text-cream">
       <section className="mx-auto flex min-h-screen w-full max-w-6xl flex-col justify-between px-6 py-8 sm:px-10 lg:px-12">
-        <header className="flex items-center justify-between border-b border-graphite/10 pb-5">
-          <p className="font-mono text-xs uppercase tracking-[0.24em] text-graphite/60">
+        <header className="flex flex-col items-start gap-4 border-b border-white/12 pb-5 sm:flex-row sm:items-center sm:justify-between">
+          <p className="kicker text-cream/60">
             Diagnostico Estrategico de Perfil
           </p>
           <Link
-            className="rounded-full border border-accent/35 px-3 py-1 font-mono text-xs uppercase tracking-[0.16em] text-accent transition hover:bg-accent/10"
+            className="border border-accent/60 px-3 py-2 font-mono text-xs uppercase tracking-[0.16em] text-accent transition hover:bg-accent hover:text-ink"
             href="/entrar"
           >
             Area privada
@@ -18,22 +18,23 @@ export default function Home() {
 
         <div className="grid gap-10 py-16 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
           <div>
-            <p className="mb-5 font-mono text-xs uppercase tracking-[0.2em] text-accent">
-              Metodologia Silas Silva
-            </p>
-            <h1 className="max-w-3xl text-5xl font-semibold leading-[0.96] tracking-normal text-graphite sm:text-6xl lg:text-7xl">
-              Diagnostico estrategico antes de publicar mais.
+            <p className="kicker mb-5 text-accent">Metodologia Silas Silva</p>
+            <h1 className="display-title max-w-3xl text-[2.18rem] leading-[0.9] text-cream sm:text-7xl lg:text-8xl">
+              <span className="block">Diagnostico</span>
+              <span className="block">antes de</span>
+              <span className="block">publicar</span>
+              <span className="block">mais.</span>
             </h1>
           </div>
 
-          <div className="border-l border-graphite/12 pl-6">
-            <p className="max-w-md text-lg leading-8 text-graphite/72">
+          <div className="border-l border-accent/50 pl-6">
+            <p className="max-w-[18rem] text-lg leading-8 text-cream/72 sm:max-w-md">
               Uma leitura privada do perfil pelas 8 Dimensoes Estrategicas:
               posicionamento, autoridade, conteudo, conversao e os sinais que
               orientam a proxima decisao.
             </p>
             <Link
-              className="mt-6 inline-block bg-graphite px-5 py-3 text-sm font-semibold text-paper transition hover:bg-accent"
+              className="action-primary action-accent mt-6"
               href="/cadastro"
             >
               Comecar diagnostico
@@ -41,14 +42,17 @@ export default function Home() {
           </div>
         </div>
 
-        <section className="grid gap-3 border-t border-graphite/10 pt-6 sm:grid-cols-5">
+        <section className="method-strip border-t border-white/12 pt-6">
           {["ENTENDER", "PRIORIZAR", "CORRIGIR", "CONSTRUIR", "MEDIR"].map(
-            (step) => (
+            (step, index) => (
               <div
-                className="min-h-24 border border-graphite/10 bg-white/42 p-4"
+                className="min-h-24 border border-white/10 bg-white/[0.035] p-4"
                 key={step}
               >
-                <p className="font-mono text-xs uppercase tracking-[0.18em] text-graphite/56">
+                <p className="font-mono text-[10px] text-accent">
+                  {String(index + 1).padStart(2, "0")}
+                </p>
+                <p className="mt-3 text-xs font-black uppercase tracking-[0.18em] text-cream/72">
                   {step}
                 </p>
               </div>

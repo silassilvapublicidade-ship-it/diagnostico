@@ -7,7 +7,7 @@ export function AnalyzeButton({ hasResult }: { hasResult: boolean }) {
 
   return (
     <button
-      className="flex items-center gap-3 bg-graphite px-5 py-3 text-sm font-semibold text-paper transition hover:bg-accent disabled:cursor-not-allowed disabled:opacity-60"
+      className="action-primary gap-3 disabled:cursor-not-allowed disabled:opacity-60"
       disabled={pending}
       type="submit"
     >

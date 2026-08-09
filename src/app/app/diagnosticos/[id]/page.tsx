@@ -5,6 +5,7 @@ import {
   type ReviewReason,
 } from "@/domain/methodology-8d";
 import { webPayloadSchema } from "@/modules/ai/map-to-domain";
+import type { AiStrategicDiagnosis } from "@/modules/ai/output-schema";
 import { runDiagnosisAnalysisAction } from "@/modules/analysis/actions";
 import {
   DIMENSION_LABELS,
@@ -27,7 +28,7 @@ type PageProps = {
 export const dynamic = "force-dynamic";
 // The "Analisar agora" Server Action on this page calls Anthropic and can
 // take several minutes (observed ~3 min in production). Sets the timeout
-// for all Server Actions on this page — Vercel plan limits still apply and
+// for all Server Actions on this page - Vercel plan limits still apply and
 // may cap this lower; see docs/architecture.md for the platform-timeout
 // risk this doesn't fully eliminate.
 export const maxDuration = 300;
@@ -70,25 +71,26 @@ export default async function DiagnosisDetailPage({
 
   return (
     <div className="space-y-10">
-      <header className="max-w-4xl">
-        <p className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-accent">
-          Diagnostico
-        </p>
-        <h1 className="text-4xl font-semibold leading-none sm:text-5xl">
+      <header className="dark-panel p-6 text-cream sm:p-8">
+        <p className="kicker text-accent">Dossie estrategico</p>
+        <h1 className="display-title mt-4 max-w-4xl text-5xl leading-[0.9] sm:text-6xl">
           {state.title}
         </h1>
-        <p className="mt-5 max-w-2xl text-sm leading-6 text-graphite/64">
+        <p className="mt-5 max-w-2xl text-sm leading-6 text-cream/68">
           {state.body}
         </p>
       </header>
 
       {errorParam ? (
-        <p className="border-l-2 border-red-800 bg-white/50 px-4 py-3 text-sm text-red-900">
+        <p className="border-l-4 border-accent bg-white/70 px-4 py-3 text-sm font-semibold text-graphite">
           {errorParam}
         </p>
       ) : null}
 
-      <form action={runDiagnosisAnalysisAction} className="flex flex-col gap-3">
+      <form
+        action={runDiagnosisAnalysisAction}
+        className="lux-panel flex flex-col gap-3 p-5"
+      >
         <div className="flex items-center gap-4">
           <input name="requestId" type="hidden" value={diagnosis.request.id} />
           <AnalyzeButton hasResult={Boolean(result)} />
@@ -100,7 +102,7 @@ export default async function DiagnosisDetailPage({
         </div>
         <p className="max-w-md text-sm text-graphite/56">
           A leitura pode levar alguns minutos, porque analisamos as evidencias
-          enviadas com cuidado. Nao feche esta pagina — o botao fica
+          enviadas com cuidado. Nao feche esta pagina - o botao fica
           desabilitado enquanto a analise roda e o resultado aparece aqui assim
           que estiver pronto.
         </p>
@@ -117,7 +119,7 @@ export default async function DiagnosisDetailPage({
       {isTestAnalysis ? (
         <Callout title="Analise de teste controlado">
           Este resultado veio de uma chamada real a IA em modo de teste
-          controlado. Nesta fase nao existe cobranca nem entrega comercial —
+          controlado. Nesta fase nao existe cobranca nem entrega comercial -
           serve para validar a qualidade da leitura antes de qualquer automacao
           publica.
         </Callout>
@@ -135,21 +137,19 @@ export default async function DiagnosisDetailPage({
       </section>
 
       {profileTopAsset ? (
-        <section className="flex flex-col gap-4 border border-graphite/10 bg-white/40 p-4 sm:flex-row sm:items-start">
+        <section className="dark-panel flex flex-col gap-5 p-4 text-cream sm:flex-row sm:items-start">
           {/* eslint-disable-next-line @next/next/no-img-element -- private,
               per-owner evidence served through our own authenticated route,
               not a static/remote asset next/image can optimize. */}
           <img
             alt="Topo do perfil enviado como evidencia"
-            className="w-full max-w-[240px] rounded border border-graphite/10"
+            className="w-full max-w-[240px] border border-accent/35"
             src={`/app/diagnosticos/${diagnosis.request.id}/assets/${profileTopAsset.id}`}
           />
           <div>
-            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-graphite/46">
-              Perfil enviado
-            </p>
-            <p className="mt-2 max-w-md text-sm leading-6 text-graphite/64">
-              Topo do perfil enviado como evidencia — foto e bio ficam aqui como
+            <p className="kicker text-accent">Perfil enviado</p>
+            <p className="mt-2 max-w-md text-sm leading-6 text-cream/68">
+              Topo do perfil enviado como evidencia - foto e bio ficam aqui como
               referencia enquanto voce le o diagnostico.
             </p>
           </div>
@@ -158,13 +158,11 @@ export default async function DiagnosisDetailPage({
 
       {result ? (
         <>
-          <section className="grid gap-10 border-y border-graphite/10 py-10 lg:grid-cols-[auto_1fr] lg:items-center lg:gap-14">
+          <section className="grid gap-10 border-y border-graphite/14 py-10 lg:grid-cols-[auto_1fr] lg:items-center lg:gap-14">
             <div className="flex items-center gap-6">
               <ScoreRing score={result.score} />
               <div>
-                <p className="font-mono text-xs uppercase tracking-[0.18em] text-graphite/46">
-                  Score Estrategico
-                </p>
+                <p className="kicker text-graphite/46">Score Estrategico</p>
                 <p className="mt-2 text-sm text-graphite/60">
                   {result.scoreKind === "complete"
                     ? "Score completo"
@@ -188,11 +186,9 @@ export default async function DiagnosisDetailPage({
 
           {webPayload ? (
             <section className="space-y-8">
-              <div className="border-l-4 border-accent bg-white/50 p-6 sm:p-8">
-                <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent">
-                  Resumo executivo
-                </p>
-                <p className="mt-4 text-xl leading-9 text-graphite/82 sm:text-2xl">
+              <div className="border-l-4 border-accent bg-graphite p-6 text-paper sm:p-8">
+                <p className="kicker text-accent">Resumo executivo</p>
+                <p className="mt-4 text-xl font-semibold leading-9 text-paper/86 sm:text-2xl">
                   {webPayload.executiveSummary}
                 </p>
               </div>
@@ -230,10 +226,8 @@ export default async function DiagnosisDetailPage({
           <section>
             <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent">
-                  8 Dimensoes Estrategicas
-                </p>
-                <h2 className="mt-2 text-3xl font-semibold">Leitura inicial</h2>
+                <p className="kicker text-accent">8 Dimensoes Estrategicas</p>
+                <h2 className="mt-2 text-4xl font-black">Leitura inicial</h2>
               </div>
               {result.requiresReview ? (
                 <p className="text-sm text-red-800">Revisao obrigatoria</p>
@@ -258,6 +252,7 @@ export default async function DiagnosisDetailPage({
                     body={
                       richDimension?.diagnosis ?? dimension.safeRecommendation
                     }
+                    strategicDiagnosis={richDimension?.strategicDiagnosis}
                     limitations={dimension.limitations}
                   />
                 );
@@ -276,10 +271,8 @@ export default async function DiagnosisDetailPage({
           ) : null}
         </>
       ) : (
-        <section className="border border-graphite/10 bg-white/40 p-6">
-          <h2 className="text-2xl font-semibold">
-            Resultado ainda nao liberado.
-          </h2>
+        <section className="lux-panel p-6">
+          <h2 className="text-3xl font-black">Resultado ainda nao liberado.</h2>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-graphite/64">
             A analise existe, mas ainda nao ha resultado consultavel para o
             usuario. Isso acontece quando o processamento ainda nao ocorreu ou
@@ -304,22 +297,18 @@ export default async function DiagnosisDetailPage({
 
 function Metric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="border border-graphite/10 bg-white/40 p-4">
-      <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-graphite/42">
-        {label}
-      </p>
-      <p className="mt-3 text-lg font-semibold">{value}</p>
+    <div className="lux-panel p-4">
+      <p className="kicker text-graphite/42">{label}</p>
+      <p className="mt-3 text-xl font-black">{value}</p>
     </div>
   );
 }
 
 function StatusChip({ label, value }: { label: string; value: string }) {
   return (
-    <div className="border border-graphite/10 bg-white/45 px-4 py-3">
-      <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-graphite/42">
-        {label}
-      </p>
-      <p className="mt-2 text-base font-semibold">{value}</p>
+    <div className="border border-graphite/14 bg-white/58 px-4 py-3">
+      <p className="kicker text-[10px] text-graphite/42">{label}</p>
+      <p className="mt-2 text-base font-black">{value}</p>
     </div>
   );
 }
@@ -332,10 +321,8 @@ function Callout({
   children: React.ReactNode;
 }) {
   return (
-    <section className="border-l-2 border-accent bg-white/50 px-5 py-4">
-      <p className="font-mono text-xs uppercase tracking-[0.18em] text-accent">
-        {title}
-      </p>
+    <section className="border-l-4 border-accent bg-white/64 px-5 py-4">
+      <p className="kicker text-accent">{title}</p>
       <div className="mt-2 text-sm leading-6 text-graphite/70">{children}</div>
     </section>
   );
@@ -348,11 +335,11 @@ function ScoreRing({ score }: { score: number }) {
     <div
       className="relative flex h-32 w-32 shrink-0 items-center justify-center rounded-full sm:h-36 sm:w-36"
       style={{
-        background: `conic-gradient(var(--accent) ${percentage * 3.6}deg, color-mix(in srgb, var(--foreground) 10%, transparent) 0deg)`,
+        background: `conic-gradient(var(--accent) ${percentage * 3.6}deg, color-mix(in srgb, var(--graphite) 12%, transparent) 0deg)`,
       }}
     >
       <div className="flex h-[calc(100%-14px)] w-[calc(100%-14px)] flex-col items-center justify-center rounded-full bg-paper">
-        <span className="text-5xl font-semibold leading-none">{score}</span>
+        <span className="display-title text-5xl leading-none">{score}</span>
         <span className="mt-1 font-mono text-[10px] uppercase tracking-[0.14em] text-graphite/46">
           de 100
         </span>
@@ -382,19 +369,21 @@ function DimensionCard({
   label,
   score,
   body,
+  strategicDiagnosis,
   limitations,
 }: {
   label: string;
   score: number | null;
   body: string;
+  strategicDiagnosis?: AiStrategicDiagnosis | undefined;
   limitations: string[];
 }) {
   return (
-    <details className="group border border-graphite/10 bg-white/40 open:bg-white/65">
+    <details className="group border border-graphite/12 bg-white/48 open:bg-white/78">
       <summary className="flex cursor-pointer list-none items-center gap-4 p-5">
         <div className="flex-1">
           <div className="flex items-center justify-between gap-3">
-            <p className="text-lg font-semibold">{label}</p>
+            <p className="text-xl font-black">{label}</p>
             <p className="shrink-0 text-sm text-graphite/56">
               {score !== null ? `${score} pontos` : "Evidencia insuficiente"}
             </p>
@@ -407,13 +396,53 @@ function DimensionCard({
           +
         </span>
       </summary>
-      <div className="space-y-3 border-t border-graphite/10 px-5 pb-5 pt-4 text-sm leading-6 text-graphite/68">
-        <p>{body}</p>
+      <div className="space-y-5 border-t border-graphite/10 px-5 pb-5 pt-4 text-sm leading-6 text-graphite/70">
+        {strategicDiagnosis ? (
+          <div className="grid gap-3 lg:grid-cols-2">
+            <InsightBlock
+              label="Diagnostico"
+              value={strategicDiagnosis.problem}
+            />
+            <InsightBlock
+              label="Evidencia"
+              value={strategicDiagnosis.evidence}
+            />
+            <InsightBlock
+              label="Consequencia"
+              value={strategicDiagnosis.consequence}
+            />
+            <InsightBlock
+              label="Correcao"
+              value={strategicDiagnosis.correction}
+            />
+            <InsightBlock
+              label="Exemplo aplicado"
+              value={strategicDiagnosis.practical_example}
+            />
+            <InsightBlock
+              label="Primeiro passo"
+              value={strategicDiagnosis.next_step}
+            />
+          </div>
+        ) : (
+          <p>{body}</p>
+        )}
         {limitations.length > 0 ? (
-          <p className="text-graphite/50">Limite: {limitations.join("; ")}</p>
+          <p className="border-t border-graphite/10 pt-3 text-graphite/50">
+            Limite: {limitations.join("; ")}
+          </p>
         ) : null}
       </div>
     </details>
+  );
+}
+
+function InsightBlock({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="border border-graphite/10 bg-paper/70 p-4">
+      <p className="kicker text-[10px] text-accent">{label}</p>
+      <p className="mt-2 text-sm leading-6 text-graphite/72">{value}</p>
+    </div>
   );
 }
 
@@ -423,10 +452,8 @@ function ChecklistCard({ title, items }: { title: string; items: string[] }) {
   }
 
   return (
-    <div className="border border-graphite/10 bg-white/40 p-5">
-      <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-accent">
-        {title}
-      </p>
+    <div className="lux-panel p-5">
+      <p className="kicker text-accent">{title}</p>
       <ul className="mt-4 space-y-3 text-sm leading-6 text-graphite/72">
         {items.map((item) => (
           <li className="flex gap-3" key={item}>
@@ -451,7 +478,7 @@ function PlanCard({
   }
 
   return (
-    <div className="border border-graphite/10 bg-white/40 p-5">
+    <div className="lux-panel p-5">
       <span className="inline-block bg-graphite px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-paper">
         {timeframe}
       </span>

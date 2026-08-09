@@ -10,17 +10,19 @@ export default async function DiagnosesPage() {
 
   return (
     <div className="space-y-8">
-      <header className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+      <header className="dark-panel flex flex-col gap-6 p-6 text-cream sm:p-8 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <p className="mb-3 font-mono text-xs uppercase tracking-[0.2em] text-accent">
-            Meus diagnosticos
-          </p>
-          <h1 className="text-4xl font-semibold leading-none">
-            Historico de leituras.
+          <p className="kicker text-accent">Meus diagnosticos</p>
+          <h1 className="display-title mt-4 max-w-2xl text-5xl leading-[0.9] sm:text-6xl">
+            Arquivo de leituras estrategicas.
           </h1>
+          <p className="mt-5 max-w-xl text-sm leading-6 text-cream/68">
+            Cada envio preserva contexto, evidencias, score e historico para
+            comparacao futura.
+          </p>
         </div>
         <Link
-          className="bg-graphite px-5 py-3 text-sm font-semibold text-paper transition hover:bg-accent"
+          className="action-primary action-accent"
           href="/app/diagnosticos/novo"
         >
           Novo diagnostico
@@ -28,28 +30,32 @@ export default async function DiagnosesPage() {
       </header>
 
       {diagnoses.length === 0 ? (
-        <section className="border border-graphite/10 bg-white/40 p-8">
-          <h2 className="text-2xl font-semibold">Nada enviado ainda.</h2>
+        <section className="lux-panel p-8">
+          <p className="kicker text-accent">Sem registros</p>
+          <h2 className="mt-4 text-3xl font-black">Nada enviado ainda.</h2>
           <p className="mt-3 max-w-xl text-sm leading-6 text-graphite/64">
             O primeiro diagnostico cria o briefing, registra evidencias privadas
             e prepara o pipeline para a futura camada de inteligencia.
           </p>
         </section>
       ) : (
-        <div className="divide-y divide-graphite/10 border-y border-graphite/10">
-          {diagnoses.map((diagnosis) => (
+        <div className="grid gap-3">
+          {diagnoses.map((diagnosis, index) => (
             <Link
-              className="grid gap-4 py-5 transition hover:bg-white/35 sm:grid-cols-[1fr_auto]"
+              className="lux-panel grid gap-4 p-5 transition hover:border-accent/70 sm:grid-cols-[auto_1fr_auto] sm:items-center"
               href={`/app/diagnosticos/${diagnosis.id}`}
               key={diagnosis.id}
             >
+              <span className="choice-marker h-11 min-w-11">
+                {String(index + 1).padStart(2, "0")}
+              </span>
               <div>
-                <p className="font-mono text-xs uppercase tracking-[0.16em] text-graphite/46">
+                <p className="kicker text-graphite/46">
                   {diagnosis.profile_type === "business"
                     ? "Negocio"
                     : "Criador"}
                 </p>
-                <h2 className="mt-2 text-2xl font-semibold">
+                <h2 className="mt-2 text-2xl font-black">
                   {STATUS_COPY[diagnosis.status].title}
                 </h2>
                 <p className="mt-2 text-sm leading-6 text-graphite/62">
