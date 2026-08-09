@@ -10,10 +10,10 @@ import type {
   WeightsSnapshot,
 } from "./types";
 
-export const METHODOLOGY_VERSION = "methodology-8d@0.1.0";
-export const PROMPT_VERSION = "prompt-not-integrated@0.1.0";
-export const SCORING_VERSION = "scoring-8d@0.1.0";
-export const RESULT_VERSION = "analysis-result@0.1.0";
+export const METHODOLOGY_VERSION = "methodology-8d@0.2.0";
+export const PROMPT_VERSION = "prompt-not-integrated@0.2.0";
+export const SCORING_VERSION = "scoring-8d@0.2.0";
+export const RESULT_VERSION = "analysis-result@0.2.0";
 export const DEFAULT_MODEL_PROVIDER = "not_integrated";
 export const DEFAULT_MODEL_NAME = "deterministic-fixture";
 

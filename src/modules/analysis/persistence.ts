@@ -218,7 +218,7 @@ export async function persistAnalysisResult(
   const { error: reportError } = await admin.from("analysis_reports").insert({
     analysis_result_id: analysisResult.id,
     status: reportStatus,
-    report_version: "web-initial@0.1.0",
+    report_version: "web-initial@0.2.0",
     web_payload: result.requiresReview
       ? null
       : (params.webPayload ?? {

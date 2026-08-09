@@ -23,12 +23,12 @@ export default async function RecoverAccessPage({ searchParams }: PageProps) {
       </p>
 
       {error ? (
-        <p className="mt-6 border-l-4 border-accent bg-white/70 px-4 py-3 text-sm font-semibold text-graphite">
+        <p className="mt-6 rounded-lg border border-accent/40 bg-accent/10 px-4 py-3 text-sm font-semibold text-cream">
           {error}
         </p>
       ) : null}
       {sent ? (
-        <p className="mt-6 border-l-4 border-accent bg-white/70 px-4 py-3 text-sm font-semibold text-graphite">
+        <p className="mt-6 rounded-lg border border-accent/40 bg-accent/10 px-4 py-3 text-sm font-semibold text-cream">
           Se o email existir, o link de recuperacao sera enviado.
         </p>
       ) : null}

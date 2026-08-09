@@ -67,7 +67,9 @@ export default async function DiagnosesPage() {
                   {new Date(diagnosis.created_at).toLocaleDateString("pt-BR")}
                 </p>
                 {diagnosis.requires_review ? (
-                  <p className="mt-2 text-red-800">Revisao necessaria</p>
+                  <p className="mt-2 font-semibold text-accent">
+                    Revisao necessaria
+                  </p>
                 ) : null}
               </div>
             </Link>

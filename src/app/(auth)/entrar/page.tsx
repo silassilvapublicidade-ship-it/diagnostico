@@ -31,7 +31,7 @@ export default async function SignInPage({ searchParams }: PageProps) {
       </p>
 
       {error ? (
-        <p className="mt-6 border-l-4 border-accent bg-white/70 px-4 py-3 text-sm font-semibold text-graphite">
+        <p className="mt-6 rounded-lg border border-accent/40 bg-accent/10 px-4 py-3 text-sm font-semibold text-cream">
           {error}
         </p>
       ) : null}

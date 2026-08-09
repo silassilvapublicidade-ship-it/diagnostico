@@ -15,7 +15,7 @@ import { aiOutputCreatorLowEvidence } from "../fixtures/ai-output-creator-low-ev
 
 const DOMAIN_DEFAULT_MODEL_PROVIDER = "not_integrated";
 const DOMAIN_DEFAULT_MODEL_NAME = "deterministic-fixture";
-const DOMAIN_DEFAULT_PROMPT_VERSION = "prompt-not-integrated@0.1.0";
+const DOMAIN_DEFAULT_PROMPT_VERSION = "prompt-not-integrated@0.2.0";
 
 describe("mapAiOutputToDomainInput", () => {
   it("produces a domain input that satisfies the engine's own Zod schema", () => {

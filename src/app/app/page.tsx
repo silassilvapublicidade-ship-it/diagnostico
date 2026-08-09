@@ -27,7 +27,7 @@ export default async function AppHomePage() {
           {["ENTENDER", "PRIORIZAR", "CORRIGIR", "CONSTRUIR", "MEDIR"].map(
             (step, index) => (
               <div
-                className="border border-white/10 bg-white/[0.035] p-3"
+                className="rounded-lg border border-white/10 bg-white/[0.035] p-3"
                 key={step}
               >
                 <p className="font-mono text-[10px] text-accent">
@@ -62,14 +62,14 @@ export default async function AppHomePage() {
         </Link>
 
         <Link
-          className="border border-graphite bg-graphite p-6 text-paper transition hover:border-accent sm:p-7"
+          className="lux-panel p-6 transition hover:border-accent/60 sm:p-7"
           href="/app/diagnosticos"
         >
           <p className="kicker text-accent">Meus diagnosticos</p>
-          <p className="display-title mt-8 text-7xl leading-none text-paper">
+          <p className="display-title mt-8 text-7xl leading-none text-cream">
             {diagnoses.length}
           </p>
-          <p className="mt-3 text-sm text-paper/62">
+          <p className="mt-3 text-sm text-cream/62">
             {diagnoses.length === 1
               ? "diagnostico criado"
               : "diagnosticos criados"}

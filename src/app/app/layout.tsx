@@ -24,11 +24,11 @@ export default async function PrivateLayout({
   return (
     <main className="min-h-screen bg-ink text-cream">
       <div className="mx-auto grid min-h-screen w-full max-w-[1500px] lg:grid-cols-[310px_1fr]">
-        <aside className="dark-panel flex flex-col justify-between gap-10 px-5 py-5 sm:px-8 lg:min-h-screen lg:px-7 lg:py-8">
+        <aside className="flex flex-col justify-between gap-10 border-b border-cream/10 bg-panel/80 px-5 py-5 sm:px-8 lg:min-h-screen lg:border-b-0 lg:border-r lg:px-7 lg:py-8">
           <div>
             <Link className="group block" href="/app">
               <div className="flex items-center gap-3">
-                <span className="flex h-12 w-12 items-center justify-center border border-accent bg-accent text-sm font-black text-ink">
+                <span className="flex h-12 w-12 items-center justify-center rounded-lg border border-accent bg-accent text-sm font-black text-ink">
                   SS
                 </span>
                 <div>
@@ -43,7 +43,7 @@ export default async function PrivateLayout({
             <nav className="mt-10 grid gap-2 text-sm">
               {navItems.map((item) => (
                 <Link
-                  className="group grid grid-cols-[2.4rem_1fr] items-center border border-white/8 bg-white/[0.035] px-3 py-3 text-cream/72 transition hover:border-accent/70 hover:bg-accent/10 hover:text-cream"
+                  className="group grid grid-cols-[2.4rem_1fr] items-center rounded-lg border border-white/8 bg-white/[0.035] px-3 py-3 text-cream/72 transition hover:border-accent/70 hover:bg-accent/10 hover:text-cream"
                   href={item.href}
                   key={item.href}
                 >
@@ -84,7 +84,7 @@ export default async function PrivateLayout({
           </div>
         </aside>
 
-        <section className="min-h-screen bg-paper text-graphite shadow-[-18px_0_60px_rgba(0,0,0,0.28)] lg:rounded-l-md">
+        <section className="min-h-screen min-w-0 bg-ink text-cream">
           <div className="mx-auto w-full max-w-6xl px-5 py-8 sm:px-8 lg:px-12 lg:py-12">
             {children}
           </div>

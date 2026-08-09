@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 
 import {
   analysisCalculationResultSchema,
+  METHODOLOGY_VERSION,
   type ReviewReason,
 } from "@/domain/methodology-8d";
 import { webPayloadSchema } from "@/modules/ai/map-to-domain";
@@ -57,6 +58,10 @@ export default async function DiagnosisDetailPage({
   const isDevelopmentFixture =
     diagnosis.result?.result_origin === "development_fixture";
   const isTestAnalysis = diagnosis.result?.is_test_analysis === true;
+  const generatedMethodologyVersion = result
+    ? formatVersionToken(result.methodologyVersion)
+    : null;
+  const currentMethodologyVersion = formatVersionToken(METHODOLOGY_VERSION);
 
   const parsedWebPayload =
     diagnosis.report?.status === "available"
@@ -82,7 +87,7 @@ export default async function DiagnosisDetailPage({
       </header>
 
       {errorParam ? (
-        <p className="border-l-4 border-accent bg-white/70 px-4 py-3 text-sm font-semibold text-graphite">
+        <p className="rounded-lg border border-accent/40 bg-accent/10 px-4 py-3 text-sm font-semibold text-cream">
           {errorParam}
         </p>
       ) : null}
@@ -158,15 +163,18 @@ export default async function DiagnosisDetailPage({
 
       {result ? (
         <>
-          <section className="grid gap-10 border-y border-graphite/14 py-10 lg:grid-cols-[auto_1fr] lg:items-center lg:gap-14">
-            <div className="flex items-center gap-6">
+          <section className="dark-panel grid gap-8 p-6 sm:p-8 lg:grid-cols-[auto_1fr] lg:items-center lg:gap-12">
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
               <ScoreRing score={result.score} />
               <div>
-                <p className="kicker text-graphite/46">Score Estrategico</p>
-                <p className="mt-2 text-sm text-graphite/60">
+                <p className="kicker text-accent">Lente estrategica</p>
+                <h2 className="mt-3 max-w-md text-3xl font-black leading-tight">
+                  O perfil foi lido pelas 8 Dimensoes Estrategicas.
+                </h2>
+                <p className="mt-3 text-sm leading-6 text-cream/58">
                   {result.scoreKind === "complete"
-                    ? "Score completo"
-                    : "Score parcial"}
+                    ? "Score completo, com todas as dimensoes consideradas."
+                    : "Score parcial, calculado apenas com dimensoes avaliaveis."}
                 </p>
               </div>
             </div>
@@ -179,18 +187,37 @@ export default async function DiagnosisDetailPage({
                 label="Confianca"
                 value={CONFIDENCE_COPY[result.confidence]}
               />
-              <StatusChip label="Metodologia" value="Metodologia Silas Silva" />
-              <StatusChip label="Versao" value={result.methodologyVersion} />
+              <StatusChip label="Metodo" value="Metodologia Silas Silva" />
+              <StatusChip
+                label="Versao atual"
+                value={currentMethodologyVersion}
+              />
+              {generatedMethodologyVersion &&
+              result.methodologyVersion !== METHODOLOGY_VERSION ? (
+                <StatusChip
+                  label="Registro historico"
+                  value={generatedMethodologyVersion}
+                />
+              ) : null}
             </div>
           </section>
 
           {webPayload ? (
             <section className="space-y-8">
-              <div className="border-l-4 border-accent bg-graphite p-6 text-paper sm:p-8">
-                <p className="kicker text-accent">Resumo executivo</p>
-                <p className="mt-4 text-xl font-semibold leading-9 text-paper/86 sm:text-2xl">
-                  {webPayload.executiveSummary}
-                </p>
+              <div className="lux-panel overflow-hidden">
+                <div className="grid gap-6 p-6 sm:p-8 lg:grid-cols-[13rem_1fr]">
+                  <div>
+                    <p className="kicker text-accent">Resumo executivo</p>
+                    <p className="mt-4 text-sm leading-6 text-cream/54">
+                      A leitura abaixo resume o gargalo central antes do plano
+                      de acao.
+                    </p>
+                  </div>
+                  <p className="max-w-4xl text-xl font-semibold leading-9 text-cream/88 sm:text-2xl">
+                    {webPayload.executiveSummary}
+                  </p>
+                </div>
+                <div className="hairline" />
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
@@ -230,7 +257,9 @@ export default async function DiagnosisDetailPage({
                 <h2 className="mt-2 text-4xl font-black">Leitura inicial</h2>
               </div>
               {result.requiresReview ? (
-                <p className="text-sm text-red-800">Revisao obrigatoria</p>
+                <p className="text-sm font-semibold text-accent">
+                  Revisao obrigatoria
+                </p>
               ) : null}
             </div>
 
@@ -279,7 +308,7 @@ export default async function DiagnosisDetailPage({
             quando a entrega esta bloqueada por revisao.
           </p>
           {diagnosis.request.review_reasons?.length ? (
-            <p className="mt-4 text-sm text-red-900">
+            <p className="mt-4 text-sm font-semibold text-accent">
               Motivos:{" "}
               {diagnosis.request.review_reasons
                 .map(
@@ -298,7 +327,7 @@ export default async function DiagnosisDetailPage({
 function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div className="lux-panel p-4">
-      <p className="kicker text-graphite/42">{label}</p>
+      <p className="kicker text-accent">{label}</p>
       <p className="mt-3 text-xl font-black">{value}</p>
     </div>
   );
@@ -306,9 +335,9 @@ function Metric({ label, value }: { label: string; value: string }) {
 
 function StatusChip({ label, value }: { label: string; value: string }) {
   return (
-    <div className="border border-graphite/14 bg-white/58 px-4 py-3">
-      <p className="kicker text-[10px] text-graphite/42">{label}</p>
-      <p className="mt-2 text-base font-black">{value}</p>
+    <div className="rounded-lg border border-cream/10 bg-black/20 px-4 py-3">
+      <p className="kicker text-[10px] text-accent">{label}</p>
+      <p className="mt-2 text-base font-black text-cream">{value}</p>
     </div>
   );
 }
@@ -321,9 +350,9 @@ function Callout({
   children: React.ReactNode;
 }) {
   return (
-    <section className="border-l-4 border-accent bg-white/64 px-5 py-4">
+    <section className="rounded-lg border border-accent/30 bg-accent/10 px-5 py-4">
       <p className="kicker text-accent">{title}</p>
-      <div className="mt-2 text-sm leading-6 text-graphite/70">{children}</div>
+      <div className="mt-2 text-sm leading-6 text-cream/70">{children}</div>
     </section>
   );
 }
@@ -338,7 +367,7 @@ function ScoreRing({ score }: { score: number }) {
         background: `conic-gradient(var(--accent) ${percentage * 3.6}deg, color-mix(in srgb, var(--graphite) 12%, transparent) 0deg)`,
       }}
     >
-      <div className="flex h-[calc(100%-14px)] w-[calc(100%-14px)] flex-col items-center justify-center rounded-full bg-paper">
+      <div className="flex h-[calc(100%-14px)] w-[calc(100%-14px)] flex-col items-center justify-center rounded-full bg-panel">
         <span className="display-title text-5xl leading-none">{score}</span>
         <span className="mt-1 font-mono text-[10px] uppercase tracking-[0.14em] text-graphite/46">
           de 100
@@ -351,12 +380,12 @@ function ScoreRing({ score }: { score: number }) {
 function ScoreBar({ score }: { score: number | null }) {
   if (score === null) {
     return (
-      <div className="h-1.5 w-full rounded-full border border-dashed border-graphite/20" />
+      <div className="h-1.5 w-full rounded-full border border-dashed border-cream/18" />
     );
   }
 
   return (
-    <div className="h-1.5 w-full overflow-hidden rounded-full bg-graphite/10">
+    <div className="h-1.5 w-full overflow-hidden rounded-full bg-cream/10">
       <div
         className="h-full rounded-full bg-accent"
         style={{ width: `${Math.max(0, Math.min(100, score))}%` }}
@@ -379,12 +408,12 @@ function DimensionCard({
   limitations: string[];
 }) {
   return (
-    <details className="group border border-graphite/12 bg-white/48 open:bg-white/78">
-      <summary className="flex cursor-pointer list-none items-center gap-4 p-5">
+    <details className="group rounded-lg border border-cream/10 bg-panel/84 open:border-accent/35 open:bg-panel-soft">
+      <summary className="flex cursor-pointer list-none items-center gap-4 p-5 transition hover:bg-accent/8">
         <div className="flex-1">
           <div className="flex items-center justify-between gap-3">
             <p className="text-xl font-black">{label}</p>
-            <p className="shrink-0 text-sm text-graphite/56">
+            <p className="shrink-0 text-sm text-cream/56">
               {score !== null ? `${score} pontos` : "Evidencia insuficiente"}
             </p>
           </div>
@@ -392,11 +421,11 @@ function DimensionCard({
             <ScoreBar score={score} />
           </div>
         </div>
-        <span className="shrink-0 font-mono text-xl leading-none text-graphite/40 transition-transform group-open:rotate-45">
+        <span className="shrink-0 font-mono text-xl leading-none text-accent transition-transform group-open:rotate-45">
           +
         </span>
       </summary>
-      <div className="space-y-5 border-t border-graphite/10 px-5 pb-5 pt-4 text-sm leading-6 text-graphite/70">
+      <div className="space-y-5 border-t border-cream/10 px-5 pb-5 pt-4 text-sm leading-6 text-cream/70">
         {strategicDiagnosis ? (
           <div className="grid gap-3 lg:grid-cols-2">
             <InsightBlock
@@ -428,7 +457,7 @@ function DimensionCard({
           <p>{body}</p>
         )}
         {limitations.length > 0 ? (
-          <p className="border-t border-graphite/10 pt-3 text-graphite/50">
+          <p className="border-t border-cream/10 pt-3 text-cream/50">
             Limite: {limitations.join("; ")}
           </p>
         ) : null}
@@ -439,9 +468,9 @@ function DimensionCard({
 
 function InsightBlock({ label, value }: { label: string; value: string }) {
   return (
-    <div className="border border-graphite/10 bg-paper/70 p-4">
+    <div className="rounded-lg border border-cream/10 bg-black/18 p-4 shadow-[inset_3px_0_0_rgba(255,90,0,0.45)]">
       <p className="kicker text-[10px] text-accent">{label}</p>
-      <p className="mt-2 text-sm leading-6 text-graphite/72">{value}</p>
+      <p className="mt-2 text-sm leading-6 text-cream/72">{value}</p>
     </div>
   );
 }
@@ -454,7 +483,7 @@ function ChecklistCard({ title, items }: { title: string; items: string[] }) {
   return (
     <div className="lux-panel p-5">
       <p className="kicker text-accent">{title}</p>
-      <ul className="mt-4 space-y-3 text-sm leading-6 text-graphite/72">
+      <ul className="mt-4 space-y-3 text-sm leading-6 text-cream/72">
         {items.map((item) => (
           <li className="flex gap-3" key={item}>
             <span className="mt-0.5 shrink-0 text-accent">&rarr;</span>
@@ -479,10 +508,10 @@ function PlanCard({
 
   return (
     <div className="lux-panel p-5">
-      <span className="inline-block bg-graphite px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-paper">
+      <span className="inline-block rounded-md bg-accent px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-ink">
         {timeframe}
       </span>
-      <ul className="mt-4 space-y-3 text-sm leading-6 text-graphite/72">
+      <ul className="mt-4 space-y-3 text-sm leading-6 text-cream/72">
         {items.map((item, index) => (
           <li className="flex gap-2" key={item}>
             <span className="shrink-0 font-semibold text-accent">
@@ -494,4 +523,14 @@ function PlanCard({
       </ul>
     </div>
   );
+}
+
+function formatVersionToken(version: string) {
+  const normalized = version
+    .replace("methodology-8d@", "8D v")
+    .replace("analysis-result@", "Resultado v")
+    .replace("scoring-8d@", "Score v")
+    .replace("prompt-not-integrated@", "Prompt base v");
+
+  return normalized === version ? version : normalized;
 }

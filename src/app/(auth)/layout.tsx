@@ -7,7 +7,7 @@ export default function AuthLayout({
   return (
     <main className="min-h-screen bg-ink text-cream">
       <section className="mx-auto grid min-h-screen w-full max-w-6xl px-6 py-8 sm:px-10 lg:grid-cols-[0.9fr_1.1fr] lg:px-12">
-        <aside className="dark-panel hidden pr-10 lg:flex lg:flex-col lg:justify-between">
+        <aside className="dark-panel hidden p-8 lg:flex lg:flex-col lg:justify-between">
           <Link className="kicker text-cream/62" href="/">
             Diagnostico Estrategico de Perfil
           </Link>
@@ -23,9 +23,7 @@ export default function AuthLayout({
         </aside>
 
         <div className="flex items-center justify-center py-10 lg:pl-14">
-          <div className="lux-panel w-full max-w-md p-6 text-graphite sm:p-8">
-            {children}
-          </div>
+          <div className="lux-panel w-full max-w-md p-6 sm:p-8">{children}</div>
         </div>
       </section>
     </main>

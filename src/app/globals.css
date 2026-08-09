@@ -1,14 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  --background: #070706;
-  --foreground: #f6efe4;
-  --paper: #f4ecdf;
-  --graphite: #11100e;
-  --muted: #766d62;
+  --background: #050403;
+  --foreground: #f7efe5;
+  --paper: #f7efe5;
+  --graphite: #f7efe5;
+  --panel: #11100e;
+  --panel-soft: #1a1512;
+  --panel-deep: #0b0908;
+  --muted: #a79a8d;
   --accent: #ff5a00;
   --accent-soft: #ffb36b;
-  --line: #2a2520;
+  --line: #332720;
 }
 
 @theme inline {
@@ -16,6 +19,9 @@
   --color-cream: var(--foreground);
   --color-ink: var(--background);
   --color-graphite: var(--graphite);
+  --color-panel: var(--panel);
+  --color-panel-soft: var(--panel-soft);
+  --color-panel-deep: var(--panel-deep);
   --color-muted: var(--muted);
   --color-accent: var(--accent);
   --color-accent-soft: var(--accent-soft);
@@ -33,7 +39,18 @@
 }
 
 body {
-  background: var(--background);
+  background:
+    radial-gradient(
+      circle at 78% 8%,
+      rgba(255, 90, 0, 0.13),
+      transparent 28rem
+    ),
+    radial-gradient(
+      circle at 8% 92%,
+      rgba(255, 179, 107, 0.07),
+      transparent 24rem
+    ),
+    var(--background);
   color: var(--foreground);
   font-family:
     "Inter",
@@ -42,6 +59,7 @@ body {
     system-ui,
     -apple-system,
     sans-serif;
+  overflow-x: hidden;
 }
 
 body::before {
@@ -50,14 +68,15 @@ body::before {
   z-index: -1;
   content: "";
   background:
-    linear-gradient(rgba(255, 90, 0, 0.055) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 90, 0, 0.04) 1px, transparent 1px),
-    linear-gradient(122deg, rgba(255, 90, 0, 0.16), transparent 36%), #070706;
+    linear-gradient(rgba(255, 90, 0, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 90, 0, 0.035) 1px, transparent 1px),
+    linear-gradient(122deg, rgba(255, 90, 0, 0.08), transparent 34%), #050403;
   background-size:
-    44px 44px,
-    44px 44px,
+    48px 48px,
+    48px 48px,
     auto,
     auto;
+  opacity: 0.62;
 }
 
 ::selection {
@@ -87,25 +106,42 @@ textarea {
 }
 
 .lux-panel {
-  border: 1px solid color-mix(in srgb, var(--graphite) 13%, transparent);
+  border: 1px solid color-mix(in srgb, var(--paper) 10%, transparent);
+  border-radius: 8px;
   background:
+    linear-gradient(145deg, rgba(255, 90, 0, 0.085), transparent 26%),
     linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.72),
-      rgba(255, 255, 255, 0.28)
+      180deg,
+      rgba(255, 255, 255, 0.052),
+      rgba(255, 255, 255, 0.015)
     ),
-    var(--paper);
+    var(--panel);
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.055);
+  color: var(--foreground);
 }
 
 .dark-panel {
-  border: 1px solid color-mix(in srgb, var(--accent) 34%, transparent);
+  border: 1px solid color-mix(in srgb, var(--paper) 10%, transparent);
+  border-radius: 8px;
   background:
-    linear-gradient(120deg, rgba(255, 90, 0, 0.16), transparent 44%),
-    linear-gradient(rgba(255, 255, 255, 0.055) 1px, transparent 1px), #0d0c0b;
+    radial-gradient(
+      circle at 12% 18%,
+      rgba(255, 90, 0, 0.22),
+      transparent 18rem
+    ),
+    linear-gradient(120deg, rgba(255, 90, 0, 0.12), transparent 42%),
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    var(--panel-deep);
   background-size:
+    auto,
     auto,
     32px 32px,
     auto;
+  box-shadow:
+    0 30px 110px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.055);
 }
 
 .action-primary {
@@ -114,9 +150,10 @@ textarea {
   align-items: center;
   justify-content: center;
   border: 1px solid var(--graphite);
-  background: var(--graphite);
+  border-radius: 8px;
+  background: var(--paper);
   padding: 0.85rem 1.15rem;
-  color: var(--paper);
+  color: var(--background);
   font-size: 0.875rem;
   font-weight: 800;
   transition:
@@ -129,20 +166,20 @@ textarea {
 .action-primary:hover {
   border-color: var(--accent);
   background: var(--accent);
-  color: #0b0908;
+  color: var(--background);
   transform: translateY(-1px);
 }
 
 .action-accent {
   border-color: var(--accent);
   background: var(--accent);
-  color: #0b0908;
+  color: var(--background);
 }
 
 .action-accent:hover {
   border-color: var(--paper);
   background: var(--paper);
-  color: #0b0908;
+  color: var(--background);
 }
 
 .action-secondary {
@@ -150,10 +187,11 @@ textarea {
   min-height: 44px;
   align-items: center;
   justify-content: center;
-  border: 1px solid color-mix(in srgb, var(--graphite) 18%, transparent);
-  background: rgba(255, 255, 255, 0.36);
+  border: 1px solid color-mix(in srgb, var(--paper) 14%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--panel-soft) 86%, transparent);
   padding: 0.75rem 1rem;
-  color: color-mix(in srgb, var(--graphite) 72%, transparent);
+  color: color-mix(in srgb, var(--paper) 72%, transparent);
   font-size: 0.875rem;
   font-weight: 700;
   transition:
@@ -164,32 +202,43 @@ textarea {
 
 .action-secondary:hover {
   border-color: var(--accent);
-  color: var(--graphite);
-  background: rgba(255, 255, 255, 0.72);
+  color: var(--paper);
+  background: color-mix(in srgb, var(--accent) 12%, var(--panel-soft));
 }
 
 .form-control {
   width: 100%;
-  border: 1px solid color-mix(in srgb, var(--graphite) 18%, transparent);
-  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid color-mix(in srgb, var(--paper) 14%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--panel-soft) 88%, transparent);
   padding: 1rem;
-  color: var(--graphite);
+  color: var(--paper);
+  font-size: 0.95rem;
+  line-height: 1.6;
   transition:
     border-color 160ms ease,
     box-shadow 160ms ease,
     background-color 160ms ease;
 }
 
+.form-control::placeholder {
+  color: color-mix(in srgb, var(--paper) 34%, transparent);
+}
+
 .form-control:focus {
   border-color: var(--accent);
-  background: #fffaf2;
+  background: color-mix(in srgb, var(--accent) 8%, var(--panel-soft));
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
   outline: none;
 }
 
 .choice-card {
-  border: 1px solid color-mix(in srgb, var(--graphite) 13%, transparent);
-  background: rgba(255, 255, 255, 0.44);
+  border: 1px solid color-mix(in srgb, var(--paper) 10%, transparent);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent),
+    color-mix(in srgb, var(--panel-soft) 88%, transparent);
+  cursor: pointer;
   transition:
     border-color 160ms ease,
     background-color 160ms ease,
@@ -199,14 +248,19 @@ textarea {
 
 .choice-card:hover {
   border-color: color-mix(in srgb, var(--accent) 58%, transparent);
-  background: rgba(255, 255, 255, 0.82);
+  background: color-mix(in srgb, var(--accent) 10%, var(--panel-soft));
   transform: translateY(-1px);
 }
 
 .choice-card:has(input:checked) {
   border-color: var(--accent);
-  background: #12100e;
+  background:
+    linear-gradient(135deg, rgba(255, 90, 0, 0.2), transparent 45%),
+    color-mix(in srgb, var(--accent) 12%, var(--panel));
   color: var(--paper);
+  box-shadow:
+    0 18px 55px rgba(0, 0, 0, 0.2),
+    inset 3px 0 0 var(--accent);
 }
 
 .choice-card:has(input:checked) .choice-marker {
@@ -222,11 +276,45 @@ textarea {
   align-items: center;
   justify-content: center;
   border: 1px solid color-mix(in srgb, var(--graphite) 18%, transparent);
+  border-radius: 6px;
   color: var(--accent);
   font-family: var(--font-mono);
   font-size: 0.65rem;
   font-weight: 800;
   letter-spacing: 0.08em;
+}
+
+.diagnostic-shell {
+  border: 1px solid color-mix(in srgb, var(--paper) 10%, transparent);
+  border-radius: 8px;
+  background:
+    linear-gradient(90deg, rgba(255, 90, 0, 0.12), transparent 22rem),
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.05),
+      rgba(255, 255, 255, 0.015)
+    ),
+    var(--panel-deep);
+  box-shadow: 0 28px 100px rgba(0, 0, 0, 0.35);
+}
+
+.diagnostic-rail {
+  border: 1px solid color-mix(in srgb, var(--paper) 10%, transparent);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 90, 0, 0.09), transparent 34%),
+    color-mix(in srgb, var(--panel-soft) 92%, transparent);
+}
+
+.hairline {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--accent) 62%, transparent),
+    color-mix(in srgb, var(--paper) 10%, transparent),
+    transparent
+  );
 }
 
 .method-strip {
@@ -236,6 +324,26 @@ textarea {
 }
 
 @media (max-width: 640px) {
+  .dark-panel,
+  .diagnostic-shell,
+  .diagnostic-rail,
+  .lux-panel {
+    width: calc(100vw - 2.5rem);
+    max-width: calc(100vw - 2.5rem);
+  }
+
+  .dark-panel .display-title {
+    max-width: 17rem;
+    font-size: 2.08rem;
+    line-height: 0.96;
+  }
+
+  .dark-panel p,
+  .diagnostic-shell p,
+  .diagnostic-rail p {
+    max-width: 100%;
+  }
+
   .method-strip {
     grid-template-columns: 1fr;
   }

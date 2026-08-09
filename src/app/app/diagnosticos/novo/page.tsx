@@ -11,36 +11,44 @@ export default async function NewDiagnosisPage({ searchParams }: PageProps) {
   const error = Array.isArray(params.erro) ? params.erro[0] : params.erro;
 
   return (
-    <div className="max-w-5xl space-y-8">
-      <header className="grid gap-6 border-b border-graphite/14 pb-8 lg:grid-cols-[1fr_16rem] lg:items-end">
-        <div>
-          <p className="kicker text-accent">Novo diagnostico</p>
-          <h1 className="display-title mt-4 max-w-3xl text-5xl leading-[0.9] sm:text-6xl">
-            Vamos mapear o seu momento.
-          </h1>
-          <p className="mt-5 max-w-2xl text-base leading-7 text-graphite/66">
-            Uma sessao curta para separar percepcao de evidencia antes da
-            leitura estrategica.
-          </p>
+    <div className="w-[calc(100vw-2.5rem)] min-w-0 space-y-6 overflow-hidden sm:w-full">
+      <header className="dark-panel w-full max-w-full overflow-hidden p-6 sm:p-8 lg:p-10">
+        <div className="grid min-w-0 gap-8 lg:grid-cols-[1fr_18rem] lg:items-end">
+          <div className="min-w-0">
+            <p className="kicker text-accent">Novo diagnostico</p>
+            <h1 className="display-title mt-4 max-w-[19rem] text-[2.25rem] leading-[0.94] sm:max-w-4xl sm:text-6xl lg:text-7xl">
+              Briefing para encontrar o gargalo.
+            </h1>
+            <p className="mt-5 max-w-2xl text-base leading-7 text-cream/70">
+              Uma sessao curta, guiada e objetiva para separar percepcao de
+              evidencia antes da leitura estrategica.
+            </p>
+          </div>
+          <div className="rounded-lg border border-accent/35 bg-accent/10 p-5">
+            <p className="kicker text-accent">Ritmo</p>
+            <p className="mt-3 text-sm leading-6 text-cream/72">
+              Primeiro contexto. Depois evidencias. O diagnostico fica mais
+              forte quando o que voce diz conversa com as imagens enviadas.
+            </p>
+          </div>
         </div>
-        <div className="border border-graphite bg-graphite p-4 text-paper">
-          <p className="kicker text-accent">Ritmo</p>
-          <p className="mt-3 text-sm leading-6 text-paper/70">
-            Responda com clareza. O diagnostico ganha forca quando o contexto
-            encontra as imagens certas.
-          </p>
+        <div className="hairline mt-8" />
+        <div className="mt-5 grid gap-3 text-xs font-black uppercase tracking-[0.12em] text-cream/58 sm:grid-cols-5">
+          {["Entender", "Priorizar", "Corrigir", "Construir", "Medir"].map(
+            (step) => (
+              <span key={step}>{step}</span>
+            ),
+          )}
         </div>
       </header>
 
       {error ? (
-        <p className="border-l-4 border-accent bg-white/70 px-4 py-3 text-sm font-semibold text-graphite">
+        <p className="rounded-lg border border-accent/40 bg-accent/10 px-4 py-3 text-sm font-semibold text-cream">
           {error}
         </p>
       ) : null}
 
-      <section className="lux-panel p-4 sm:p-6">
-        <NewDiagnosisForm />
-      </section>
+      <NewDiagnosisForm />
     </div>
   );
 }

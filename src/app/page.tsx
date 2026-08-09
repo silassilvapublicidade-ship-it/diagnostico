@@ -46,7 +46,7 @@ export default function Home() {
           {["ENTENDER", "PRIORIZAR", "CORRIGIR", "CONSTRUIR", "MEDIR"].map(
             (step, index) => (
               <div
-                className="min-h-24 border border-white/10 bg-white/[0.035] p-4"
+                className="min-h-24 rounded-lg border border-white/10 bg-white/[0.035] p-4"
                 key={step}
               >
                 <p className="font-mono text-[10px] text-accent">

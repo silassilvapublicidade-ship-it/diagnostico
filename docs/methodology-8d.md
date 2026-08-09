@@ -9,6 +9,20 @@ Official product language:
 The internal folder and package-style identifier `methodology-8d` is a legacy
 technical identifier. It must not be used in public product copy.
 
+## Versioning
+
+Current deterministic base versions for new analysis runs:
+
+- methodology: `methodology-8d@0.2.0`;
+- prompt fallback: `prompt-not-integrated@0.2.0`;
+- scoring: `scoring-8d@0.2.0`;
+- result: `analysis-result@0.2.0`;
+- initial web report: `web-initial@0.2.0`.
+
+Historical results keep the version stored at generation time for auditability.
+The product UI should translate these technical identifiers into client-facing
+language instead of exposing raw package-style strings.
+
 ## Profile types
 
 - `business`
