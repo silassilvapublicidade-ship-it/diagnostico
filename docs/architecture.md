@@ -47,10 +47,13 @@ integration, and the `requires_review` delivery gate.
   must not appear in public product copy. It has no knowledge of Supabase,
   HTTP, or the briefing/upload shape used by the product layer above it.
 - `src/modules/analysis`: orchestration for the diagnosis flow — briefing
-  parsing (`briefing.ts`), the `createDiagnosisFromForm` and
-  `runDiagnosisAnalysisAction` Server Actions plus shared persistence
-  helpers (`persistence.ts`, including `persistAnalysisResult` — shared by
-  the development-fixture path and the real Anthropic path),
+  parsing (`briefing.ts`), the diagnosis upload Server Actions
+  (`prepareDiagnosisUploadAction` creates the request and signed upload
+  tokens, `completeDiagnosisUploadAction` records the already-uploaded
+  evidence, `createDiagnosisFromForm` remains as the legacy server-side
+  fallback) and `runDiagnosisAnalysisAction` plus shared persistence helpers
+  (`persistence.ts`, including `persistAnalysisResult` — shared by the
+  development-fixture path and the real Anthropic path),
   the development fixture gate (`development-fixture.ts`), `result_origin`
   typing, status/label copy, and the public Server Action entrypoint
   (`actions.ts`).
@@ -92,7 +95,10 @@ Components (`listDiagnoses`, `getDiagnosis` run through the RLS-scoped
 server client). UI mutations should prefer Server Actions
 (`createDiagnosisFromForm`, the auth actions) writing through the
 service-role admin client only after `requireUser()` has resolved the
-session. External webhooks in later phases should use Route Handlers.
+session. Evidence files must upload directly from the browser to Supabase
+Storage through short-lived signed upload tokens; Vercel Functions should
+only receive small metadata payloads because production request bodies have a
+platform limit. External webhooks in later phases should use Route Handlers.
 
 ## Known trade-offs
 

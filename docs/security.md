@@ -17,10 +17,14 @@ server-only, ownership-checked posture.
   `getDiagnosis`, and — in Phase 2B — `modules/ai/run-analysis.ts` loading
   the briefing, answers, and evidence bytes for the Anthropic call).
 - Analysis assets are modeled as private storage objects; the storage
-  bucket is created non-public in `0001_initial_schema.sql`. Evidence sent
-  to Anthropic is read as bytes server-side and inlined as base64 in the
-  request — no signed URL is ever generated, so there is no window where a
-  URL to private evidence exists, even briefly.
+  bucket is created non-public in `0001_initial_schema.sql`. Browser uploads
+  use short-lived signed upload tokens generated server-side after
+  `requireUser()` and scoped to the path
+  `{user_id}/{analysis_request_id}/{asset_type}/{filename}` so evidence files
+  do not pass through a Vercel Function payload. Evidence reads remain
+  private: files sent to Anthropic are read as bytes server-side and inlined
+  as base64 in the request. No signed read URL is generated for customer or AI
+  access.
 - Service-role access is not exposed to the client. `src/lib/supabase/admin.ts`
   is guarded by `import "server-only"` and is only ever called from
   `modules/analysis/persistence.ts` and `modules/analysis/actions.ts`

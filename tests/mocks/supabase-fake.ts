@@ -251,6 +251,27 @@ function createFakeStorageApi(store: FakeStore) {
   return {
     from(bucket: string) {
       return {
+        createSignedUploadUrl(path: string) {
+          return Promise.resolve({
+            data: {
+              path,
+              signedUrl: `https://storage.example/upload/${bucket}/${path}?token=fake-token`,
+              token: "fake-token",
+            },
+            error: null,
+          });
+        },
+        exists(path: string) {
+          const uploaded = store.__storage?.some(
+            (file) => file.bucket === bucket && file.path === path,
+          );
+          const seeded = Boolean(store.__storageFiles?.[`${bucket}/${path}`]);
+
+          return Promise.resolve({
+            data: Boolean(uploaded || seeded),
+            error: null,
+          });
+        },
         upload(path: string) {
           if (store.__storageShouldFail) {
             return Promise.resolve({

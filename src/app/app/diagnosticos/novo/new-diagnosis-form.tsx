@@ -1,8 +1,40 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import {
+  BadgeCheck,
+  BarChart3,
+  Building2,
+  CircleDollarSign,
+  Compass,
+  EyeOff,
+  Handshake,
+  Images,
+  LayoutGrid,
+  Lightbulb,
+  MessageCircleQuestion,
+  MousePointerClick,
+  PenLine,
+  Smartphone,
+  Target,
+  TrendingUp,
+  Trophy,
+  UserRound,
+  Video,
+  type LucideIcon,
+} from "lucide-react";
+import { useMemo, useRef, useState, type FormEvent } from "react";
 
-import { submitDiagnosisAction } from "@/modules/analysis/actions";
+import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
+import {
+  completeDiagnosisUploadAction,
+  markDiagnosisUploadFailedAction,
+  prepareDiagnosisUploadAction,
+} from "@/modules/analysis/actions";
+import {
+  collectUploadCandidates,
+  getFileAssetType,
+  validateUploadCandidates,
+} from "@/modules/assets/validation";
 
 type ProfileType = "business" | "creator";
 
@@ -35,55 +67,55 @@ const steps = [
 
 const MAIN_OBJECTIVE_OPTIONS = [
   {
-    marker: "CLI",
+    icon: Target,
     label: "Atrair mais clientes",
     description: "Transformar visita em conversa comercial.",
   },
   {
-    marker: "REF",
+    icon: Trophy,
     label: "Ser visto como referencia",
     description: "Aumentar percepcao de autoridade.",
   },
   {
-    marker: "ALC",
+    icon: TrendingUp,
     label: "Crescer nas redes sociais",
     description: "Criar mais clareza para ampliar alcance.",
   },
   {
-    marker: "OPR",
+    icon: Handshake,
     label: "Conseguir novas oportunidades",
     description: "Preparar o perfil para convites e parcerias.",
   },
   {
-    marker: "PRO",
+    icon: BadgeCheck,
     label: "Deixar meu perfil mais profissional",
     description: "Organizar presenca, mensagem e prova.",
   },
   {
-    marker: "CON",
+    icon: Lightbulb,
     label: "Criar conteudos melhores",
     description: "Encontrar temas com funcao estrategica.",
   },
-];
+] as const satisfies readonly IconOption[];
 
 const PROFILE_CARDS: {
   id: string;
   value: ProfileType;
-  marker: string;
+  icon: LucideIcon;
   label: string;
   description: string;
 }[] = [
   {
     id: "business",
     value: "business",
-    marker: "NEG",
+    icon: Building2,
     label: "Tenho uma empresa ou negocio",
     description: "Leitura orientada para oferta, prova e conversao.",
   },
   {
     id: "personal",
     value: "creator",
-    marker: "IMG",
+    icon: UserRound,
     label: "Trabalho com minha imagem pessoal",
     description:
       "Leitura orientada para autoridade, identidade e oportunidades.",
@@ -91,46 +123,293 @@ const PROFILE_CARDS: {
   {
     id: "content",
     value: "creator",
-    marker: "MID",
+    icon: Video,
     label: "Produzo conteudo para internet",
     description: "Leitura orientada para narrativa, conteudo e crescimento.",
   },
 ];
 
 const MAIN_DIFFICULTY_OPTIONS = [
-  "Meu perfil nao mostra meu valor",
-  "Nao sei que conteudo criar",
-  "Tenho seguidores, mas poucos resultados",
-  "Minha comunicacao esta confusa",
-  "Quero me destacar dos concorrentes",
-  "Nao sei por onde comecar",
-];
+  {
+    icon: EyeOff,
+    label: "Meu perfil nao mostra meu valor",
+    description: "A percepcao de autoridade nao aparece com clareza.",
+  },
+  {
+    icon: PenLine,
+    label: "Nao sei que conteudo criar",
+    description: "Falta um caminho editorial para decidir pautas.",
+  },
+  {
+    icon: CircleDollarSign,
+    label: "Tenho seguidores, mas poucos resultados",
+    description: "A audiencia existe, mas a conversao nao acompanha.",
+  },
+  {
+    icon: MessageCircleQuestion,
+    label: "Minha comunicacao esta confusa",
+    description: "Oferta, narrativa ou promessa parecem dispersas.",
+  },
+  {
+    icon: Compass,
+    label: "Quero me destacar dos concorrentes",
+    description: "A diferenciacao ainda nao esta evidente no perfil.",
+  },
+  {
+    icon: MousePointerClick,
+    label: "Nao sei por onde comecar",
+    description: "Precisa de prioridade clara para agir primeiro.",
+  },
+] as const satisfies readonly IconOption[];
 
 const EVIDENCE_FIELDS = [
-  { assetType: "profile_top", marker: "TOPO", label: "Tela inicial do perfil" },
-  { assetType: "feed", marker: "FEED", label: "Feed" },
-  { assetType: "highlights", marker: "DEST", label: "Destaques" },
-  { assetType: "insights", marker: "DADO", label: "Insights (opcional)" },
-];
+  {
+    assetType: "profile_top",
+    icon: Smartphone,
+    label: "Tela inicial do perfil",
+  },
+  { assetType: "feed", icon: LayoutGrid, label: "Feed" },
+  { assetType: "highlights", icon: Images, label: "Destaques" },
+  { assetType: "insights", icon: BarChart3, label: "Insights (opcional)" },
+] as const;
+
+type IconOption = {
+  icon: LucideIcon;
+  label: string;
+  description: string;
+};
 
 export function NewDiagnosisForm() {
+  const formRef = useRef<HTMLFormElement>(null);
   const [step, setStep] = useState(0);
-  const [selectedProfileCardId, setSelectedProfileCardId] =
-    useState<string>("business");
-  const profileType =
-    PROFILE_CARDS.find((card) => card.id === selectedProfileCardId)?.value ??
-    "business";
+  const [selectedProfileCardId, setSelectedProfileCardId] = useState<
+    string | null
+  >(null);
+  const [stepError, setStepError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionError, setSubmissionError] = useState<string | null>(null);
+  const [submissionStatus, setSubmissionStatus] = useState<string | null>(null);
+  const selectedProfile = PROFILE_CARDS.find(
+    (card) => card.id === selectedProfileCardId,
+  );
+  const profileType = selectedProfile?.value ?? "";
   const progress = useMemo(
     () => Math.round(((step + 1) / steps.length) * 100),
     [step],
   );
   const currentStep = steps[step]!;
 
+  function validateStep(stepToValidate: number, formData: FormData) {
+    if (stepToValidate === 0 && formData.getAll("mainObjective").length === 0) {
+      return "Escolha pelo menos uma prioridade para continuar.";
+    }
+
+    if (stepToValidate === 1 && !selectedProfileCardId) {
+      return "Escolha o tipo de perfil para continuar.";
+    }
+
+    if (
+      stepToValidate === 2 &&
+      String(formData.get("niche") ?? "").trim().length < 8
+    ) {
+      return "Descreva brevemente como voce se apresenta hoje.";
+    }
+
+    if (
+      stepToValidate === 3 &&
+      formData.getAll("mainDifficulty").length === 0
+    ) {
+      return "Escolha pelo menos um desafio principal.";
+    }
+
+    if (stepToValidate === 4) {
+      const url = String(formData.get("instagramUrl") ?? "").trim();
+
+      try {
+        const parsedUrl = new URL(url);
+        const isHttpUrl =
+          parsedUrl.protocol === "https:" || parsedUrl.protocol === "http:";
+
+        if (!isHttpUrl || !parsedUrl.hostname) {
+          return "Informe um link valido do Instagram.";
+        }
+      } catch {
+        return "Informe um link valido do Instagram.";
+      }
+    }
+
+    if (stepToValidate === 5) {
+      if (formData.get("processingConsent") !== "on") {
+        return "Autorize o processamento para enviar o diagnostico.";
+      }
+
+      try {
+        const files = collectUploadCandidates(formData);
+        validateUploadCandidates(
+          files.map((file) => ({
+            assetType: getFileAssetType(file),
+            name: file.name,
+            type: file.type,
+            size: file.size,
+          })),
+        );
+      } catch (error) {
+        return error instanceof Error
+          ? error.message
+          : "Envie pelo menos uma evidencia do perfil.";
+      }
+    }
+
+    return null;
+  }
+
+  function handleContinue() {
+    const form = formRef.current;
+
+    if (!form) {
+      return;
+    }
+
+    const error = validateStep(step, new FormData(form));
+
+    if (error) {
+      setStepError(error);
+      return;
+    }
+
+    setStepError(null);
+    setStep((current) => Math.min(steps.length - 1, current + 1));
+  }
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (isSubmitting) {
+      return;
+    }
+
+    if (step < steps.length - 1) {
+      handleContinue();
+      return;
+    }
+
+    const validationError = validateStep(5, new FormData(event.currentTarget));
+
+    if (validationError) {
+      setStepError(validationError);
+      setStep(5);
+      return;
+    }
+
+    let preparedRequestId: string | undefined;
+    setStepError(null);
+    setIsSubmitting(true);
+    setSubmissionError(null);
+    setSubmissionStatus("Preparando envio seguro das evidencias...");
+
+    try {
+      const form = event.currentTarget;
+      const rawFormData = new FormData(form);
+      const files = collectUploadCandidates(rawFormData);
+      const uploadCandidates = validateUploadCandidates(
+        files.map((file) => ({
+          assetType: getFileAssetType(file),
+          name: file.name,
+          type: file.type,
+          size: file.size,
+        })),
+      );
+      const metadataFormData = new FormData();
+
+      rawFormData.forEach((value, key) => {
+        if (!(value instanceof File)) {
+          metadataFormData.append(key, value);
+        }
+      });
+
+      const prepared = await prepareDiagnosisUploadAction(
+        metadataFormData,
+        uploadCandidates,
+      );
+
+      if (!prepared.ok) {
+        throw new Error(prepared.error);
+      }
+
+      preparedRequestId = prepared.data.requestId;
+
+      if (prepared.data.uploads.length !== files.length) {
+        throw new Error("Nao foi possivel preparar todos os arquivos.");
+      }
+
+      const supabase = createSupabaseBrowserClient();
+
+      for (const [index, file] of files.entries()) {
+        const upload = prepared.data.uploads[index]!;
+        setSubmissionStatus(
+          `Enviando evidencia ${index + 1} de ${files.length}...`,
+        );
+
+        const { error: uploadError } = await supabase.storage
+          .from(upload.storageBucket)
+          .uploadToSignedUrl(upload.storagePath, upload.token, file, {
+            contentType: file.type,
+            upsert: false,
+          });
+
+        if (uploadError) {
+          throw uploadError;
+        }
+      }
+
+      setSubmissionStatus("Finalizando diagnostico...");
+
+      const completed = await completeDiagnosisUploadAction({
+        requestId: prepared.data.requestId,
+        assets: prepared.data.uploads.map((upload) => ({
+          assetType: upload.assetType,
+          storageBucket: upload.storageBucket,
+          storagePath: upload.storagePath,
+          originalFilename: upload.originalFilename,
+          mimeType: upload.mimeType,
+          fileSizeBytes: upload.fileSizeBytes,
+        })),
+      });
+
+      if (!completed.ok) {
+        throw new Error(completed.error);
+      }
+
+      window.location.assign(completed.data.redirectTo);
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Nao foi possivel enviar as evidencias.";
+
+      if (preparedRequestId) {
+        await markDiagnosisUploadFailedAction({
+          requestId: preparedRequestId,
+          errorMessage: message,
+        });
+      }
+
+      setSubmissionStatus(null);
+      setSubmissionError(message);
+      setIsSubmitting(false);
+    }
+  }
+
   return (
     <form
-      action={submitDiagnosisAction}
+      ref={formRef}
       className="grid w-full min-w-0 max-w-full gap-5 lg:grid-cols-[18rem_1fr]"
       noValidate
+      onChange={() => {
+        setStepError(null);
+        setSubmissionError(null);
+      }}
+      onSubmit={handleSubmit}
     >
       <input name="profileType" type="hidden" value={profileType} />
 
@@ -216,24 +495,28 @@ export function NewDiagnosisForm() {
             <div className="grid gap-4 sm:grid-cols-3">
               {PROFILE_CARDS.map((card) => (
                 <button
+                  aria-pressed={selectedProfileCardId === card.id}
                   className={`min-h-44 rounded-lg border p-5 text-left transition ${
                     selectedProfileCardId === card.id
                       ? "border-accent bg-accent/15 text-cream shadow-[inset_3px_0_0_var(--accent)]"
                       : "border-cream/10 bg-panel-soft/80 text-cream hover:border-accent/70 hover:bg-accent/10"
                   }`}
                   key={card.id}
-                  onClick={() => setSelectedProfileCardId(card.id)}
+                  onClick={() => {
+                    setSelectedProfileCardId(card.id);
+                    setStepError(null);
+                  }}
                   type="button"
                 >
-                  <span
-                    className={`choice-marker ${
+                  <card.icon
+                    aria-hidden="true"
+                    className={`h-7 w-7 ${
                       selectedProfileCardId === card.id
-                        ? "border-accent bg-accent text-ink"
-                        : ""
+                        ? "text-accent"
+                        : "text-cream/58"
                     }`}
-                  >
-                    {card.marker}
-                  </span>
+                    strokeWidth={1.8}
+                  />
                   <span className="mt-5 block text-base font-black leading-6">
                     {card.label}
                   </span>
@@ -298,7 +581,13 @@ export function NewDiagnosisForm() {
               {EVIDENCE_FIELDS.map((field) => (
                 <label className="choice-card block p-5" key={field.assetType}>
                   <span className="flex items-center gap-3 text-sm font-black">
-                    <span className="choice-marker">{field.marker}</span>
+                    <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-accent/35 bg-accent/10 text-accent">
+                      <field.icon
+                        aria-hidden="true"
+                        className="h-4 w-4"
+                        strokeWidth={1.9}
+                      />
+                    </span>
                     {field.label}
                   </span>
                   <input
@@ -327,27 +616,48 @@ export function NewDiagnosisForm() {
               </span>
             </label>
 
-            <button className="action-primary action-accent w-full sm:w-auto">
-              Enviar diagnostico
+            <button
+              className="action-primary action-accent w-full disabled:cursor-not-allowed disabled:opacity-55 sm:w-auto"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Enviando..." : "Enviar diagnostico"}
             </button>
+
+            {submissionStatus ? (
+              <p className="rounded-lg border border-accent/30 bg-accent/10 px-4 py-3 text-sm font-semibold text-cream">
+                {submissionStatus}
+              </p>
+            ) : null}
+
+            {submissionError ? (
+              <p className="rounded-lg border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm font-semibold text-cream">
+                {submissionError}
+              </p>
+            ) : null}
           </div>
         </div>
 
-        <div className="flex items-center justify-between border-t border-cream/10 bg-black/12 px-5 py-4 sm:px-7 lg:px-9">
+        <div className="flex flex-col gap-4 border-t border-cream/10 bg-black/12 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-7 lg:px-9">
           <button
             className="action-secondary disabled:cursor-not-allowed disabled:opacity-30"
-            disabled={step === 0}
+            disabled={step === 0 || isSubmitting}
             onClick={() => setStep((current) => Math.max(0, current - 1))}
             type="button"
           >
             Voltar
           </button>
+          {stepError ? (
+            <p className="max-w-md text-sm font-semibold leading-6 text-accent sm:text-center">
+              {stepError}
+            </p>
+          ) : (
+            <span className="hidden sm:block" />
+          )}
           {step < steps.length - 1 ? (
             <button
               className="action-primary action-accent"
-              onClick={() =>
-                setStep((current) => Math.min(steps.length - 1, current + 1))
-              }
+              disabled={isSubmitting}
+              onClick={handleContinue}
               type="button"
             >
               Continuar
@@ -437,22 +747,40 @@ function TextArea({
   );
 }
 
-function CheckboxGroup({ name, options }: { name: string; options: string[] }) {
+function CheckboxGroup({
+  name,
+  options,
+}: {
+  name: string;
+  options: readonly IconOption[];
+}) {
   return (
     <div className="grid gap-3 sm:grid-cols-2">
-      {options.map((option, index) => (
-        <label className="choice-card flex items-start gap-4 p-4" key={option}>
+      {options.map((option) => (
+        <label
+          className="choice-card grid min-h-28 grid-cols-[2.4rem_1fr] gap-4 p-4"
+          key={option.label}
+        >
           <input
             className="sr-only"
             name={name}
             type="checkbox"
-            value={option}
+            value={option.label}
           />
-          <span className="choice-marker">
-            {String(index + 1).padStart(2, "0")}
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-accent/35 bg-accent/10 text-accent">
+            <option.icon
+              aria-hidden="true"
+              className="h-4 w-4"
+              strokeWidth={1.9}
+            />
           </span>
-          <span className="text-sm font-semibold leading-6 text-cream/82">
-            {option}
+          <span>
+            <span className="block text-sm font-black leading-6">
+              {option.label}
+            </span>
+            <span className="mt-1 block text-xs leading-5 text-cream/50">
+              {option.description}
+            </span>
           </span>
         </label>
       ))}
@@ -465,7 +793,7 @@ function MarkerCheckboxGroup({
   options,
 }: {
   name: string;
-  options: { marker: string; label: string; description: string }[];
+  options: readonly IconOption[];
 }) {
   return (
     <div className="grid gap-3 sm:grid-cols-2">
@@ -480,7 +808,13 @@ function MarkerCheckboxGroup({
             type="checkbox"
             value={option.label}
           />
-          <span className="choice-marker">{option.marker}</span>
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-accent/35 bg-accent/10 text-accent">
+            <option.icon
+              aria-hidden="true"
+              className="h-4 w-4"
+              strokeWidth={1.9}
+            />
+          </span>
           <span>
             <span className="block text-sm font-black leading-6">
               {option.label}

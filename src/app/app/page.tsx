@@ -14,19 +14,15 @@ export default async function AppHomePage() {
   return (
     <div className="space-y-8">
       <section className="dark-panel relative overflow-hidden p-6 text-cream sm:p-9 lg:p-10">
-        <div className="max-w-4xl">
+        <div className="max-w-5xl">
           <p className="kicker text-accent">Sala estrategica privada</p>
-          <h1 className="display-title mt-5 max-w-4xl text-5xl leading-[0.9] sm:text-6xl lg:text-7xl">
-            Diagnostico que encontra o gargalo.
+          <h1 className="display-title mt-5 max-w-5xl text-[3.15rem] leading-[0.9] sm:text-[4.45rem] lg:text-[5.35rem]">
+            <span className="block">Diagnostico que</span>
+            <span className="block">encontra o gargalo.</span>
           </h1>
-          <p className="mt-6 max-w-2xl text-base leading-7 text-cream/72 sm:text-lg sm:leading-8">
-            Envie contexto e evidencias para receber uma leitura em 8 dimensoes
-            estrategicas, com score, confianca e proximo movimento separados com
-            clareza.
-          </p>
         </div>
 
-        <div className="mt-10 border-t border-white/12 pt-5">
+        <div className="mt-9 border-t border-white/12 pt-5">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <p className="kicker text-accent">Mapa de leitura 8D</p>
             <p className="font-mono text-[10px] font-black uppercase tracking-[0.16em] text-cream/42">

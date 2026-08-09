@@ -33,15 +33,13 @@ export default async function PrivateLayout({
             </Link>
 
             <div className="mt-8 rounded-xl border border-accent/35 bg-[linear-gradient(135deg,rgba(255,90,0,0.18),rgba(255,90,0,0.04)_46%,rgba(255,255,255,0.035))] p-4 shadow-[0_22px_70px_rgba(0,0,0,0.22)]">
-              <div className="flex items-end justify-between gap-4">
-                <div>
-                  <p className="kicker text-accent">Metodo Silas Silva</p>
-                  <p className="display-title mt-3 text-6xl leading-none">8D</p>
-                </div>
-                <p className="rounded-full border border-accent/45 bg-black/18 px-3 py-1 font-mono text-[10px] font-black uppercase tracking-[0.14em] text-accent">
-                  8 dimensoes
-                </p>
-              </div>
+              <p className="kicker text-accent">Metodo Silas Silva</p>
+              <p className="mt-4 flex items-baseline gap-3 text-accent">
+                <span className="display-title text-6xl leading-none">8</span>
+                <span className="font-mono text-[11px] font-black uppercase tracking-[0.16em]">
+                  Dimensoes
+                </span>
+              </p>
               <p className="mt-4 text-sm leading-6 text-cream/66">
                 O diagnostico cruza evidencia, score, confianca e prioridade de
                 acao sem misturar leitura tecnica com achismo.

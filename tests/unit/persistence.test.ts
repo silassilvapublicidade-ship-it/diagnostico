@@ -8,11 +8,13 @@ import {
 } from "../mocks/persistence-harness";
 import { seedRow, type FakeStore } from "../mocks/supabase-fake";
 import {
+  completePreparedDiagnosisUpload,
   createDiagnosisFromForm,
   getDiagnosis,
   getNextResultSequence,
   listDiagnoses,
   persistDevelopmentResult,
+  prepareDiagnosisUploadFromForm,
 } from "@/modules/analysis/persistence";
 
 const harness = vi.hoisted(() => ({
@@ -205,6 +207,74 @@ describe("createDiagnosisFromForm", () => {
     expect(results[0]!.result_origin).toBe("development_fixture");
     expect(harness.store.analysis_scores ?? []).toHaveLength(0);
     expect(harness.store.analysis_reports ?? []).toHaveLength(0);
+  });
+});
+
+describe("direct browser evidence upload flow", () => {
+  beforeEach(() => {
+    resetFakeStore(harness.store);
+    harness.userId = "user-1";
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it("prepares signed uploads, then records uploaded evidence without sending file bytes through the server action", async () => {
+    const metadata = buildBusinessFormData();
+    metadata.delete("asset_profile_top");
+
+    const prepared = await prepareDiagnosisUploadFromForm(metadata, [
+      {
+        assetType: "profile_top",
+        name: "print-celular.jpg",
+        type: "image/jpeg",
+        size: 4 * 1024 * 1024,
+      },
+    ]);
+
+    const request = (harness.store.analysis_requests ?? [])[0]!;
+    expect(request.status).toBe("waiting_assets");
+    expect(prepared.uploads).toHaveLength(1);
+    expect(prepared.uploads[0]!.token).toBe("fake-token");
+    expect(harness.store.analysis_assets ?? []).toHaveLength(0);
+
+    harness.store.__storage = [
+      {
+        bucket: prepared.uploads[0]!.storageBucket,
+        path: prepared.uploads[0]!.storagePath,
+      },
+    ];
+
+    const completed = await completePreparedDiagnosisUpload({
+      requestId: prepared.requestId,
+      assets: prepared.uploads.map((upload) => ({
+        assetType: upload.assetType,
+        storageBucket: upload.storageBucket,
+        storagePath: upload.storagePath,
+        originalFilename: upload.originalFilename,
+        mimeType: upload.mimeType,
+        fileSizeBytes: upload.fileSizeBytes,
+      })),
+    });
+
+    expect(completed.redirectTo).toBe(
+      `/app/diagnosticos/${prepared.requestId}`,
+    );
+
+    const updatedRequest = (harness.store.analysis_requests ?? [])[0]!;
+    expect(updatedRequest.status).toBe("ready");
+
+    const assets = harness.store.analysis_assets ?? [];
+    expect(assets).toHaveLength(1);
+    expect(assets[0]!.user_id).toBe("user-1");
+    expect(assets[0]!.metadata).toMatchObject({
+      source: "direct_browser_upload",
+    });
+
+    const jobs = harness.store.analysis_jobs ?? [];
+    expect(jobs).toHaveLength(1);
+    expect(jobs[0]!.status).toBe("ready");
   });
 });
 

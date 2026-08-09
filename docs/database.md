@@ -66,7 +66,7 @@ The planned retention is 90 days after analysis completion. The automatic deleti
 
 Customer-owned records are readable only when linked to `auth.uid()`. Version tables and prompt snapshots are service-only by default. Products and active prices are readable because they are public purchase information.
 
-Writes for `analysis_requests`, `analysis_answers`, `analysis_assets`, `analysis_jobs`, `analysis_results`, `analysis_scores`, and `analysis_reports` happen through `modules/analysis/persistence.ts`, using the service-role admin client after `requireUser()` resolves the session — never from the browser and never trusting a client-supplied owner id. Orders and payments follow the same service-role-only pattern once billing is integrated in a later phase.
+Writes for `analysis_requests`, `analysis_answers`, `analysis_assets`, `analysis_jobs`, `analysis_results`, `analysis_scores`, and `analysis_reports` happen through `modules/analysis/persistence.ts`, using the service-role admin client after `requireUser()` resolves the session — never trusting a client-supplied owner id. Evidence file bytes upload directly from the browser to the private Supabase Storage bucket through short-lived signed upload tokens scoped to the authenticated user's request path; only the resulting metadata row is recorded server-side. Orders and payments follow the same service-role-only pattern once billing is integrated in a later phase.
 
 Customer reads for `analysis_results`, `analysis_scores`, and `analysis_reports` are intentionally conservative:
 

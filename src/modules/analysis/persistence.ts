@@ -15,6 +15,7 @@ import {
   getFileAssetType,
   validateUploadCandidates,
   type AssetType,
+  type UploadCandidate,
 } from "@/modules/assets/validation";
 import { requireUser } from "@/modules/auth/session";
 
@@ -32,6 +33,18 @@ import type { ResultOrigin } from "./result-origin";
 
 const STORAGE_BUCKET = "analysis-assets";
 const RETENTION_DAYS = 90;
+
+export type PreparedAssetUpload = {
+  assetType: AssetType;
+  storageBucket: typeof STORAGE_BUCKET;
+  storagePath: string;
+  originalFilename: string;
+  mimeType: string;
+  fileSizeBytes: number;
+  token: string;
+};
+
+export type UploadedAssetConfirmation = Omit<PreparedAssetUpload, "token">;
 
 export type DiagnosisListItem = {
   id: string;
@@ -91,6 +104,20 @@ function sanitizeFileName(fileName: string) {
     .replace(/-+/g, "-")
     .replace(/^-|-$/g, "")
     .toLowerCase();
+}
+
+function buildStoragePath(params: {
+  userId: string;
+  analysisRequestId: string;
+  assetType: AssetType;
+  fileName: string;
+}) {
+  return [
+    params.userId,
+    params.analysisRequestId,
+    params.assetType,
+    `${crypto.randomUUID()}-${sanitizeFileName(params.fileName) || "asset"}`,
+  ].join("/");
 }
 
 function redirectWithError(message: string): never {
@@ -302,12 +329,12 @@ async function persistUploads(params: {
 
   for (const file of params.files) {
     const assetType = getFileAssetType(file);
-    const storagePath = [
-      params.userId,
-      params.analysisRequestId,
+    const storagePath = buildStoragePath({
+      userId: params.userId,
+      analysisRequestId: params.analysisRequestId,
       assetType,
-      `${crypto.randomUUID()}-${sanitizeFileName(file.name) || "asset"}`,
-    ].join("/");
+      fileName: file.name,
+    });
 
     const { error: uploadError } = await admin.storage
       .from(STORAGE_BUCKET)
@@ -339,6 +366,285 @@ async function persistUploads(params: {
     if (assetError) {
       throw assetError;
     }
+  }
+}
+
+async function createInitialAnalysisJob(params: {
+  analysisRequestId: string;
+  profileType: ProfileType;
+}) {
+  const admin = createSupabaseAdminClient();
+  const fixturesEnabled = isDevelopmentFixturesEnabled(process.env);
+
+  const { data: job, error: jobError } = await admin
+    .from("analysis_jobs")
+    .insert({
+      analysis_request_id: params.analysisRequestId,
+      status: fixturesEnabled ? "processing" : "ready",
+      attempt_number: 1,
+      trigger_reason: fixturesEnabled
+        ? "development_fixture"
+        : "initial_submission",
+      started_at: new Date().toISOString(),
+    })
+    .select("id")
+    .single();
+
+  if (jobError || !job) {
+    throw jobError ?? new Error("Analysis job was not created.");
+  }
+
+  if (fixturesEnabled) {
+    await persistDevelopmentResult({
+      analysisRequestId: params.analysisRequestId,
+      analysisJobId: job.id,
+      profileType: params.profileType,
+    });
+
+    return job.id;
+  }
+
+  const { error: updateError } = await admin
+    .from("analysis_requests")
+    .update({
+      status: "ready" satisfies AnalysisStatus,
+    })
+    .eq("id", params.analysisRequestId);
+
+  if (updateError) {
+    throw updateError;
+  }
+
+  return job.id;
+}
+
+export async function prepareDiagnosisUploadFromForm(
+  formData: FormData,
+  uploadCandidates: UploadCandidate[],
+) {
+  const user = await requireUser();
+  let briefing: DiagnosisBriefing;
+  const validatedUploads = validateUploadCandidates(uploadCandidates);
+
+  try {
+    parseProcessingConsent(formData);
+    briefing = parseBriefingForm(formData);
+  } catch (error) {
+    throw error instanceof Error
+      ? error
+      : new Error("Revise o briefing e as evidencias enviadas.");
+  }
+
+  const admin = createSupabaseAdminClient();
+  const now = new Date();
+  const processingConsentAt = now.toISOString();
+
+  const { data: request, error: requestError } = await admin
+    .from("analysis_requests")
+    .insert({
+      user_id: user.id,
+      profile_type: briefing.profileType,
+      instagram_url: briefing.instagramUrl,
+      status: "waiting_assets",
+      submitted_at: processingConsentAt,
+    })
+    .select("id")
+    .single();
+
+  if (requestError || !request) {
+    throw requestError ?? new Error("Nao foi possivel criar o diagnostico.");
+  }
+
+  try {
+    const answerRows = toAnswerRows(briefing).map((row) => ({
+      analysis_request_id: request.id,
+      question_key: row.question_key,
+      answer: row.answer,
+    }));
+
+    const { error: answersError } = await admin
+      .from("analysis_answers")
+      .insert(answerRows);
+
+    if (answersError) {
+      throw answersError;
+    }
+
+    const uploads: PreparedAssetUpload[] = [];
+
+    for (const upload of validatedUploads) {
+      const storagePath = buildStoragePath({
+        userId: user.id,
+        analysisRequestId: request.id,
+        assetType: upload.assetType,
+        fileName: upload.name,
+      });
+      const { data: signedUpload, error: signedUploadError } =
+        await admin.storage
+          .from(STORAGE_BUCKET)
+          .createSignedUploadUrl(storagePath);
+
+      if (signedUploadError || !signedUpload) {
+        throw (
+          signedUploadError ??
+          new Error("Nao foi possivel preparar o envio das evidencias.")
+        );
+      }
+
+      uploads.push({
+        assetType: upload.assetType,
+        storageBucket: STORAGE_BUCKET,
+        storagePath,
+        originalFilename: upload.name,
+        mimeType: upload.type,
+        fileSizeBytes: upload.size,
+        token: signedUpload.token,
+      });
+    }
+
+    return {
+      requestId: request.id,
+      uploads,
+    };
+  } catch (error) {
+    await admin
+      .from("analysis_requests")
+      .update({ status: "failed" })
+      .eq("id", request.id);
+
+    throw error;
+  }
+}
+
+export async function completePreparedDiagnosisUpload(params: {
+  requestId: string;
+  assets: UploadedAssetConfirmation[];
+}) {
+  const user = await requireUser();
+  const admin = createSupabaseAdminClient();
+
+  const { data: request, error: requestError } = await admin
+    .from("analysis_requests")
+    .select("id, user_id, profile_type, status")
+    .eq("id", params.requestId)
+    .single();
+
+  if (requestError || !request || request.user_id !== user.id) {
+    throw new Error("Diagnostico nao encontrado para este usuario.");
+  }
+
+  if (request.status !== "waiting_assets") {
+    return {
+      redirectTo: `/app/diagnosticos/${request.id}`,
+    };
+  }
+
+  const validatedAssets = validateUploadCandidates(
+    params.assets.map((asset) => ({
+      assetType: asset.assetType,
+      name: asset.originalFilename,
+      type: asset.mimeType,
+      size: asset.fileSizeBytes,
+    })),
+  );
+  const now = new Date();
+  const processingConsentAt = now.toISOString();
+  const retentionUntil = addDays(now, RETENTION_DAYS).toISOString();
+
+  try {
+    for (const [index, asset] of params.assets.entries()) {
+      const validatedAsset = validatedAssets[index]!;
+
+      if (asset.storageBucket !== STORAGE_BUCKET) {
+        throw new Error("Bucket de evidencia invalido.");
+      }
+
+      const expectedPrefix = `${user.id}/${request.id}/${asset.assetType}/`;
+
+      if (!asset.storagePath.startsWith(expectedPrefix)) {
+        throw new Error("Caminho de evidencia invalido.");
+      }
+
+      const { data: exists, error: existsError } = await admin.storage
+        .from(STORAGE_BUCKET)
+        .exists(asset.storagePath);
+
+      if (existsError || !exists) {
+        throw (
+          existsError ?? new Error("Uma evidencia enviada nao foi encontrada.")
+        );
+      }
+
+      const { error: assetError } = await admin.from("analysis_assets").insert({
+        analysis_request_id: request.id,
+        user_id: user.id,
+        asset_type: validatedAsset.assetType,
+        storage_bucket: STORAGE_BUCKET,
+        storage_path: asset.storagePath,
+        original_filename: validatedAsset.name,
+        mime_type: validatedAsset.type,
+        file_size_bytes: validatedAsset.size,
+        processing_consent_at: processingConsentAt,
+        retention_until: retentionUntil,
+        metadata: {
+          source: "direct_browser_upload",
+        },
+      });
+
+      if (assetError) {
+        throw assetError;
+      }
+    }
+
+    await createInitialAnalysisJob({
+      analysisRequestId: request.id,
+      profileType: request.profile_type,
+    });
+
+    return {
+      redirectTo: `/app/diagnosticos/${request.id}`,
+    };
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : "Nao foi possivel finalizar o envio.";
+
+    await admin
+      .from("analysis_requests")
+      .update({
+        status: "failed",
+      })
+      .eq("id", request.id);
+
+    throw new Error(errorMessage);
+  }
+}
+
+export async function markPreparedDiagnosisUploadFailed(params: {
+  requestId: string;
+  errorMessage: string;
+}) {
+  const user = await requireUser();
+  const admin = createSupabaseAdminClient();
+
+  const { data: request } = await admin
+    .from("analysis_requests")
+    .select("id, user_id, status")
+    .eq("id", params.requestId)
+    .single();
+
+  if (!request || request.user_id !== user.id) {
+    return;
+  }
+
+  if (request.status === "waiting_assets") {
+    await admin
+      .from("analysis_requests")
+      .update({
+        status: "failed",
+      })
+      .eq("id", request.id);
   }
 }
 

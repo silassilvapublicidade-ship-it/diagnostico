@@ -1,20 +1,93 @@
 "use server";
 
-import { redirect } from "next/navigation";
+import { redirect, unstable_rethrow } from "next/navigation";
 
 import { type AnalysisStatus } from "@/domain/methodology-8d";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { generateAiDiagnosis } from "@/modules/ai/run-analysis";
+import type { UploadCandidate } from "@/modules/assets/validation";
 import { requireUser } from "@/modules/auth/session";
 
 import {
+  completePreparedDiagnosisUpload,
   createDiagnosisFromForm,
   getNextAttemptNumber,
+  markPreparedDiagnosisUploadFailed,
   persistAnalysisResult,
+  prepareDiagnosisUploadFromForm,
+  type UploadedAssetConfirmation,
 } from "./persistence";
 
 export async function submitDiagnosisAction(formData: FormData) {
   return createDiagnosisFromForm(formData);
+}
+
+function safeActionError(error: unknown, fallback: string) {
+  unstable_rethrow(error);
+
+  const message = error instanceof Error ? error.message : fallback;
+  console.error("[diagnosis-upload]", message);
+
+  return message;
+}
+
+export async function prepareDiagnosisUploadAction(
+  formData: FormData,
+  uploadCandidates: UploadCandidate[],
+) {
+  try {
+    const prepared = await prepareDiagnosisUploadFromForm(
+      formData,
+      uploadCandidates,
+    );
+
+    return {
+      ok: true as const,
+      data: prepared,
+    };
+  } catch (error) {
+    return {
+      ok: false as const,
+      error: safeActionError(
+        error,
+        "Nao foi possivel preparar o envio das evidencias.",
+      ),
+    };
+  }
+}
+
+export async function completeDiagnosisUploadAction(params: {
+  requestId: string;
+  assets: UploadedAssetConfirmation[];
+}) {
+  try {
+    const completed = await completePreparedDiagnosisUpload(params);
+
+    return {
+      ok: true as const,
+      data: completed,
+    };
+  } catch (error) {
+    return {
+      ok: false as const,
+      error: safeActionError(
+        error,
+        "Nao foi possivel finalizar o envio das evidencias.",
+      ),
+    };
+  }
+}
+
+export async function markDiagnosisUploadFailedAction(params: {
+  requestId: string;
+  errorMessage: string;
+}) {
+  try {
+    await markPreparedDiagnosisUploadFailed(params);
+  } catch (error) {
+    unstable_rethrow(error);
+    console.error("[diagnosis-upload] failed to mark upload as failed", error);
+  }
 }
 
 export async function runDiagnosisAnalysisAction(formData: FormData) {
