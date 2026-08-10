@@ -3,6 +3,9 @@ import Link from "next/link";
 
 import { FullResultPreview, HeroResultPreview } from "./landing-result-preview";
 
+// Preco provisorio - sera atualizado quando o valor final for definido.
+const PRICE_LABEL = "R$ 99 · diagnóstico completo";
+
 const PAIN_POINTS = [
   "Posicionamento confuso",
   "1ª impressão fraca",
@@ -146,6 +149,7 @@ export default function Home() {
               <Link className="action-primary action-accent" href="/cadastro">
                 Analisar meu perfil
               </Link>
+              <p className="mt-3 text-sm text-cream/50">{PRICE_LABEL}</p>
             </div>
           </div>
 
@@ -353,6 +357,7 @@ export default function Home() {
             <Link className="action-primary action-accent" href="/cadastro">
               Analisar meu perfil
             </Link>
+            <p className="mt-3 text-sm text-cream/50">{PRICE_LABEL}</p>
           </div>
         </section>
 
