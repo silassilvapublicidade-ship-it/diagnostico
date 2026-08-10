@@ -345,9 +345,9 @@ export default function Home() {
         </section>
 
         <section className="border-t border-white/12 py-24 text-center sm:py-36">
-          <h2 className="display-title mx-auto max-w-2xl text-3xl leading-[1.15] text-cream sm:text-5xl">
-            <span className="block">Seu perfil pode estar</span>
-            <span className="block">perdendo oportunidades.</span>
+          <h2 className="display-title text-2xl leading-[1.15] text-cream sm:text-4xl lg:text-5xl">
+            <span className="block whitespace-nowrap">Seu perfil pode estar</span>
+            <span className="block whitespace-nowrap">perdendo oportunidades.</span>
           </h2>
           <div className="mt-10">
             <Link className="action-primary action-accent" href="/cadastro">
