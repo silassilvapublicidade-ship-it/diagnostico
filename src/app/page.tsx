@@ -86,15 +86,15 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-ink text-cream">
       <header className="sticky top-0 z-40 border-b border-white/10 bg-ink/85 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-6 py-4 sm:px-10 lg:px-12">
+        <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 px-6 py-3 sm:px-10 lg:px-16 xl:px-20">
           <Link className="flex items-center gap-3" href="/">
-            <span className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-accent/40 bg-black/40">
+            <span className="relative h-12 w-12 shrink-0 sm:h-14 sm:w-14">
               <Image
                 alt="Metodologia Silas Silva"
                 className="object-contain"
                 fill
                 priority
-                sizes="36px"
+                sizes="56px"
                 src="/logo-mark.png"
               />
             </span>
@@ -132,7 +132,7 @@ export default function Home() {
         </div>
       </header>
 
-      <div className="mx-auto w-full max-w-6xl px-6 sm:px-10 lg:px-12">
+      <div className="mx-auto w-full max-w-[1440px] px-6 sm:px-10 lg:px-16 xl:px-20">
         <section className="grid gap-10 py-20 sm:py-28 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-12">
           <div>
             <h1 className="display-title text-balance text-4xl leading-[1.08] text-cream sm:text-5xl">
@@ -358,12 +358,12 @@ export default function Home() {
 
         <footer className="flex flex-col items-start gap-4 border-t border-white/12 pt-8 pb-10 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
-            <span className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-accent/40 bg-black/40">
+            <span className="relative h-9 w-9 shrink-0">
               <Image
                 alt="Metodologia Silas Silva"
                 className="object-contain"
                 fill
-                sizes="32px"
+                sizes="36px"
                 src="/logo-mark.png"
               />
             </span>
