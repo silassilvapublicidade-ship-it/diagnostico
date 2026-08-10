@@ -1,19 +1,16 @@
-const EXAMPLE_DISCLAIMER =
-  "Exemplo ilustrativo — não é o resultado médio de clientes nem um perfil real.";
-
 function ExampleScoreRing({ score }: { score: number }) {
   const percentage = Math.max(0, Math.min(100, score));
 
   return (
     <div
-      className="relative flex h-28 w-28 shrink-0 items-center justify-center rounded-full sm:h-32 sm:w-32"
+      className="relative flex h-24 w-24 shrink-0 items-center justify-center rounded-full sm:h-28 sm:w-28"
       style={{
         background: `conic-gradient(var(--accent) ${percentage * 3.6}deg, color-mix(in srgb, var(--graphite) 12%, transparent) 0deg)`,
       }}
     >
-      <div className="flex h-[calc(100%-12px)] w-[calc(100%-12px)] flex-col items-center justify-center rounded-full bg-panel">
-        <span className="display-title text-4xl leading-none">{score}</span>
-        <span className="mt-1 font-mono text-[9px] uppercase tracking-[0.14em] text-graphite/46">
+      <div className="flex h-[calc(100%-11px)] w-[calc(100%-11px)] flex-col items-center justify-center rounded-full bg-panel">
+        <span className="display-title text-3xl leading-none">{score}</span>
+        <span className="mt-1 font-mono text-[8px] uppercase tracking-[0.14em] text-graphite/46">
           de 100
         </span>
       </div>
@@ -43,26 +40,14 @@ function MiniStat({ label, value }: { label: string; value: string }) {
 
 export function HeroResultPreview() {
   return (
-    <div className="dark-panel relative overflow-hidden p-5 sm:p-6">
-      <div className="flex items-center justify-between gap-3">
-        <p className="kicker text-accent">Exemplo ilustrativo</p>
-        <span className="shrink-0 rounded-full border border-cream/15 bg-black/30 px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.12em] text-cream/50">
-          Pré-visualização
-        </span>
-      </div>
+    <div className="dark-panel p-5 sm:p-6">
+      <p className="kicker text-accent">Exemplo ilustrativo</p>
 
       <div className="mt-5 flex items-center gap-5">
         <ExampleScoreRing score={65} />
         <div>
-          <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-cream/45">
-            Score estratégico
-          </p>
-          <p className="mt-1 text-lg font-black text-cream">
-            Em desenvolvimento
-          </p>
-          <p className="mt-1 text-xs text-cream/50">
-            8 Dimensões Estratégicas avaliadas
-          </p>
+          <p className="text-lg font-black text-cream">Em desenvolvimento</p>
+          <p className="mt-1 text-xs text-cream/50">Score estratégico</p>
         </div>
       </div>
 
@@ -71,7 +56,6 @@ export function HeroResultPreview() {
           [
             { label: "Conversão", score: 38 },
             { label: "Identidade", score: 82 },
-            { label: "Posicionamento", score: 70 },
           ] as const
         ).map((row) => (
           <div key={row.label}>
@@ -88,17 +72,15 @@ export function HeroResultPreview() {
 
       <div className="mt-6 rounded-lg border border-accent/30 bg-accent/10 p-4">
         <p className="kicker text-[10px] text-accent">Ponto crítico</p>
-        <p className="mt-2 text-sm leading-6 text-cream/85">
-          Conversão (38/100) — o perfil recebe visitas, mas não direciona
-          para nenhuma ação clara.
+        <p className="mt-1.5 text-sm font-medium text-cream/90">
+          Conversão baixa apesar do bom alcance.
         </p>
       </div>
 
-      <div className="mt-4 rounded-lg border border-cream/10 bg-black/20 p-4">
-        <p className="kicker text-[10px] text-accent">Próximo passo</p>
-        <p className="mt-2 text-sm leading-6 text-cream/72">
-          Fixar um destaque &ldquo;Comece aqui&rdquo; com o link principal e
-          trocar a bio por uma proposta específica.
+      <div className="mt-3 rounded-lg border border-cream/10 bg-black/20 p-4">
+        <p className="kicker text-[10px] text-accent">Ação recomendada</p>
+        <p className="mt-1.5 text-sm font-medium text-cream/75">
+          Reposicionar bio e caminho de conversão.
         </p>
       </div>
     </div>
@@ -134,7 +116,7 @@ function ExampleDimensionCard({
       <summary className="flex cursor-pointer list-none items-center gap-4 p-5 transition hover:bg-accent/8">
         <div className="flex-1">
           <div className="flex items-center justify-between gap-3">
-            <p className="text-xl font-black text-cream">{label}</p>
+            <p className="text-lg font-black text-cream">{label}</p>
             <p className="shrink-0 text-sm text-cream/56">{score} pontos</p>
           </div>
           <div className="mt-3">
@@ -145,7 +127,7 @@ function ExampleDimensionCard({
           +
         </span>
       </summary>
-      <div className="grid gap-3 border-t border-cream/10 px-5 pb-5 pt-4 text-sm leading-6 text-cream/70 lg:grid-cols-2">
+      <div className="grid gap-3 border-t border-cream/10 px-5 pb-5 pt-4 text-sm leading-6 text-cream/70 sm:grid-cols-2">
         <InsightBlock label="Diagnóstico" value={problem} />
         <InsightBlock label="Evidência" value={evidence} />
         <InsightBlock label="Consequência" value={consequence} />
@@ -159,9 +141,9 @@ function ExampleDimensionCard({
 
 function InsightBlock({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-cream/10 bg-black/18 p-4 shadow-[inset_3px_0_0_rgba(255,90,0,0.45)]">
-      <p className="kicker text-[10px] text-accent">{label}</p>
-      <p className="mt-2 text-sm leading-6 text-cream/72">{value}</p>
+    <div className="rounded-lg border border-cream/10 bg-black/18 p-3.5 shadow-[inset_3px_0_0_rgba(255,90,0,0.45)]">
+      <p className="kicker text-[9px] text-accent">{label}</p>
+      <p className="mt-1.5 text-sm leading-5 text-cream/72">{value}</p>
     </div>
   );
 }
@@ -170,10 +152,10 @@ function ExampleList({ title, items }: { title: string; items: string[] }) {
   return (
     <div className="lux-panel p-5">
       <p className="kicker text-accent">{title}</p>
-      <ul className="mt-4 space-y-3 text-sm leading-6 text-cream/72">
+      <ul className="mt-4 space-y-2.5 text-sm text-cream/75">
         {items.map((item) => (
-          <li className="flex gap-3" key={item}>
-            <span className="mt-0.5 shrink-0 text-accent">&rarr;</span>
+          <li className="flex gap-2.5" key={item}>
+            <span className="shrink-0 text-accent">&rarr;</span>
             <span>{item}</span>
           </li>
         ))}
@@ -188,7 +170,7 @@ function ExamplePlan({ timeframe, items }: { timeframe: string; items: string[] 
       <span className="inline-block rounded-md bg-accent px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-ink">
         {timeframe}
       </span>
-      <ul className="mt-4 space-y-3 text-sm leading-6 text-cream/72">
+      <ul className="mt-4 space-y-2.5 text-sm text-cream/75">
         {items.map((item, index) => (
           <li className="flex gap-2" key={item}>
             <span className="shrink-0 font-semibold text-accent">
@@ -204,70 +186,60 @@ function ExamplePlan({ timeframe, items }: { timeframe: string; items: string[] 
 
 export function FullResultPreview() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <div className="flex items-center gap-2">
         <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
-        <p className="kicker text-cream/50">{EXAMPLE_DISCLAIMER}</p>
+        <p className="kicker text-cream/50">Exemplo ilustrativo</p>
       </div>
 
       <div className="dark-panel grid gap-6 p-6 sm:p-8 lg:grid-cols-[auto_1fr] lg:items-center">
         <div className="flex items-center gap-5">
           <ExampleScoreRing score={65} />
           <div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-cream/45">
-              Score estratégico
-            </p>
-            <p className="mt-1 text-2xl font-black text-cream">
+            <p className="text-2xl font-black text-cream">
               Em desenvolvimento
             </p>
+            <p className="mt-1 text-xs text-cream/45">Score estratégico</p>
           </div>
         </div>
         <div className="grid gap-3 sm:grid-cols-3">
           <MiniStat label="Classificação" value="Em desenvolvimento" />
-          <MiniStat label="Dimensões avaliadas" value="8 de 8" />
+          <MiniStat label="Dimensões" value="8 de 8" />
           <MiniStat label="Método" value="Metodologia Silas Silva" />
         </div>
       </div>
 
       <div className="grid gap-3">
         <ExampleDimensionCard
-          consequence="Quem chega pela primeira vez vê competência sem contexto — e sem contexto, a decisão de seguir ou contratar fica mais fria."
-          correction="Adicionar um destaque de bastidores ou processo e citar, mesmo que brevemente, tempo de atuação ou formação na bio ou em um post fixado."
+          consequence="Cada visita se perde em silêncio."
+          correction="Uma única chamada, repetida em todo lugar."
           defaultOpen
-          evidence="Nos destaques e no feed enviados não aparece nenhuma credencial, bastidor de processo ou prova de quem está por trás do trabalho."
-          example="Destaque 'Quem sou' com 3 a 5 stories: 1 sobre a trajetória, 2 sobre o processo de trabalho, 1 com um resultado real explicado."
-          label="Autoridade"
-          nextStep="Gravar hoje um story simples explicando há quanto tempo atua e para quem trabalha."
-          problem="O perfil mostra resultados, mas não mostra por que confiar em quem os entrega."
-          score={54}
+          evidence="Bio e destaques sem nenhuma chamada clara."
+          example="Bio: 'Ajudo [X] a [Y]. Comece aqui ↓'"
+          label="Conversão"
+          nextStep="Reescrever a bio hoje."
+          problem="Atenção não vira ação."
+          score={38}
         />
         <ExampleDimensionCard
-          consequence="Cada visita é uma oportunidade perdida em silêncio, porque a pessoa não sabe qual é o próximo passo depois de gostar do que viu."
-          correction="Definir uma única ação prioritária (chamar no direct, clicar no link da bio) e repetir esse caminho na bio, no destaque e no encerramento dos posts."
-          evidence="A bio não tem uma chamada para ação, os destaques não incluem um caminho de contato e as publicações recentes não pedem nenhuma ação específica."
-          example="Bio: 'Ajudo [público] a [resultado]. Comece aqui.' + destaque fixo 'Comece aqui' com o link. Nos posts, encerrar com uma chamada direta."
-          label="Conversão"
-          nextStep="Reescrever a bio ainda hoje com uma única chamada clara."
-          problem="O perfil recebe atenção, mas não direciona essa atenção para nenhuma ação clara."
-          score={38}
+          consequence="Competência sem contexto esfria a decisão."
+          correction="Mostrar processo e trajetória, mesmo que breve."
+          evidence="Nenhuma credencial ou bastidor no perfil."
+          example="Destaque 'Quem sou' com 3-4 stories."
+          label="Autoridade"
+          nextStep="Gravar um story sobre sua trajetória."
+          problem="Mostra resultado, não mostra por que confiar."
+          score={54}
         />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <ExampleList
-          items={[
-            "Definir uma proposta clara na bio.",
-            "Criar um destaque com prova de autoridade.",
-            "Padronizar uma única chamada para ação nos próximos posts.",
-          ]}
+          items={["Bio com proposta clara", "Prova de autoridade", "Uma chamada por post"]}
           title="Prioridades"
         />
         <ExamplePlan
-          items={[
-            "Reescrever a bio com proposta e chamada para ação.",
-            "Fixar um destaque ou post com prova de autoridade.",
-            "Escolher a ação prioritária que vai aparecer em todo post daqui pra frente.",
-          ]}
+          items={["Reescrever a bio", "Fixar prova de autoridade", "Definir a chamada principal"]}
           timeframe="24 horas"
         />
       </div>

@@ -3,169 +3,66 @@ import Link from "next/link";
 
 import { FullResultPreview, HeroResultPreview } from "./landing-result-preview";
 
-const DIMENSIONS = [
-  {
-    code: "POS",
-    label: "Posicionamento",
-    question:
-      "Fica claro quem você é, para quem fala e por que deveriam escolher você?",
-  },
-  {
-    code: "IMP",
-    label: "Primeira Impressão",
-    question: "O que alguém entende sobre você nos primeiros segundos?",
-  },
-  {
-    code: "AUT",
-    label: "Autoridade",
-    question: "Seu perfil demonstra motivos reais para confiar em você?",
-  },
-  {
-    code: "CON",
-    label: "Conteúdo",
-    question: "O que você publica possui direção ou apenas ocupa o feed?",
-  },
-  {
-    code: "IDE",
-    label: "Identidade",
-    question: "Seu perfil possui reconhecimento e coerência?",
-  },
-  {
-    code: "CVR",
-    label: "Conversão",
-    question: "Existe um caminho claro entre atenção e ação?",
-  },
-  {
-    code: "REL",
-    label: "Relacionamento",
-    question:
-      "Você está construindo audiência ou apenas acumulando visualizações?",
-  },
-  {
-    code: "OPR",
-    label: "Oportunidades",
-    question: "O que seu perfil já possui, mas ainda não está aproveitando?",
-  },
+const PAIN_TAGS = [
+  "Posicionamento confuso",
+  "1ª impressão fraca",
+  "Pouca autoridade",
+  "Conteúdo sem direção",
+  "Identidade inconsistente",
+  "Conversão fraca",
+  "Relacionamento raso",
+  "Oportunidades perdidas",
 ] as const;
 
-const RECEIVE_ITEMS = [
-  {
-    title: "Descubra onde seu perfil está perdendo força",
-    description:
-      "As 8 Dimensões Estratégicas mostram exatamente onde estão os gargalos, sem misturar tudo em uma nota genérica.",
-  },
-  {
-    title: "Veja o nível real do seu perfil, não um número solto",
-    description:
-      "O Score Estratégico mostra a maturidade atual, dimensão por dimensão.",
-  },
-  {
-    title: "Pare de tentar adivinhar o que está travando resultado",
-    description:
-      "Os pontos críticos mostram, com evidência, o que está limitando crescimento, autoridade ou conversão agora.",
-  },
-  {
-    title: "Saiba o que resolver primeiro",
-    description:
-      "As prioridades evitam que você tente mudar tudo ao mesmo tempo e perca o foco.",
-  },
-  {
-    title: "Receba a solução, não só o problema",
-    description:
-      "Cada recomendação vem com exemplo prático e aplicação, não apenas o diagnóstico.",
-  },
-  {
-    title: "Tenha um plano, não uma lista de ideias soltas",
-    description:
-      "Ações organizadas para começar hoje e evoluir nas próximas semanas.",
-  },
-  {
-    title: "Saiba o que postar a partir de agora",
-    description:
-      "Sugestões de conteúdo conectadas diretamente aos problemas e oportunidades encontrados.",
-  },
-] as const;
-
-const PAIN_POINTS = [
-  "Posicionamento confuso — não fica claro quem você é nem por que escolher você.",
-  "Primeira impressão fraca — quem chega não entende o perfil em poucos segundos.",
-  "Autoridade pouco demonstrada — parece competente, mas não prova por quê.",
-  "Conteúdo sem direção — publica, mas sem um fio condutor.",
-  "Identidade inconsistente — cada parte do perfil parece de um perfil diferente.",
-  "Caminho de conversão ruim — quem gosta não sabe o que fazer depois.",
-  "Relacionamento superficial — números de alcance sem construção de audiência.",
-  "Oportunidades ignoradas — recursos que o próprio perfil já tem e nunca foram usados.",
+const RECEIVE_TAGS = [
+  "Score real do perfil",
+  "Pontos críticos",
+  "Prioridades",
+  "Solução pronta pra aplicar",
+  "Plano de ação",
 ] as const;
 
 const HOW_IT_WORKS = [
-  {
-    title: "Conte sobre seu perfil",
-    description:
-      "Responda perguntas rápidas sobre você, seu perfil e o que você quer alcançar.",
-  },
-  {
-    title: "Envie as evidências",
-    description:
-      "Adicione prints do perfil, do feed, dos destaques e das métricas disponíveis.",
-  },
-  {
-    title: "Receba sua leitura",
-    description:
-      "Cruzamos o que você contou com as evidências enviadas e analisamos o perfil em profundidade.",
-  },
-  {
-    title: "Veja o que precisa mudar",
-    description:
-      "Diagnóstico, prioridades, recomendações com exemplos e um plano de ação.",
-  },
+  { title: "Conte sobre seu perfil", hint: "Perguntas rápidas" },
+  { title: "Envie as evidências", hint: "Prints do perfil" },
+  { title: "Receba sua leitura", hint: "Análise em profundidade" },
+  { title: "Veja o que mudar", hint: "Diagnóstico e plano" },
+] as const;
+
+const DIMENSIONS = [
+  { code: "POS", label: "Posicionamento" },
+  { code: "IMP", label: "Primeira Impressão" },
+  { code: "AUT", label: "Autoridade" },
+  { code: "CON", label: "Conteúdo" },
+  { code: "IDE", label: "Identidade" },
+  { code: "CVR", label: "Conversão" },
+  { code: "REL", label: "Relacionamento" },
+  { code: "OPR", label: "Oportunidades" },
 ] as const;
 
 const PROFILE_TYPES = [
   {
     code: "BUSINESS",
     title: "Perfil comercial",
-    description:
-      "Mais peso para posicionamento, autoridade e conversão — o que mais pesa na decisão de compra.",
+    keywords: "Posicionamento · Autoridade · Conversão",
   },
   {
     code: "CREATOR",
     title: "Imagem pessoal e conteúdo",
-    description:
-      "Mais peso para conteúdo, identidade e relacionamento — o que mais pesa na construção de audiência.",
+    keywords: "Conteúdo · Identidade · Relacionamento",
   },
 ] as const;
 
 const COMPARISON_ROWS = [
-  {
-    without: "Vou mudar minha bio e ver se melhora.",
-    with: "Minha proposta está genérica — preciso torná-la mais específica.",
-  },
-  {
-    without: "Preciso postar mais.",
-    with: "O problema está na conversão do alcance que eu já tenho.",
-  },
-  {
-    without: "Meu feed precisa ficar mais bonito.",
-    with: "Minha identidade está forte — o gargalo está em outro ponto.",
-  },
+  { without: "Vou mudar a bio e ver.", with: "Sei o que mudar e por quê." },
+  { without: "Preciso postar mais.", with: "O problema é conversão, não volume." },
+  { without: "Feed mais bonito.", with: "Identidade forte, gargalo é outro." },
 ] as const;
 
 const TRUST_POINTS = [
-  {
-    title: "Suas evidências ficam privadas",
-    description:
-      "Os prints enviados servem só para a análise. Nada é publicado nem compartilhado.",
-  },
-  {
-    title: "Sem inventar o que não foi enviado",
-    description:
-      "Quando falta evidência para uma leitura confiável, isso fica claro em vez de virar um número aleatório.",
-  },
-  {
-    title: "Você decide o que muda",
-    description:
-      "O diagnóstico mostra o caminho. A decisão de aplicar continua sendo sua.",
-  },
+  { title: "Evidências privadas", hint: "Nunca publicadas ou compartilhadas" },
+  { title: "Sem inventar dado", hint: "Falta de evidência fica clara" },
+  { title: "Você decide", hint: "A aplicação é sua escolha" },
 ] as const;
 
 const NAV_LINKS = [
@@ -173,6 +70,17 @@ const NAV_LINKS = [
   { href: "#como-funciona", label: "Como funciona" },
   { href: "#dimensoes", label: "8 Dimensões" },
 ] as const;
+
+function SectionHeading({ kicker, title }: { kicker: string; title: string }) {
+  return (
+    <div>
+      <p className="kicker text-accent">{kicker}</p>
+      <h2 className="mt-2 text-xl font-semibold text-cream sm:text-2xl">
+        {title}
+      </h2>
+    </div>
+  );
+}
 
 export default function Home() {
   return (
@@ -225,184 +133,155 @@ export default function Home() {
       </header>
 
       <div className="mx-auto w-full max-w-6xl px-6 sm:px-10 lg:px-12">
-        <section className="grid gap-10 py-14 sm:py-20 lg:grid-cols-[1.05fr_0.95fr] lg:items-start lg:gap-12">
+        <section className="grid gap-10 py-20 sm:py-28 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-12">
           <div>
-            <p className="kicker mb-5 text-accent">Metodologia Silas Silva</p>
-            <h1 className="display-title max-w-2xl text-4xl leading-[1.05] text-cream sm:text-6xl lg:text-[4.4rem] lg:leading-[1.04]">
-              Pare de adivinhar o que precisa mudar no seu Instagram.
+            <h1 className="display-title max-w-xl text-4xl leading-[1.05] text-cream sm:text-6xl lg:text-7xl">
+              <span className="block">Descubra o que está</span>
+              <span className="block">travando seu Instagram.</span>
             </h1>
-            <p className="mt-6 max-w-lg text-lg leading-8 text-cream/72">
-              Envie seu perfil, conte o que você quer alcançar e receba uma
-              análise completa mostrando o que está funcionando, o que está
-              limitando seus resultados e exatamente o que fazer a partir de
-              agora.
+            <p className="mt-6 max-w-md text-lg leading-8 text-cream/70">
+              Análise estratégica do seu perfil, com prioridades e um plano
+              claro do que mudar.
             </p>
-            <div className="mt-8 flex flex-col items-start gap-3">
+            <div className="mt-8">
               <Link className="action-primary action-accent" href="/cadastro">
-                Quero meu diagnóstico
+                Analisar meu perfil
               </Link>
-              <p className="text-xs text-cream/45">
-                Leitura privada. Você decide o que muda.
-              </p>
             </div>
           </div>
 
           <HeroResultPreview />
         </section>
 
-        <section className="border-t border-white/12 py-16 sm:py-20">
-          <p className="kicker text-accent">Antes de mudar mais alguma coisa</p>
-          <h2 className="display-title mt-3 max-w-2xl text-3xl leading-[1.05] text-cream sm:text-5xl">
-            Talvez o problema não seja postar pouco.
-          </h2>
-          <p className="mt-5 max-w-2xl text-base leading-7 text-cream/68">
-            Às vezes o perfil já publica, já aparece, já tem alcance — e mesmo
-            assim não cresce, não converte, não parece diferente da
-            concorrência. Isso quase nunca é falta de esforço. Geralmente é um
-            problema estrutural que não aparece só de olhar.
-          </p>
+        <section className="border-t border-white/12 py-16 sm:py-24">
+          <SectionHeading
+            kicker="Antes de mudar mais alguma coisa"
+            title="Talvez o problema não seja postar pouco."
+          />
 
-          <div className="mt-10 grid gap-x-8 gap-y-5 sm:grid-cols-2">
-            {PAIN_POINTS.map((point) => (
-              <div className="flex gap-3" key={point}>
-                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
-                <p className="text-sm leading-6 text-cream/68">{point}</p>
-              </div>
+          <div className="mt-8 flex flex-wrap gap-2">
+            {PAIN_TAGS.map((tag) => (
+              <span
+                className="rounded-full border border-cream/15 bg-white/[0.03] px-3.5 py-2 text-xs font-medium text-cream/70"
+                key={tag}
+              >
+                {tag}
+              </span>
             ))}
           </div>
 
-          <p className="mt-10 text-lg font-semibold text-cream">
-            É exatamente isso que esta análise procura.
+          <p className="mt-8 text-sm font-semibold text-cream/85">
+            É isso que a análise identifica.
           </p>
         </section>
 
-        <section className="border-t border-white/12 py-16 sm:py-20" id="o-que-voce-recebe">
-          <p className="kicker text-accent">O que você recebe</p>
-          <h2 className="display-title mt-3 max-w-2xl text-3xl leading-[1.05] text-cream sm:text-5xl">
-            Clareza, direção e o que fazer com ela.
-          </h2>
+        <section
+          className="border-t border-white/12 py-16 sm:py-24"
+          id="o-que-voce-recebe"
+        >
+          <SectionHeading kicker="O que você recebe" title="Clareza sobre o que fazer." />
 
-          <div className="mt-10 grid gap-4 sm:grid-cols-2">
-            {RECEIVE_ITEMS.map((item) => (
-              <div className="lux-panel p-5" key={item.title}>
-                <p className="text-base font-semibold text-cream">
-                  {item.title}
-                </p>
-                <p className="mt-2 text-sm leading-6 text-cream/64">
-                  {item.description}
-                </p>
-              </div>
+          <div className="mt-8 flex flex-wrap gap-2.5">
+            {RECEIVE_TAGS.map((tag) => (
+              <span
+                className="rounded-full border border-accent/30 bg-accent/8 px-4 py-2.5 text-sm font-semibold text-cream/85"
+                key={tag}
+              >
+                {tag}
+              </span>
             ))}
           </div>
         </section>
 
-        <section className="border-t border-white/12 py-16 sm:py-20">
-          <p className="kicker text-accent">Você não recebe apenas uma nota</p>
-          <h2 className="display-title mt-3 max-w-2xl text-3xl leading-[1.05] text-cream sm:text-5xl">
-            Problema, evidência e o que fazer a respeito.
-          </h2>
-          <p className="mt-5 max-w-2xl text-base leading-7 text-cream/68">
-            Cada dimensão traz o diagnóstico, a evidência que sustenta,
-            por que isso prejudica o perfil, a correção, um exemplo pronto
-            para aplicar e o próximo passo.
-          </p>
+        <section className="border-t border-white/12 py-16 sm:py-24">
+          <SectionHeading
+            kicker="Prova, não promessa"
+            title="Você não recebe apenas uma nota."
+          />
 
-          <div className="mt-10">
+          <div className="mt-8">
             <FullResultPreview />
           </div>
         </section>
 
-        <section className="border-t border-white/12 py-16 sm:py-20" id="como-funciona">
-          <p className="kicker text-accent">Como funciona</p>
-          <h2 className="display-title mt-3 max-w-xl text-2xl leading-[1.05] text-cream sm:text-4xl">
-            Simples de enviar, profundo de receber.
-          </h2>
+        <section
+          className="border-t border-white/12 py-16 sm:py-24"
+          id="como-funciona"
+        >
+          <SectionHeading
+            kicker="Como funciona"
+            title="Simples de enviar, profundo de receber."
+          />
 
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {HOW_IT_WORKS.map((step, index) => (
-              <div className="dark-panel p-5" key={step.title}>
+              <div className="dark-panel p-4" key={step.title}>
                 <p className="font-mono text-[10px] text-accent">
                   {String(index + 1).padStart(2, "0")}
                 </p>
-                <p className="mt-3 text-sm font-black uppercase tracking-[0.1em] text-cream/85">
+                <p className="mt-2 text-sm font-black text-cream">
                   {step.title}
                 </p>
-                <p className="mt-3 text-xs leading-5 text-cream/60">
-                  {step.description}
-                </p>
+                <p className="mt-1 text-xs text-cream/50">{step.hint}</p>
               </div>
             ))}
           </div>
         </section>
 
-        <section className="border-t border-white/12 py-16 sm:py-20" id="dimensoes">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p className="kicker text-accent">8 Dimensões Estratégicas</p>
-              <h2 className="display-title mt-3 max-w-xl text-2xl leading-[1.05] text-cream sm:text-4xl">
-                Seu perfil não tem um único problema.
-              </h2>
-            </div>
-            <p className="max-w-sm text-sm leading-6 text-cream/60">
-              Um perfil pode ter bom conteúdo e converter mal, ter boa
-              identidade e posicionamento fraco, ter alcance e pouca
-              autoridade. Por isso a leitura é dividida em 8 dimensões.
-            </p>
-          </div>
+        <section
+          className="border-t border-white/12 py-16 sm:py-24"
+          id="dimensoes"
+        >
+          <SectionHeading
+            kicker="8 Dimensões Estratégicas"
+            title="Um perfil, vários ângulos."
+          />
 
-          <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-8 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
             {DIMENSIONS.map((dimension) => (
               <div
-                className="rounded-lg border border-cream/10 bg-white/[0.03] p-4"
+                className="rounded-lg border border-cream/10 bg-white/[0.03] px-3 py-3.5 text-center"
                 key={dimension.code}
               >
-                <p className="font-mono text-[10px] font-black text-cream/34">
+                <p className="font-mono text-[9px] font-black text-cream/30">
                   {dimension.code}
                 </p>
-                <p className="mt-2 text-sm font-semibold text-cream">
+                <p className="mt-1 text-sm font-semibold text-cream">
                   {dimension.label}
-                </p>
-                <p className="mt-2 text-xs leading-5 text-cream/58">
-                  {dimension.question}
                 </p>
               </div>
             ))}
           </div>
         </section>
 
-        <section className="border-t border-white/12 py-16 sm:py-20">
-          <p className="kicker text-accent">Leitura personalizada</p>
-          <h2 className="display-title mt-3 max-w-xl text-2xl leading-[1.05] text-cream sm:text-4xl">
-            A mesma régua não serve para todo perfil.
-          </h2>
-          <p className="mt-4 max-w-2xl text-sm leading-6 text-cream/64">
-            Empresas e criadores têm objetivos e sinais estratégicos
-            diferentes. A leitura ajusta o peso de cada dimensão conforme o
-            tipo de perfil.
-          </p>
+        <section className="border-t border-white/12 py-16 sm:py-24">
+          <SectionHeading
+            kicker="Leitura personalizada"
+            title="Empresa ou criador. Pesos diferentes."
+          />
 
-          <div className="mt-8 grid gap-4 sm:grid-cols-2">
+          <div className="mt-8 grid gap-3 sm:grid-cols-2">
             {PROFILE_TYPES.map((profile) => (
-              <div className="dark-panel p-6" key={profile.code}>
+              <div className="dark-panel p-5" key={profile.code}>
                 <p className="font-mono text-[10px] font-black text-accent">
                   {profile.code}
                 </p>
-                <p className="mt-2 text-lg font-semibold text-cream">
+                <p className="mt-2 text-base font-semibold text-cream">
                   {profile.title}
                 </p>
-                <p className="mt-2 text-sm leading-6 text-cream/64">
-                  {profile.description}
+                <p className="mt-1.5 text-xs font-medium text-cream/50">
+                  {profile.keywords}
                 </p>
               </div>
             ))}
           </div>
         </section>
 
-        <section className="border-t border-white/12 py-16 sm:py-20">
-          <p className="kicker text-accent">Achismo x direção</p>
-          <h2 className="display-title mt-3 max-w-xl text-2xl leading-[1.05] text-cream sm:text-4xl">
-            Pare de tentar adivinhar. Comece a saber.
-          </h2>
+        <section className="border-t border-white/12 py-16 sm:py-24">
+          <SectionHeading
+            kicker="Achismo x direção"
+            title="Pare de tentar adivinhar. Comece a saber."
+          />
 
           <div className="mt-8 overflow-hidden rounded-lg border border-cream/10">
             <div className="grid grid-cols-2 border-b border-cream/10 bg-white/[0.03]">
@@ -429,44 +308,35 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="border-t border-white/12 py-16 sm:py-20">
-          <p className="kicker text-accent">Privacidade e confiança</p>
-          <h2 className="display-title mt-3 max-w-xl text-2xl leading-[1.05] text-cream sm:text-4xl">
-            Uma leitura privada, do seu jeito.
-          </h2>
+        <section className="border-t border-white/12 py-16 sm:py-24">
+          <SectionHeading kicker="Privacidade" title="Privado, do seu jeito." />
 
           <div className="mt-8 grid gap-4 sm:grid-cols-3">
             {TRUST_POINTS.map((point) => (
               <div key={point.title}>
-                <div className="hairline mb-4" />
+                <div className="hairline mb-3" />
                 <p className="text-sm font-semibold text-cream">
                   {point.title}
                 </p>
-                <p className="mt-2 text-sm leading-6 text-cream/60">
-                  {point.description}
-                </p>
+                <p className="mt-1 text-xs text-cream/50">{point.hint}</p>
               </div>
             ))}
           </div>
         </section>
 
-        <section className="lux-panel my-8 flex flex-col gap-6 p-8 sm:p-10">
-          <div className="max-w-2xl">
-            <p className="kicker text-accent">Chega de tentativa e erro</p>
-            <p className="display-title mt-3 text-2xl leading-[1.1] text-cream sm:text-4xl">
-              Você pode continuar publicando e esperando descobrir o que
-              funciona. Ou pode descobrir agora o que o seu perfil realmente
-              precisa.
+        <section className="lux-panel my-10 flex flex-col items-center gap-7 p-10 text-center sm:p-16">
+          <div className="max-w-xl">
+            <h2 className="display-title text-3xl leading-[1.1] text-cream sm:text-5xl">
+              <span className="block">Seu perfil pode estar</span>
+              <span className="block">perdendo oportunidades.</span>
+            </h2>
+            <p className="mt-4 text-base text-cream/60">
+              Descubra onde e saiba o que fazer.
             </p>
           </div>
-          <div className="flex flex-col items-start gap-3">
-            <Link className="action-primary action-accent" href="/cadastro">
-              Quero analisar meu perfil
-            </Link>
-            <p className="text-xs text-cream/50">
-              Leva poucos minutos para enviar as informações.
-            </p>
-          </div>
+          <Link className="action-primary action-accent" href="/cadastro">
+            Analisar meu perfil
+          </Link>
         </section>
 
         <footer className="flex flex-col items-start gap-4 border-t border-white/12 pt-8 pb-10 sm:flex-row sm:items-center sm:justify-between">
