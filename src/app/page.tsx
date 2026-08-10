@@ -135,9 +135,8 @@ export default function Home() {
       <div className="mx-auto w-full max-w-6xl px-6 sm:px-10 lg:px-12">
         <section className="grid gap-10 py-20 sm:py-28 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-12">
           <div>
-            <h1 className="display-title max-w-xl text-4xl leading-[1.05] text-cream sm:text-6xl lg:text-7xl">
-              <span className="block">Descubra o que está</span>
-              <span className="block">travando seu Instagram.</span>
+            <h1 className="display-title max-w-lg text-balance text-4xl leading-[1.08] text-cream sm:text-5xl lg:text-6xl">
+              Descubra o que está travando seu Instagram.
             </h1>
             <p className="mt-6 max-w-md text-lg leading-8 text-cream/70">
               Análise estratégica do seu perfil, com prioridades e um plano
@@ -326,9 +325,8 @@ export default function Home() {
 
         <section className="lux-panel my-10 flex flex-col items-center gap-7 p-10 text-center sm:p-16">
           <div className="max-w-xl">
-            <h2 className="display-title text-3xl leading-[1.1] text-cream sm:text-5xl">
-              <span className="block">Seu perfil pode estar</span>
-              <span className="block">perdendo oportunidades.</span>
+            <h2 className="display-title text-balance text-3xl leading-[1.1] text-cream sm:text-5xl">
+              Seu perfil pode estar perdendo oportunidades.
             </h2>
             <p className="mt-4 text-base text-cream/60">
               Descubra onde e saiba o que fazer.
