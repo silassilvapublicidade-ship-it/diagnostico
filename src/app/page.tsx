@@ -344,18 +344,15 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="lux-panel my-10 flex flex-col items-center gap-7 p-10 text-center sm:p-16">
-          <div className="max-w-xl">
-            <h2 className="display-title text-balance text-3xl leading-[1.1] text-cream sm:text-5xl">
-              Seu perfil pode estar perdendo oportunidades.
-            </h2>
-            <p className="mt-4 text-base text-cream/60">
-              Descubra onde e saiba o que fazer.
-            </p>
+        <section className="border-t border-white/12 py-24 text-center sm:py-36">
+          <h2 className="display-title text-balance mx-auto max-w-2xl text-3xl leading-[1.15] text-cream sm:text-5xl">
+            Seu perfil pode estar perdendo oportunidades.
+          </h2>
+          <div className="mt-10">
+            <Link className="action-primary action-accent" href="/cadastro">
+              Analisar meu perfil
+            </Link>
           </div>
-          <Link className="action-primary action-accent" href="/cadastro">
-            Analisar meu perfil
-          </Link>
         </section>
 
         <footer className="flex flex-col items-start gap-4 border-t border-white/12 pt-8 pb-10 sm:flex-row sm:items-center sm:justify-between">
