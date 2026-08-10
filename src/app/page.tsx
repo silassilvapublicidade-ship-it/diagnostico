@@ -75,7 +75,7 @@ function SectionHeading({ kicker, title }: { kicker: string; title: string }) {
   return (
     <div>
       <p className="kicker text-accent">{kicker}</p>
-      <h2 className="mt-2 text-xl font-semibold text-cream sm:text-2xl">
+      <h2 className="display-title mt-3 text-2xl leading-[1.1] text-cream sm:text-3xl">
         {title}
       </h2>
     </div>
@@ -135,8 +135,8 @@ export default function Home() {
       <div className="mx-auto w-full max-w-6xl px-6 sm:px-10 lg:px-12">
         <section className="grid gap-10 py-20 sm:py-28 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-12">
           <div>
-            <h1 className="display-title max-w-lg text-balance text-4xl leading-[1.08] text-cream sm:text-5xl lg:text-6xl">
-              Descubra o que está travando seu Instagram.
+            <h1 className="display-title text-balance text-4xl leading-[1.08] text-cream sm:text-5xl">
+              Descubra o que está travando seu&nbsp;Instagram.
             </h1>
             <p className="mt-6 max-w-md text-lg leading-8 text-cream/70">
               Análise estratégica do seu perfil, com prioridades e um plano
@@ -158,10 +158,10 @@ export default function Home() {
             title="Talvez o problema não seja postar pouco."
           />
 
-          <div className="mt-8 flex flex-wrap gap-2">
+          <div className="mt-8 flex flex-wrap gap-2.5">
             {PAIN_TAGS.map((tag) => (
               <span
-                className="rounded-full border border-cream/15 bg-white/[0.03] px-3.5 py-2 text-xs font-medium text-cream/70"
+                className="rounded-full border border-cream/15 bg-white/[0.04] px-4 py-2.5 text-sm font-medium text-cream/75"
                 key={tag}
               >
                 {tag}
@@ -169,7 +169,7 @@ export default function Home() {
             ))}
           </div>
 
-          <p className="mt-8 text-sm font-semibold text-cream/85">
+          <p className="mt-8 text-base font-semibold text-cream/90">
             É isso que a análise identifica.
           </p>
         </section>
@@ -180,10 +180,10 @@ export default function Home() {
         >
           <SectionHeading kicker="O que você recebe" title="Clareza sobre o que fazer." />
 
-          <div className="mt-8 flex flex-wrap gap-2.5">
+          <div className="mt-8 flex flex-wrap gap-3">
             {RECEIVE_TAGS.map((tag) => (
               <span
-                className="rounded-full border border-accent/30 bg-accent/8 px-4 py-2.5 text-sm font-semibold text-cream/85"
+                className="rounded-full border border-accent/35 bg-accent/10 px-5 py-3 text-base font-semibold text-cream/90"
                 key={tag}
               >
                 {tag}
@@ -212,16 +212,16 @@ export default function Home() {
             title="Simples de enviar, profundo de receber."
           />
 
-          <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-8 grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
             {HOW_IT_WORKS.map((step, index) => (
-              <div className="dark-panel p-4" key={step.title}>
-                <p className="font-mono text-[10px] text-accent">
+              <div className="dark-panel p-5" key={step.title}>
+                <p className="font-mono text-xs text-accent">
                   {String(index + 1).padStart(2, "0")}
                 </p>
-                <p className="mt-2 text-sm font-black text-cream">
+                <p className="mt-3 text-base font-black text-cream">
                   {step.title}
                 </p>
-                <p className="mt-1 text-xs text-cream/50">{step.hint}</p>
+                <p className="mt-1.5 text-sm text-cream/55">{step.hint}</p>
               </div>
             ))}
           </div>
@@ -236,16 +236,16 @@ export default function Home() {
             title="Um perfil, vários ângulos."
           />
 
-          <div className="mt-8 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+          <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {DIMENSIONS.map((dimension) => (
               <div
-                className="rounded-lg border border-cream/10 bg-white/[0.03] px-3 py-3.5 text-center"
+                className="rounded-lg border border-cream/12 bg-white/[0.04] px-3 py-4 text-center transition hover:border-accent/40 hover:bg-accent/8"
                 key={dimension.code}
               >
-                <p className="font-mono text-[9px] font-black text-cream/30">
+                <p className="font-mono text-[10px] font-black text-accent/70">
                   {dimension.code}
                 </p>
-                <p className="mt-1 text-sm font-semibold text-cream">
+                <p className="mt-1.5 text-base font-semibold text-cream">
                   {dimension.label}
                 </p>
               </div>
@@ -261,14 +261,14 @@ export default function Home() {
 
           <div className="mt-8 grid gap-3 sm:grid-cols-2">
             {PROFILE_TYPES.map((profile) => (
-              <div className="dark-panel p-5" key={profile.code}>
-                <p className="font-mono text-[10px] font-black text-accent">
+              <div className="dark-panel p-6" key={profile.code}>
+                <p className="font-mono text-xs font-black text-accent">
                   {profile.code}
                 </p>
-                <p className="mt-2 text-base font-semibold text-cream">
+                <p className="mt-2.5 text-lg font-semibold text-cream">
                   {profile.title}
                 </p>
-                <p className="mt-1.5 text-xs font-medium text-cream/50">
+                <p className="mt-2 text-sm font-medium text-cream/55">
                   {profile.keywords}
                 </p>
               </div>
@@ -296,10 +296,10 @@ export default function Home() {
                 className="grid grid-cols-2 border-b border-cream/10 last:border-b-0"
                 key={row.without}
               >
-                <p className="px-4 py-4 text-sm leading-6 text-cream/50 sm:px-6">
+                <p className="px-4 py-5 text-base leading-6 text-cream/50 sm:px-6">
                   {row.without}
                 </p>
-                <p className="border-l border-cream/10 px-4 py-4 text-sm font-medium leading-6 text-cream/90 sm:px-6">
+                <p className="border-l border-cream/10 px-4 py-5 text-base font-medium leading-6 text-cream/90 sm:px-6">
                   {row.with}
                 </p>
               </div>
@@ -310,14 +310,14 @@ export default function Home() {
         <section className="border-t border-white/12 py-16 sm:py-24">
           <SectionHeading kicker="Privacidade" title="Privado, do seu jeito." />
 
-          <div className="mt-8 grid gap-4 sm:grid-cols-3">
+          <div className="mt-8 grid gap-5 sm:grid-cols-3">
             {TRUST_POINTS.map((point) => (
               <div key={point.title}>
-                <div className="hairline mb-3" />
-                <p className="text-sm font-semibold text-cream">
+                <div className="hairline mb-4" />
+                <p className="text-base font-semibold text-cream">
                   {point.title}
                 </p>
-                <p className="mt-1 text-xs text-cream/50">{point.hint}</p>
+                <p className="mt-1.5 text-sm text-cream/55">{point.hint}</p>
               </div>
             ))}
           </div>
