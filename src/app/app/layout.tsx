@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -20,8 +21,15 @@ export default async function PrivateLayout({
           <div className="relative">
             <Link className="group block" href="/app">
               <div className="flex items-center gap-3">
-                <span className="flex h-12 w-12 items-center justify-center rounded-lg border border-accent bg-accent text-sm font-black text-ink shadow-[0_0_45px_rgba(255,90,0,0.28)]">
-                  SS
+                <span className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-accent/40 bg-black/40 shadow-[0_0_45px_rgba(255,90,0,0.28)]">
+                  <Image
+                    alt="Metodologia Silas Silva"
+                    className="object-contain"
+                    fill
+                    priority
+                    sizes="48px"
+                    src="/logo-mark.png"
+                  />
                 </span>
                 <div>
                   <p className="kicker text-accent">Diagnostico</p>
