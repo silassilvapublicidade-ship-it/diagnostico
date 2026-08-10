@@ -1,25 +1,39 @@
+import {
+  BadgeCheck,
+  BarChart3,
+  Compass,
+  Eye,
+  Handshake,
+  Layers,
+  ListChecks,
+  PenLine,
+  Route,
+  Target,
+  TrendingDown,
+  Wrench,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
 import { FullResultPreview, HeroResultPreview } from "./landing-result-preview";
 
-const PAIN_TAGS = [
-  "Posicionamento confuso",
-  "1ª impressão fraca",
-  "Pouca autoridade",
-  "Conteúdo sem direção",
-  "Identidade inconsistente",
-  "Conversão fraca",
-  "Relacionamento raso",
-  "Oportunidades perdidas",
+const PAIN_POINTS = [
+  { icon: Compass, label: "Posicionamento confuso" },
+  { icon: Eye, label: "1ª impressão fraca" },
+  { icon: BadgeCheck, label: "Pouca autoridade" },
+  { icon: PenLine, label: "Conteúdo sem direção" },
+  { icon: Layers, label: "Identidade inconsistente" },
+  { icon: TrendingDown, label: "Conversão fraca" },
+  { icon: Handshake, label: "Relacionamento raso" },
+  { icon: Target, label: "Oportunidades perdidas" },
 ] as const;
 
-const RECEIVE_TAGS = [
-  "Score real do perfil",
-  "Pontos críticos",
-  "Prioridades",
-  "Solução pronta pra aplicar",
-  "Plano de ação",
+const RECEIVE_ITEMS = [
+  { icon: BarChart3, label: "Score real do perfil" },
+  { icon: Target, label: "Pontos críticos" },
+  { icon: ListChecks, label: "Prioridades" },
+  { icon: Wrench, label: "Solução pronta pra aplicar" },
+  { icon: Route, label: "Plano de ação" },
 ] as const;
 
 const HOW_IT_WORKS = [
@@ -158,14 +172,19 @@ export default function Home() {
             title="Talvez o problema não seja postar pouco."
           />
 
-          <div className="mt-8 flex flex-wrap gap-2.5">
-            {PAIN_TAGS.map((tag) => (
-              <span
-                className="rounded-full border border-cream/15 bg-white/[0.04] px-4 py-2.5 text-sm font-medium text-cream/75"
-                key={tag}
+          <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {PAIN_POINTS.map((point) => (
+              <div
+                className="flex items-center gap-3 rounded-lg border border-cream/10 bg-white/[0.03] px-4 py-3.5"
+                key={point.label}
               >
-                {tag}
-              </span>
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-cream/10 bg-white/[0.05] text-cream/60">
+                  <point.icon aria-hidden className="h-[18px] w-[18px]" />
+                </span>
+                <span className="text-sm font-medium text-cream/80">
+                  {point.label}
+                </span>
+              </div>
             ))}
           </div>
 
@@ -180,14 +199,16 @@ export default function Home() {
         >
           <SectionHeading kicker="O que você recebe" title="Clareza sobre o que fazer." />
 
-          <div className="mt-8 flex flex-wrap gap-3">
-            {RECEIVE_TAGS.map((tag) => (
-              <span
-                className="rounded-full border border-accent/35 bg-accent/10 px-5 py-3 text-base font-semibold text-cream/90"
-                key={tag}
-              >
-                {tag}
-              </span>
+          <div className="mt-8 grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
+            {RECEIVE_ITEMS.map((item) => (
+              <div className="dark-panel flex items-center gap-4 p-5" key={item.label}>
+                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-accent/30 bg-accent/10 text-accent">
+                  <item.icon aria-hidden className="h-5 w-5" />
+                </span>
+                <span className="text-base font-semibold text-cream">
+                  {item.label}
+                </span>
+              </div>
             ))}
           </div>
         </section>
