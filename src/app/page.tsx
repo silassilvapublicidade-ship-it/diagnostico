@@ -1,39 +1,25 @@
-import {
-  BadgeCheck,
-  BarChart3,
-  Compass,
-  Eye,
-  Handshake,
-  Layers,
-  ListChecks,
-  PenLine,
-  Route,
-  Target,
-  TrendingDown,
-  Wrench,
-} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
 import { FullResultPreview, HeroResultPreview } from "./landing-result-preview";
 
 const PAIN_POINTS = [
-  { icon: Compass, label: "Posicionamento confuso" },
-  { icon: Eye, label: "1ª impressão fraca" },
-  { icon: BadgeCheck, label: "Pouca autoridade" },
-  { icon: PenLine, label: "Conteúdo sem direção" },
-  { icon: Layers, label: "Identidade inconsistente" },
-  { icon: TrendingDown, label: "Conversão fraca" },
-  { icon: Handshake, label: "Relacionamento raso" },
-  { icon: Target, label: "Oportunidades perdidas" },
+  "Posicionamento confuso",
+  "1ª impressão fraca",
+  "Pouca autoridade",
+  "Conteúdo sem direção",
+  "Identidade inconsistente",
+  "Conversão fraca",
+  "Relacionamento raso",
+  "Oportunidades perdidas",
 ] as const;
 
 const RECEIVE_ITEMS = [
-  { icon: BarChart3, label: "Score real do perfil" },
-  { icon: Target, label: "Pontos críticos" },
-  { icon: ListChecks, label: "Prioridades" },
-  { icon: Wrench, label: "Solução pronta pra aplicar" },
-  { icon: Route, label: "Plano de ação" },
+  "Score real do perfil",
+  "Pontos críticos",
+  "Prioridades",
+  "Solução pronta pra aplicar",
+  "Plano de ação",
 ] as const;
 
 const HOW_IT_WORKS = [
@@ -172,17 +158,17 @@ export default function Home() {
             title="Talvez o problema não seja postar pouco."
           />
 
-          <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {PAIN_POINTS.map((point) => (
+          <div className="mt-8 grid gap-x-10 border-t border-cream/10 sm:grid-cols-2">
+            {PAIN_POINTS.map((point, index) => (
               <div
-                className="flex items-center gap-3 rounded-lg border border-cream/10 bg-white/[0.03] px-4 py-3.5"
-                key={point.label}
+                className="flex items-center gap-4 border-b border-cream/10 py-3.5"
+                key={point}
               >
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-cream/10 bg-white/[0.05] text-cream/60">
-                  <point.icon aria-hidden className="h-[18px] w-[18px]" />
+                <span className="font-mono text-sm font-black text-accent/60">
+                  {String(index + 1).padStart(2, "0")}
                 </span>
-                <span className="text-sm font-medium text-cream/80">
-                  {point.label}
+                <span className="text-base font-medium text-cream/80">
+                  {point}
                 </span>
               </div>
             ))}
@@ -199,14 +185,17 @@ export default function Home() {
         >
           <SectionHeading kicker="O que você recebe" title="Clareza sobre o que fazer." />
 
-          <div className="mt-8 grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
-            {RECEIVE_ITEMS.map((item) => (
-              <div className="dark-panel flex items-center gap-4 p-5" key={item.label}>
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-accent/30 bg-accent/10 text-accent">
-                  <item.icon aria-hidden className="h-5 w-5" />
+          <div className="mt-8 max-w-2xl border-t border-accent/15">
+            {RECEIVE_ITEMS.map((item, index) => (
+              <div
+                className="flex items-center gap-5 border-b border-accent/15 py-4"
+                key={item}
+              >
+                <span className="font-mono text-base font-black text-accent">
+                  {String(index + 1).padStart(2, "0")}
                 </span>
-                <span className="text-base font-semibold text-cream">
-                  {item.label}
+                <span className="text-lg font-semibold text-cream">
+                  {item}
                 </span>
               </div>
             ))}
@@ -233,16 +222,15 @@ export default function Home() {
             title="Simples de enviar, profundo de receber."
           />
 
-          <div className="mt-8 grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="relative mt-10 grid gap-8 sm:grid-cols-4">
+            <div className="pointer-events-none absolute top-5 right-0 left-0 hidden h-px bg-cream/15 sm:block" />
             {HOW_IT_WORKS.map((step, index) => (
-              <div className="dark-panel p-5" key={step.title}>
-                <p className="font-mono text-xs text-accent">
-                  {String(index + 1).padStart(2, "0")}
-                </p>
-                <p className="mt-3 text-base font-black text-cream">
-                  {step.title}
-                </p>
-                <p className="mt-1.5 text-sm text-cream/55">{step.hint}</p>
+              <div className="relative flex flex-col items-start gap-3" key={step.title}>
+                <span className="relative z-10 flex h-10 w-10 items-center justify-center rounded-full border border-accent bg-ink font-mono text-sm font-black text-accent">
+                  {index + 1}
+                </span>
+                <p className="text-base font-black text-cream">{step.title}</p>
+                <p className="text-sm text-cream/55">{step.hint}</p>
               </div>
             ))}
           </div>
@@ -257,18 +245,23 @@ export default function Home() {
             title="Um perfil, vários ângulos."
           />
 
-          <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {DIMENSIONS.map((dimension) => (
+          <div className="mt-8 grid gap-x-10 border-t border-cream/10 sm:grid-cols-2">
+            {DIMENSIONS.map((dimension, index) => (
               <div
-                className="rounded-lg border border-cream/12 bg-white/[0.04] px-3 py-4 text-center transition hover:border-accent/40 hover:bg-accent/8"
+                className="flex items-center justify-between gap-4 border-b border-cream/10 py-3.5"
                 key={dimension.code}
               >
-                <p className="font-mono text-[10px] font-black text-accent/70">
+                <div className="flex items-center gap-4">
+                  <span className="font-mono text-xs font-black text-cream/30">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <span className="text-base font-semibold text-cream">
+                    {dimension.label}
+                  </span>
+                </div>
+                <span className="font-mono text-xs font-black text-accent/60">
                   {dimension.code}
-                </p>
-                <p className="mt-1.5 text-base font-semibold text-cream">
-                  {dimension.label}
-                </p>
+                </span>
               </div>
             ))}
           </div>
@@ -280,13 +273,20 @@ export default function Home() {
             title="Empresa ou criador. Pesos diferentes."
           />
 
-          <div className="mt-8 grid gap-3 sm:grid-cols-2">
-            {PROFILE_TYPES.map((profile) => (
-              <div className="dark-panel p-6" key={profile.code}>
+          <div className="mt-8 grid overflow-hidden rounded-lg border border-cream/10 sm:grid-cols-2">
+            {PROFILE_TYPES.map((profile, index) => (
+              <div
+                className={
+                  index === 0
+                    ? "border-b border-cream/10 p-6 sm:border-r sm:border-b-0 sm:p-8"
+                    : "p-6 sm:p-8"
+                }
+                key={profile.code}
+              >
                 <p className="font-mono text-xs font-black text-accent">
                   {profile.code}
                 </p>
-                <p className="mt-2.5 text-lg font-semibold text-cream">
+                <p className="mt-2.5 text-xl font-semibold text-cream">
                   {profile.title}
                 </p>
                 <p className="mt-2 text-sm font-medium text-cream/55">
