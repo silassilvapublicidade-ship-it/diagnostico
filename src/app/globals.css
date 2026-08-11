@@ -167,7 +167,7 @@ textarea {
   border-color: var(--accent);
   background: var(--accent);
   color: var(--background);
-  transform: translateY(-1px);
+  transform: translateY(-1px) scale(1.02);
 }
 
 .action-accent {
@@ -354,5 +354,9 @@ textarea {
   *::before,
   *::after {
     scroll-behavior: auto !important;
+  }
+
+  .action-primary:hover {
+    transform: none;
   }
 }

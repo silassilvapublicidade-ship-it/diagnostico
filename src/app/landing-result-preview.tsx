@@ -1,15 +1,24 @@
+"use client";
+
+import { useCountUp, useInView } from "./landing-motion";
+
 function ExampleScoreRing({ score }: { score: number }) {
-  const percentage = Math.max(0, Math.min(100, score));
+  const [ref, inView] = useInView<HTMLDivElement>(0.4);
+  const animated = useCountUp(score, inView);
+  const percentage = Math.max(0, Math.min(100, animated));
 
   return (
     <div
       className="relative flex h-24 w-24 shrink-0 items-center justify-center rounded-full sm:h-28 sm:w-28"
+      ref={ref}
       style={{
         background: `conic-gradient(var(--accent) ${percentage * 3.6}deg, color-mix(in srgb, var(--graphite) 12%, transparent) 0deg)`,
       }}
     >
       <div className="flex h-[calc(100%-11px)] w-[calc(100%-11px)] flex-col items-center justify-center rounded-full bg-panel">
-        <span className="display-title text-3xl leading-none">{score}</span>
+        <span className="display-title text-3xl leading-none">
+          {animated}
+        </span>
         <span className="mt-1 font-mono text-[8px] uppercase tracking-[0.14em] text-graphite/46">
           de 100
         </span>
@@ -19,11 +28,15 @@ function ExampleScoreRing({ score }: { score: number }) {
 }
 
 function ExampleScoreBar({ score }: { score: number }) {
+  const [ref, inView] = useInView<HTMLDivElement>(0.6);
+  const animated = useCountUp(score, inView, 700);
+  const width = Math.max(0, Math.min(100, animated));
+
   return (
-    <div className="h-1.5 w-full overflow-hidden rounded-full bg-cream/10">
+    <div className="h-1.5 w-full overflow-hidden rounded-full bg-cream/10" ref={ref}>
       <div
-        className="h-full rounded-full bg-accent"
-        style={{ width: `${Math.max(0, Math.min(100, score))}%` }}
+        className="h-full rounded-full bg-accent transition-[width] duration-100"
+        style={{ width: `${width}%` }}
       />
     </div>
   );
@@ -110,7 +123,7 @@ function ExampleDimensionCard({
 }) {
   return (
     <details
-      className="group rounded-lg border border-cream/10 bg-panel/84 open:border-accent/35 open:bg-panel-soft"
+      className="group rounded-lg border border-cream/10 bg-panel/84 backdrop-blur-sm transition-shadow duration-300 open:border-accent/35 open:bg-panel-soft open:shadow-[0_20px_60px_-20px_rgba(255,90,0,0.35)]"
       open={defaultOpen}
     >
       <summary className="flex cursor-pointer list-none items-center gap-4 p-5 transition hover:bg-accent/8">
@@ -141,7 +154,7 @@ function ExampleDimensionCard({
 
 function InsightBlock({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-cream/10 bg-black/18 p-3.5 shadow-[inset_3px_0_0_rgba(255,90,0,0.45)]">
+    <div className="rounded-lg border border-cream/10 bg-black/18 p-3.5 shadow-[inset_3px_0_0_rgba(255,90,0,0.45)] transition duration-300 hover:-translate-y-0.5 hover:border-accent/25 hover:bg-black/28">
       <p className="kicker text-[9px] text-accent">{label}</p>
       <p className="mt-1.5 text-sm leading-5 text-cream/72">{value}</p>
     </div>
