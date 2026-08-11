@@ -20,6 +20,7 @@ import { FullResultPreview, HeroResultPreview } from "./landing-result-preview";
 
 // Preco provisorio - sera atualizado quando o valor final for definido.
 const PRICE_NUMBER = "99";
+const PRICE_LABEL = `R$ ${PRICE_NUMBER} · diagnóstico completo`;
 
 const OFFER_INCLUDES = [
   "Score Estratégico por dimensão",
@@ -207,7 +208,10 @@ export default function Home() {
               claro do que mudar.
             </p>
             <div className="mt-8">
-              <PricingCard />
+              <Link className="action-primary action-accent" href="/cadastro">
+                Analisar meu perfil
+              </Link>
+              <p className="mt-3 text-sm text-cream/50">{PRICE_LABEL}</p>
             </div>
           </div>
 
@@ -278,6 +282,13 @@ export default function Home() {
             <div className="mt-8">
               <FullResultPreview />
             </div>
+          </Reveal>
+        </section>
+
+        <section className="py-16 sm:py-24">
+          <div className="hairline" />
+          <Reveal className="mt-10 sm:mt-14">
+            <PricingCard />
           </Reveal>
         </section>
 
