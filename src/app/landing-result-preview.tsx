@@ -2,21 +2,29 @@
 
 import { useCountUp, useInView } from "./landing-motion";
 
-function ExampleScoreRing({ score }: { score: number }) {
+function ExampleScoreRing({
+  score,
+  size = "lg",
+}: {
+  score: number;
+  size?: "sm" | "lg";
+}) {
   const [ref, inView] = useInView<HTMLDivElement>(0.4);
   const animated = useCountUp(score, inView);
   const percentage = Math.max(0, Math.min(100, animated));
+  const dimensionClass = size === "sm" ? "h-20 w-20" : "h-24 w-24 sm:h-28 sm:w-28";
+  const numberClass = size === "sm" ? "text-2xl" : "text-3xl";
 
   return (
     <div
-      className="relative flex h-24 w-24 shrink-0 items-center justify-center rounded-full sm:h-28 sm:w-28"
+      className={`relative flex shrink-0 items-center justify-center rounded-full ${dimensionClass}`}
       ref={ref}
       style={{
         background: `conic-gradient(var(--accent) ${percentage * 3.6}deg, color-mix(in srgb, var(--graphite) 12%, transparent) 0deg)`,
       }}
     >
       <div className="flex h-[calc(100%-11px)] w-[calc(100%-11px)] flex-col items-center justify-center rounded-full bg-panel">
-        <span className="display-title text-3xl leading-none">
+        <span className={`display-title leading-none ${numberClass}`}>
           {animated}
         </span>
         <span className="mt-1 font-mono text-[8px] uppercase tracking-[0.14em] text-graphite/46">
@@ -53,18 +61,20 @@ function MiniStat({ label, value }: { label: string; value: string }) {
 
 export function HeroResultPreview() {
   return (
-    <div className="dark-panel p-5 sm:p-6">
+    <div className="dark-panel max-w-[26rem] p-4 sm:p-5">
       <p className="kicker text-accent">Exemplo ilustrativo</p>
 
-      <div className="mt-5 flex items-center gap-5">
-        <ExampleScoreRing score={65} />
+      <div className="mt-4 flex items-center gap-4">
+        <ExampleScoreRing score={65} size="sm" />
         <div>
-          <p className="text-lg font-black text-cream">Em desenvolvimento</p>
+          <p className="text-base font-black text-cream">
+            Em desenvolvimento
+          </p>
           <p className="mt-1 text-xs text-cream/50">Score estratégico</p>
         </div>
       </div>
 
-      <div className="mt-6 space-y-3">
+      <div className="mt-4 space-y-2.5">
         {(
           [
             { label: "Conversão", score: 38 },
@@ -83,17 +93,10 @@ export function HeroResultPreview() {
         ))}
       </div>
 
-      <div className="mt-6 rounded-lg border border-accent/30 bg-accent/10 p-4">
-        <p className="kicker text-[10px] text-accent">Ponto crítico</p>
-        <p className="mt-1.5 text-sm font-medium text-cream/90">
-          Conversão baixa apesar do bom alcance.
-        </p>
-      </div>
-
-      <div className="mt-3 rounded-lg border border-cream/10 bg-black/20 p-4">
-        <p className="kicker text-[10px] text-accent">Ação recomendada</p>
-        <p className="mt-1.5 text-sm font-medium text-cream/75">
-          Reposicionar bio e caminho de conversão.
+      <div className="mt-4 rounded-lg border border-accent/30 bg-accent/10 px-3 py-2.5">
+        <p className="text-xs leading-5 font-medium text-cream/90">
+          <span className="text-accent">Ponto crítico:</span> Conversão
+          baixa apesar do bom alcance.
         </p>
       </div>
     </div>
