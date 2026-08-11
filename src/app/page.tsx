@@ -20,7 +20,6 @@ import { FullResultPreview, HeroResultPreview } from "./landing-result-preview";
 
 // Preco provisorio - sera atualizado quando o valor final for definido.
 const PRICE_NUMBER = "99";
-const PRICE_LABEL = `R$ ${PRICE_NUMBER} · diagnóstico completo`;
 
 const OFFER_INCLUDES = [
   "Score Estratégico por dimensão",
@@ -207,12 +206,6 @@ export default function Home() {
               Análise estratégica do seu perfil, com prioridades e um plano
               claro do que mudar.
             </p>
-            <div className="mt-8">
-              <Link className="action-primary action-accent" href="/cadastro">
-                Analisar meu perfil
-              </Link>
-              <p className="mt-3 text-sm text-cream/50">{PRICE_LABEL}</p>
-            </div>
           </div>
 
           <HeroResultPreview />
