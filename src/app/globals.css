@@ -467,9 +467,16 @@ textarea {
   font-size: 1.5rem;
 }
 .pricing-number {
-  color: #fff;
+  /* Self-contained on purpose: does not inherit .display-title's
+     Impact/Haettenschweiler fallback stack, whose condensed metrics
+     were overlapping repeated digits ("99") at this font size. */
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 900;
   font-size: 4.5rem;
   line-height: 1;
+  letter-spacing: normal;
+  font-variant-numeric: normal;
+  color: #fff;
 }
 .pricing-sub {
   margin: 0.5rem 0 1.5rem;

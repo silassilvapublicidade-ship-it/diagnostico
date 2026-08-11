@@ -126,7 +126,7 @@ function PricingCard() {
       <span className="pricing-badge">DIAGNÓSTICO COMPLETO</span>
       <div className="pricing-value">
         <span className="pricing-currency">R$</span>
-        <span className="pricing-number display-title">{PRICE_NUMBER}</span>
+        <span className="pricing-number">{PRICE_NUMBER}</span>
       </div>
       <p className="pricing-sub">pagamento único · sem assinatura</p>
       <ul className="pricing-list">
@@ -288,7 +288,14 @@ export default function Home() {
         <section className="py-16 sm:py-24">
           <div className="hairline" />
           <Reveal className="mt-10 sm:mt-14">
-            <PricingCard />
+            <SectionHeading kicker="A oferta" title="Isso é o que você recebe." />
+            <p className="mt-4 max-w-2xl text-sm leading-6 text-cream/60">
+              Depois de ver como a leitura funciona, aqui está exatamente o
+              que está incluso.
+            </p>
+            <div className="mt-8">
+              <PricingCard />
+            </div>
           </Reveal>
         </section>
 
