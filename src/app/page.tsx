@@ -226,10 +226,12 @@ export default function Home() {
               title="Talvez o problema não seja postar pouco."
             />
 
-            <div className="mt-8 grid gap-x-10 border-t border-cream/10 sm:grid-cols-2">
+            <div className="mt-8 grid border-t border-cream/10 sm:grid-cols-2">
               {PAIN_POINTS.map((point, index) => (
                 <div
-                  className="flex items-center gap-4 border-b border-cream/10 py-3.5"
+                  className={`flex items-center gap-4 border-b border-cream/10 py-3.5 ${
+                    index % 2 === 0 ? "sm:pr-5" : "sm:pl-5"
+                  }`}
                   key={point}
                 >
                   <span className="font-mono text-sm font-black text-accent/60">
@@ -285,11 +287,11 @@ export default function Home() {
           </Reveal>
         </section>
 
-        <section className="py-16 sm:py-24">
+        <section className="py-16 sm:py-24 text-center">
           <div className="hairline" />
           <Reveal className="mt-10 sm:mt-14">
             <SectionHeading kicker="A oferta" title="Isso é o que você recebe." />
-            <p className="mt-4 max-w-2xl text-sm leading-6 text-cream/60">
+            <p className="mx-auto mt-4 max-w-2xl text-sm leading-6 text-cream/60">
               Depois de ver como a leitura funciona, aqui está exatamente o
               que está incluso.
             </p>
