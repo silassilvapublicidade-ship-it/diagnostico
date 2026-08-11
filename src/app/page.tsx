@@ -449,7 +449,9 @@ export default function Home() {
               <span className="block whitespace-nowrap">perdendo oportunidades.</span>
             </h2>
             <div className="mt-10">
-              <PricingCard />
+              <Link className="action-primary action-accent" href="/cadastro">
+                Analisar meu perfil
+              </Link>
             </div>
           </Reveal>
         </section>
