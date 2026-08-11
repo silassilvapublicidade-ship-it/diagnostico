@@ -19,9 +19,7 @@ import { AmbientBackground, Reveal } from "./landing-motion";
 import { FullResultPreview, HeroResultPreview } from "./landing-result-preview";
 
 // Preco provisorio - sera atualizado quando o valor final for definido.
-const PRICE_VALUE = "R$ 99";
-const PRICE_NOTE = "diagnóstico completo";
-const PRICE_LABEL = `${PRICE_VALUE} · ${PRICE_NOTE}`;
+const PRICE_NUMBER = "99";
 
 const OFFER_INCLUDES = [
   "Score Estratégico por dimensão",
@@ -121,25 +119,28 @@ function SectionHeading({ kicker, title }: { kicker: string; title: string }) {
   );
 }
 
-function OfferCard() {
+function PricingCard() {
   return (
-    <div className="max-w-sm rounded-lg bg-gradient-to-br from-accent/45 via-accent/15 to-transparent p-px shadow-[0_0_40px_rgba(255,90,0,0.15)]">
-      <div className="dark-panel rounded-lg p-5 backdrop-blur-md">
-        <div className="flex items-baseline gap-2">
-          <span className="display-title text-3xl text-cream">
-            {PRICE_VALUE}
-          </span>
-          <span className="text-sm text-cream/50">{PRICE_NOTE}</span>
-        </div>
-        <ul className="mt-4 space-y-2 text-sm text-cream/70">
-          {OFFER_INCLUDES.map((item) => (
-            <li className="flex items-start gap-2" key={item}>
-              <span className="mt-0.5 shrink-0 text-accent">✓</span>
-              <span>{item}</span>
-            </li>
-          ))}
-        </ul>
+    <div className="pricing-card">
+      <span className="pricing-badge">DIAGNÓSTICO COMPLETO</span>
+      <div className="pricing-value">
+        <span className="pricing-currency">R$</span>
+        <span className="pricing-number display-title">{PRICE_NUMBER}</span>
       </div>
+      <p className="pricing-sub">pagamento único · sem assinatura</p>
+      <ul className="pricing-list">
+        {OFFER_INCLUDES.map((item) => (
+          <li className="text-sm text-cream/75" key={item}>
+            <span className="text-accent">✓</span> {item}
+          </li>
+        ))}
+      </ul>
+      <Link
+        className="action-primary action-accent btn-pulse pricing-cta"
+        href="/cadastro"
+      >
+        Analisar meu perfil
+      </Link>
     </div>
   );
 }
@@ -206,12 +207,7 @@ export default function Home() {
               claro do que mudar.
             </p>
             <div className="mt-8">
-              <Link className="action-primary action-accent" href="/cadastro">
-                Analisar meu perfil
-              </Link>
-            </div>
-            <div className="mt-6">
-              <OfferCard />
+              <PricingCard />
             </div>
           </div>
 
@@ -256,7 +252,7 @@ export default function Home() {
             <div className="mt-8 grid gap-3 sm:grid-cols-2">
               {RECEIVE_ITEMS.map((item, index) => (
                 <div
-                  className="flex items-center gap-4 rounded-lg border border-white/10 bg-white/[0.03] p-4 backdrop-blur-sm"
+                  className="card flex items-center gap-4 rounded-lg border border-white/10 bg-white/[0.03] p-4 backdrop-blur-sm"
                   key={item}
                 >
                   <span className="font-mono text-base font-black text-accent">
@@ -296,7 +292,7 @@ export default function Home() {
             <div className="mt-10 grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
               {HOW_IT_WORKS.map((step, index) => (
                 <div
-                  className="rounded-lg border border-white/10 bg-white/[0.03] p-5 backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-accent/30 hover:shadow-[0_20px_50px_-20px_rgba(255,90,0,0.3)]"
+                  className="card rounded-lg border border-white/10 bg-white/[0.03] p-5 backdrop-blur-sm"
                   key={step.title}
                 >
                   <div className="flex items-center gap-3">
@@ -328,7 +324,7 @@ export default function Home() {
             <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
               {DIMENSIONS.map((dimension) => (
                 <div
-                  className="rounded-lg border border-white/10 bg-white/[0.03] p-4 text-center backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-accent/30 hover:shadow-[0_20px_50px_-20px_rgba(255,90,0,0.3)]"
+                  className="card rounded-lg border border-white/10 bg-white/[0.03] p-4 text-center backdrop-blur-sm"
                   key={dimension.code}
                 >
                   <span className="mx-auto flex h-10 w-10 items-center justify-center rounded-full border border-accent/30 bg-accent/10 text-accent">
@@ -440,12 +436,7 @@ export default function Home() {
               <span className="block whitespace-nowrap">perdendo oportunidades.</span>
             </h2>
             <div className="mt-10">
-              <Link className="action-primary action-accent" href="/cadastro">
-                Analisar meu perfil
-              </Link>
-              <p className="mt-3 text-sm font-semibold text-accent">
-                {PRICE_LABEL}
-              </p>
+              <PricingCard />
             </div>
           </Reveal>
         </section>

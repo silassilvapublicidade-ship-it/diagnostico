@@ -400,6 +400,93 @@ textarea {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
+/* hover elevado + glow, reutilizado pelos grids de card da landing */
+.card {
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+.card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 106, 26, 0.4);
+  box-shadow: 0 12px 40px rgba(255, 106, 26, 0.15);
+}
+
+/* pulso continuo e sutil nos CTAs principais - nao aplicado ao botao fixo
+   do header, que fica sempre visivel e pulsaria sem parar */
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 106, 26, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(255, 106, 26, 0);
+  }
+}
+.btn-pulse {
+  animation: pulse-glow 2.5s ease-in-out infinite;
+}
+
+.pricing-card {
+  position: relative;
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 2.5rem;
+  border-radius: 20px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.04),
+    rgba(255, 255, 255, 0.01)
+  );
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 106, 26, 0.25);
+  box-shadow:
+    0 0 60px rgba(255, 106, 26, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  text-align: center;
+}
+.pricing-badge {
+  display: inline-block;
+  margin-bottom: 1rem;
+  border: 1px solid rgba(255, 140, 66, 0.3);
+  border-radius: 999px;
+  padding: 4px 12px;
+  color: #ff8c42;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+}
+.pricing-value {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
+}
+.pricing-currency {
+  color: var(--foreground);
+  font-size: 1.5rem;
+}
+.pricing-number {
+  color: #fff;
+  font-size: 4.5rem;
+  line-height: 1;
+}
+.pricing-sub {
+  margin: 0.5rem 0 1.5rem;
+  color: rgba(245, 233, 223, 0.6);
+}
+.pricing-list {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0 0 2rem;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+.pricing-cta {
+  width: 100%;
+}
+
 @media (max-width: 640px) {
   .dark-panel,
   .diagnostic-shell,
@@ -439,5 +526,13 @@ textarea {
 
   .bg-orb {
     animation: none;
+  }
+
+  .btn-pulse {
+    animation: none;
+  }
+
+  .card:hover {
+    transform: none;
   }
 }
