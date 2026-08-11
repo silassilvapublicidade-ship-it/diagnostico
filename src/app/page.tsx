@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { GlowBackground, Reveal } from "./landing-motion";
+import { AmbientBackground, Reveal } from "./landing-motion";
 import { FullResultPreview, HeroResultPreview } from "./landing-result-preview";
 
 // Preco provisorio - sera atualizado quando o valor final for definido.
@@ -97,21 +97,23 @@ function SectionHeading({ kicker, title }: { kicker: string; title: string }) {
 
 function OfferCard() {
   return (
-    <div className="dark-panel max-w-sm p-5">
-      <div className="flex items-baseline gap-2">
-        <span className="display-title text-3xl text-cream">
-          {PRICE_VALUE}
-        </span>
-        <span className="text-sm text-cream/50">{PRICE_NOTE}</span>
+    <div className="max-w-sm rounded-lg bg-gradient-to-br from-accent/45 via-accent/15 to-transparent p-px shadow-[0_0_40px_rgba(255,90,0,0.15)]">
+      <div className="dark-panel rounded-lg p-5 backdrop-blur-md">
+        <div className="flex items-baseline gap-2">
+          <span className="display-title text-3xl text-cream">
+            {PRICE_VALUE}
+          </span>
+          <span className="text-sm text-cream/50">{PRICE_NOTE}</span>
+        </div>
+        <ul className="mt-4 space-y-2 text-sm text-cream/70">
+          {OFFER_INCLUDES.map((item) => (
+            <li className="flex items-start gap-2" key={item}>
+              <span className="mt-0.5 shrink-0 text-accent">✓</span>
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
       </div>
-      <ul className="mt-4 space-y-2 text-sm text-cream/70">
-        {OFFER_INCLUDES.map((item) => (
-          <li className="flex items-start gap-2" key={item}>
-            <span className="mt-0.5 shrink-0 text-accent">✓</span>
-            <span>{item}</span>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }
@@ -119,6 +121,7 @@ function OfferCard() {
 export default function Home() {
   return (
     <main className="min-h-screen bg-ink text-cream">
+      <AmbientBackground />
       <header className="sticky top-0 z-40 border-b border-white/10 bg-ink/85 backdrop-blur">
         <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 px-6 py-3 sm:px-10 lg:px-16 xl:px-20">
           <Link className="flex items-center gap-3" href="/">
@@ -167,29 +170,26 @@ export default function Home() {
       </header>
 
       <div className="mx-auto w-full max-w-[1440px] px-6 sm:px-10 lg:px-16 xl:px-20">
-        <section className="relative overflow-hidden">
-          <GlowBackground variant="hero" />
-          <div className="relative grid gap-10 py-20 sm:py-28 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-12">
-            <div>
-              <h1 className="display-title text-balance text-4xl leading-[1.08] text-cream sm:text-5xl">
-                Descubra o que está travando seu&nbsp;Instagram.
-              </h1>
-              <p className="mt-6 max-w-md text-lg leading-8 text-cream/70">
-                Análise estratégica do seu perfil, com prioridades e um plano
-                claro do que mudar.
-              </p>
-              <div className="mt-8">
-                <Link className="action-primary action-accent" href="/cadastro">
-                  Analisar meu perfil
-                </Link>
-              </div>
-              <div className="mt-6">
-                <OfferCard />
-              </div>
+        <section className="grid gap-10 py-20 sm:py-28 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-12">
+          <div>
+            <h1 className="display-title text-balance text-4xl leading-[1.08] text-cream sm:text-5xl">
+              Descubra o que está travando seu&nbsp;Instagram.
+            </h1>
+            <p className="mt-6 max-w-md text-lg leading-8 text-cream/70">
+              Análise estratégica do seu perfil, com prioridades e um plano
+              claro do que mudar.
+            </p>
+            <div className="mt-8">
+              <Link className="action-primary action-accent" href="/cadastro">
+                Analisar meu perfil
+              </Link>
             </div>
-
-            <HeroResultPreview />
+            <div className="mt-6">
+              <OfferCard />
+            </div>
           </div>
+
+          <HeroResultPreview />
         </section>
 
         <section className="py-16 sm:py-24">
@@ -227,16 +227,16 @@ export default function Home() {
           <Reveal className="mt-10 sm:mt-14">
             <SectionHeading kicker="O que você recebe" title="Clareza sobre o que fazer." />
 
-            <div className="mt-8 max-w-2xl border-t border-accent/15">
+            <div className="mt-8 grid gap-3 sm:grid-cols-2">
               {RECEIVE_ITEMS.map((item, index) => (
                 <div
-                  className="flex items-center gap-5 border-b border-accent/15 py-4"
+                  className="flex items-center gap-4 rounded-lg border border-white/10 bg-white/[0.03] p-4 backdrop-blur-sm"
                   key={item}
                 >
                   <span className="font-mono text-base font-black text-accent">
                     {String(index + 1).padStart(2, "0")}
                   </span>
-                  <span className="text-lg font-semibold text-cream">
+                  <span className="text-base font-semibold text-cream">
                     {item}
                   </span>
                 </div>
@@ -245,10 +245,9 @@ export default function Home() {
           </Reveal>
         </section>
 
-        <section className="relative overflow-hidden py-16 sm:py-24">
-          <GlowBackground variant="demo" />
-          <div className="hairline relative" />
-          <Reveal className="relative mt-10 sm:mt-14">
+        <section className="py-16 sm:py-24">
+          <div className="hairline" />
+          <Reveal className="mt-10 sm:mt-14">
             <SectionHeading
               kicker="Prova, não promessa"
               title="Você não recebe apenas uma nota."
@@ -355,7 +354,7 @@ export default function Home() {
               title="Pare de tentar adivinhar. Comece a saber."
             />
 
-            <div className="mt-8 overflow-hidden rounded-lg border border-cream/10">
+            <div className="mt-8 overflow-hidden rounded-lg border border-white/10 bg-white/[0.03] backdrop-blur-sm">
               <div className="grid grid-cols-2 border-b border-cream/10 bg-white/[0.03]">
                 <p className="kicker px-4 py-3 text-cream/45 sm:px-6">
                   Sem diagnóstico

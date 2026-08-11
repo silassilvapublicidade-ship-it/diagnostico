@@ -93,19 +93,34 @@ export function Reveal({
 const NOISE_BACKGROUND =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")";
 
-export function GlowBackground({ variant }: { variant: "hero" | "demo" }) {
-  const orbClass =
-    variant === "hero"
-      ? "top-[-10%] right-[5%] h-[26rem] w-[26rem]"
-      : "top-[10%] left-[10%] h-[22rem] w-[22rem]";
+// Warm accent + accent-soft blend, kept well below full opacity so the
+// blur reads as a soft glow instead of muddying into brown over the
+// near-black background.
+const GLOW_ORBS = [
+  { className: "top-[-8%] right-[6%] h-[30rem] w-[30rem]" },
+  { className: "top-[42%] left-[-6%] h-[26rem] w-[26rem]" },
+  { className: "bottom-[-6%] right-[18%] h-[28rem] w-[28rem]" },
+] as const;
 
+export function AmbientBackground() {
   return (
-    <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+    <div
+      aria-hidden
+      className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
+    >
+      {GLOW_ORBS.map((orb) => (
+        <div
+          className={`absolute rounded-full blur-[130px] ${orb.className}`}
+          key={orb.className}
+          style={{
+            background:
+              "radial-gradient(circle, color-mix(in srgb, var(--accent) 55%, var(--accent-soft) 45%) 0%, transparent 70%)",
+            opacity: 0.16,
+          }}
+        />
+      ))}
       <div
-        className={`absolute rounded-full bg-accent/25 blur-[110px] ${orbClass}`}
-      />
-      <div
-        className="absolute inset-0 opacity-[0.05]"
+        className="absolute inset-0 opacity-[0.045]"
         style={{ backgroundImage: NOISE_BACKGROUND }}
       />
     </div>
