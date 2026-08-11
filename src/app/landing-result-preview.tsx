@@ -68,7 +68,7 @@ export function HeroResultPreview() {
         <ExampleScoreRing score={65} size="sm" />
         <div>
           <p className="text-base font-black text-cream">
-            Em desenvolvimento
+            Abaixo do potencial
           </p>
           <p className="mt-1 text-xs text-cream/50">Score estratégico</p>
         </div>
@@ -213,13 +213,13 @@ export function FullResultPreview() {
           <ExampleScoreRing score={65} />
           <div>
             <p className="text-2xl font-black text-cream">
-              Em desenvolvimento
+              Abaixo do potencial
             </p>
             <p className="mt-1 text-xs text-cream/45">Score estratégico</p>
           </div>
         </div>
         <div className="grid gap-3 sm:grid-cols-3">
-          <MiniStat label="Classificação" value="Em desenvolvimento" />
+          <MiniStat label="Classificação" value="Abaixo do potencial" />
           <MiniStat label="Dimensões" value="8 de 8" />
           <MiniStat label="Método" value="Metodologia Silas Silva" />
         </div>
