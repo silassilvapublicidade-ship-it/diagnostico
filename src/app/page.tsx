@@ -1,3 +1,17 @@
+import {
+  BadgeCheck,
+  CheckCircle2,
+  ClipboardList,
+  Compass,
+  Eye,
+  Handshake,
+  Layers,
+  Lightbulb,
+  MousePointerClick,
+  PenLine,
+  ScanSearch,
+  Upload,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -36,21 +50,33 @@ const RECEIVE_ITEMS = [
 ] as const;
 
 const HOW_IT_WORKS = [
-  { title: "Conte sobre seu perfil", hint: "Perguntas rápidas" },
-  { title: "Envie as evidências", hint: "Prints do perfil" },
-  { title: "Receba sua leitura", hint: "Análise em profundidade" },
-  { title: "Veja o que mudar", hint: "Diagnóstico e plano" },
+  {
+    icon: ClipboardList,
+    title: "Conte sobre seu perfil",
+    hint: "Perguntas rápidas",
+  },
+  { icon: Upload, title: "Envie as evidências", hint: "Prints do perfil" },
+  {
+    icon: ScanSearch,
+    title: "Receba sua leitura",
+    hint: "Análise em profundidade",
+  },
+  {
+    icon: CheckCircle2,
+    title: "Veja o que mudar",
+    hint: "Diagnóstico e plano",
+  },
 ] as const;
 
 const DIMENSIONS = [
-  { code: "POS", label: "Posicionamento" },
-  { code: "IMP", label: "Primeira Impressão" },
-  { code: "AUT", label: "Autoridade" },
-  { code: "CON", label: "Conteúdo" },
-  { code: "IDE", label: "Identidade" },
-  { code: "CVR", label: "Conversão" },
-  { code: "REL", label: "Relacionamento" },
-  { code: "OPR", label: "Oportunidades" },
+  { code: "POS", icon: Compass, label: "Posicionamento" },
+  { code: "IMP", icon: Eye, label: "Primeira Impressão" },
+  { code: "AUT", icon: BadgeCheck, label: "Autoridade" },
+  { code: "CON", icon: PenLine, label: "Conteúdo" },
+  { code: "IDE", icon: Layers, label: "Identidade" },
+  { code: "CVR", icon: MousePointerClick, label: "Conversão" },
+  { code: "REL", icon: Handshake, label: "Relacionamento" },
+  { code: "OPR", icon: Lightbulb, label: "Oportunidades" },
 ] as const;
 
 const PROFILE_TYPES = [
@@ -267,15 +293,24 @@ export default function Home() {
               title="Simples de enviar, profundo de receber."
             />
 
-            <div className="relative mt-10 grid gap-8 sm:grid-cols-4">
-              <div className="pointer-events-none absolute top-5 right-0 left-0 hidden h-px bg-cream/15 sm:block" />
+            <div className="mt-10 grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
               {HOW_IT_WORKS.map((step, index) => (
-                <div className="relative flex flex-col items-start gap-3" key={step.title}>
-                  <span className="relative z-10 flex h-10 w-10 items-center justify-center rounded-full border border-accent bg-ink font-mono text-sm font-black text-accent">
-                    {index + 1}
-                  </span>
-                  <p className="text-base font-black text-cream">{step.title}</p>
-                  <p className="text-sm text-cream/55">{step.hint}</p>
+                <div
+                  className="rounded-lg border border-white/10 bg-white/[0.03] p-5 backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-accent/30 hover:shadow-[0_20px_50px_-20px_rgba(255,90,0,0.3)]"
+                  key={step.title}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-accent/30 bg-accent/10 text-accent">
+                      <step.icon aria-hidden className="h-[18px] w-[18px]" />
+                    </span>
+                    <span className="font-mono text-xs text-accent/70">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                  </div>
+                  <p className="mt-3 text-base font-black text-cream">
+                    {step.title}
+                  </p>
+                  <p className="mt-1 text-sm text-cream/55">{step.hint}</p>
                 </div>
               ))}
             </div>
@@ -290,23 +325,21 @@ export default function Home() {
               title="Um perfil, vários ângulos."
             />
 
-            <div className="mt-8 grid gap-x-10 border-t border-cream/10 sm:grid-cols-2">
-              {DIMENSIONS.map((dimension, index) => (
+            <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {DIMENSIONS.map((dimension) => (
                 <div
-                  className="flex items-center justify-between gap-4 border-b border-cream/10 py-3.5"
+                  className="rounded-lg border border-white/10 bg-white/[0.03] p-4 text-center backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-accent/30 hover:shadow-[0_20px_50px_-20px_rgba(255,90,0,0.3)]"
                   key={dimension.code}
                 >
-                  <div className="flex items-center gap-4">
-                    <span className="font-mono text-xs font-black text-cream/30">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                    <span className="text-base font-semibold text-cream">
-                      {dimension.label}
-                    </span>
-                  </div>
-                  <span className="font-mono text-xs font-black text-accent/60">
-                    {dimension.code}
+                  <span className="mx-auto flex h-10 w-10 items-center justify-center rounded-full border border-accent/30 bg-accent/10 text-accent">
+                    <dimension.icon aria-hidden className="h-[18px] w-[18px]" />
                   </span>
+                  <p className="mt-3 font-mono text-[9px] font-black text-cream/30">
+                    {dimension.code}
+                  </p>
+                  <p className="mt-1 text-sm font-semibold text-cream">
+                    {dimension.label}
+                  </p>
                 </div>
               ))}
             </div>
