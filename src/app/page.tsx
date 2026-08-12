@@ -457,44 +457,6 @@ export default function Home() {
           </Reveal>
         </section>
 
-        <section className="py-16 sm:py-24">
-          <div className="hairline" />
-          <Reveal className="mt-10 sm:mt-14">
-            <SectionHeading
-              kicker="Prova, não promessa"
-              title="Você não recebe apenas uma nota."
-            />
-
-            <div className="mt-8">
-              <FullResultPreview />
-            </div>
-          </Reveal>
-        </section>
-
-        <section className="py-20 sm:py-28">
-          <div className="hairline" />
-          <Reveal className="mt-10 sm:mt-14">
-            <div className="dark-panel flex flex-col items-center px-6 py-14 text-center sm:px-12 sm:py-20">
-              <p className="kicker text-accent">A oferta</p>
-              <h2 className="display-title mt-3 text-2xl leading-[1.1] text-cream sm:text-3xl">
-                Isso é o que você recebe.
-              </h2>
-              <p className="mt-4 max-w-2xl text-sm leading-6 text-cream/60">
-                Depois de ver como a leitura funciona, aqui está exatamente o
-                que está incluso.
-              </p>
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-cream/60">
-                Você não paga para saber uma nota. O score é só o ponto de
-                partida. Você paga para entender por que ele é esse, o que
-                está causando isso e como corrigir.
-              </p>
-              <div className="mt-8">
-                <PricingCard />
-              </div>
-            </div>
-          </Reveal>
-        </section>
-
         <section className="py-16 sm:py-24" id="como-funciona">
           <div className="hairline" />
           <Reveal className="mt-10 sm:mt-14">
@@ -607,6 +569,20 @@ export default function Home() {
           <div className="hairline" />
           <Reveal className="mt-10 sm:mt-14">
             <SectionHeading
+              kicker="Prova, não promessa"
+              title="Você não recebe apenas uma nota."
+            />
+
+            <div className="mt-8">
+              <FullResultPreview />
+            </div>
+          </Reveal>
+        </section>
+
+        <section className="py-16 sm:py-24">
+          <div className="hairline" />
+          <Reveal className="mt-10 sm:mt-14">
+            <SectionHeading
               kicker="Achismo x direção"
               title="Pare de tentar adivinhar. Comece a saber."
             />
@@ -631,6 +607,30 @@ export default function Home() {
                   <p className="border-l border-cream/10 px-4 py-5 text-base font-medium leading-6 text-cream/90 sm:px-6">
                     {row.with}
                   </p>
+                </div>
+              ))}
+            </div>
+          </Reveal>
+        </section>
+
+        <section className="py-16 sm:py-24">
+          <div className="hairline" />
+          <Reveal className="mt-10 sm:mt-14">
+            <SectionHeading kicker="Privacidade" title="Privado, do seu jeito." />
+
+            <div className="mt-8 grid gap-3.5 sm:grid-cols-3">
+              {TRUST_POINTS.map((point) => (
+                <div
+                  className="card rounded-lg border border-white/10 bg-white/[0.03] p-5 backdrop-blur-sm"
+                  key={point.title}
+                >
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-accent/30 bg-accent/10 text-accent">
+                    <point.icon aria-hidden className="h-[18px] w-[18px]" />
+                  </span>
+                  <p className="mt-3 text-base font-semibold text-cream">
+                    {point.title}
+                  </p>
+                  <p className="mt-1.5 text-sm text-cream/55">{point.hint}</p>
                 </div>
               ))}
             </div>
@@ -682,30 +682,6 @@ export default function Home() {
         <section className="py-16 sm:py-24">
           <div className="hairline" />
           <Reveal className="mt-10 sm:mt-14">
-            <SectionHeading kicker="Privacidade" title="Privado, do seu jeito." />
-
-            <div className="mt-8 grid gap-3.5 sm:grid-cols-3">
-              {TRUST_POINTS.map((point) => (
-                <div
-                  className="card rounded-lg border border-white/10 bg-white/[0.03] p-5 backdrop-blur-sm"
-                  key={point.title}
-                >
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-accent/30 bg-accent/10 text-accent">
-                    <point.icon aria-hidden className="h-[18px] w-[18px]" />
-                  </span>
-                  <p className="mt-3 text-base font-semibold text-cream">
-                    {point.title}
-                  </p>
-                  <p className="mt-1.5 text-sm text-cream/55">{point.hint}</p>
-                </div>
-              ))}
-            </div>
-          </Reveal>
-        </section>
-
-        <section className="py-16 sm:py-24">
-          <div className="hairline" />
-          <Reveal className="mt-10 sm:mt-14">
             <SectionHeading kicker="Perguntas frequentes" title="Antes de perguntar, leia aqui." />
 
             <div className="mt-8 grid gap-3">
@@ -725,6 +701,30 @@ export default function Home() {
                   </p>
                 </details>
               ))}
+            </div>
+          </Reveal>
+        </section>
+
+        <section className="py-20 sm:py-28">
+          <div className="hairline" />
+          <Reveal className="mt-10 sm:mt-14">
+            <div className="dark-panel flex flex-col items-center px-6 py-14 text-center sm:px-12 sm:py-20">
+              <p className="kicker text-accent">A oferta</p>
+              <h2 className="display-title mt-3 text-2xl leading-[1.1] text-cream sm:text-3xl">
+                Isso é o que você recebe.
+              </h2>
+              <p className="mt-4 max-w-2xl text-sm leading-6 text-cream/60">
+                Depois de ver como a leitura funciona, aqui está exatamente o
+                que está incluso.
+              </p>
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-cream/60">
+                Você não paga para saber uma nota. O score é só o ponto de
+                partida. Você paga para entender por que ele é esse, o que
+                está causando isso e como corrigir.
+              </p>
+              <div className="mt-8">
+                <PricingCard />
+              </div>
             </div>
           </Reveal>
         </section>
