@@ -12,11 +12,39 @@ import {
   ScanSearch,
   Upload,
 } from "lucide-react";
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 
 import { AmbientBackground, Reveal } from "./landing-motion";
 import { FullResultPreview, HeroResultPreview } from "./landing-result-preview";
+import { SITE_NAME, SITE_URL } from "./site-config";
+
+const PAGE_TITLE =
+  "Diagnóstico Estratégico de Perfil no Instagram | Metodologia Silas Silva";
+const PAGE_DESCRIPTION =
+  "Descubra o que está travando seu Instagram: score estratégico, pontos críticos com evidência e um plano de ação claro do que mudar. Diagnóstico completo por R$ 99.";
+
+export const metadata: Metadata = {
+  title: PAGE_TITLE,
+  description: PAGE_DESCRIPTION,
+  alternates: {
+    canonical: SITE_URL,
+  },
+  openGraph: {
+    title: PAGE_TITLE,
+    description: PAGE_DESCRIPTION,
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    locale: "pt_BR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: PAGE_TITLE,
+    description: PAGE_DESCRIPTION,
+  },
+};
 
 // Preco provisorio - sera atualizado quando o valor final for definido.
 const PRICE_NUMBER = "99";
@@ -94,12 +122,44 @@ const COMPARISON_ROWS = [
   { without: "Vou mudar a bio e ver.", with: "Sei o que mudar e por quê." },
   { without: "Preciso postar mais.", with: "O problema é conversão, não volume." },
   { without: "Feed mais bonito.", with: "Identidade forte, gargalo é outro." },
+  {
+    without: "Uma IA genérica já faz isso.",
+    with: "Nada é inventado — é evidência cruzada entre as dimensões.",
+  },
 ] as const;
 
 const TRUST_POINTS = [
   { title: "Evidências privadas", hint: "Nunca publicadas ou compartilhadas" },
   { title: "Sem inventar dado", hint: "Falta de evidência fica clara" },
   { title: "Você decide", hint: "A aplicação é sua escolha" },
+] as const;
+
+const FAQ_ITEMS = [
+  {
+    question: "Por que meu Instagram não converte mesmo com bom alcance?",
+    answer:
+      "Alcance e conversão são dimensões diferentes. Muitas vezes o problema não é quem vê o perfil, e sim o que acontece depois — bio sem proposta clara, destaques sem caminho, nenhuma chamada para ação. O diagnóstico aponta exatamente onde esse caminho quebra.",
+  },
+  {
+    question: "Como saber se minha bio está ruim?",
+    answer:
+      "Uma bio funciona quando quem chega entende, em segundos, quem você é, para quem fala e o que fazer a seguir. Se falta um desses três pontos, isso aparece na leitura de Posicionamento e Conversão, com a correção específica para o seu caso.",
+  },
+  {
+    question: "O diagnóstico funciona para perfil pequeno?",
+    answer:
+      "Sim. A leitura avalia posicionamento, identidade, conteúdo e os outros pontos estratégicos do perfil — não depende do número de seguidores.",
+  },
+  {
+    question: "Preciso enviar métricas do Instagram (Insights)?",
+    answer:
+      "Não é obrigatório. Você envia prints do perfil como evidência; quando uma métrica não é enviada, esse ponto específico fica registrado como limitação em vez de ser inventado.",
+  },
+  {
+    question: "Isso substitui uma consultoria completa?",
+    answer:
+      "Não. É um guia inicial direto — mostra o que está funcionando, o que está travando e como corrigir. Para uma consultoria contínua e aprofundada, o caminho é outro.",
+  },
 ] as const;
 
 const NAV_LINKS = [
@@ -146,8 +206,52 @@ function PricingCard() {
 }
 
 export default function Home() {
+  const serviceJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: SITE_NAME,
+    description: PAGE_DESCRIPTION,
+    provider: {
+      "@type": "Person",
+      name: "Silas Silva",
+    },
+    areaServed: "BR",
+    serviceType: "Consultoria de estratégia de perfil no Instagram",
+    offers: {
+      "@type": "Offer",
+      price: PRICE_NUMBER,
+      priceCurrency: "BRL",
+      url: SITE_URL,
+    },
+  };
+
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: FAQ_ITEMS.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.answer,
+      },
+    })),
+  };
+
   return (
     <main className="min-h-screen bg-ink text-cream">
+      <script
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(serviceJsonLd).replace(/</g, "\\u003c"),
+        }}
+        type="application/ld+json"
+      />
+      <script
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(faqJsonLd).replace(/</g, "\\u003c"),
+        }}
+        type="application/ld+json"
+      />
       <AmbientBackground />
       <header className="sticky top-0 z-40 border-b border-white/10 bg-ink/85 backdrop-blur">
         <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 px-6 py-3 sm:px-10 lg:px-16 xl:px-20">
@@ -203,8 +307,8 @@ export default function Home() {
               Descubra o que está travando seu&nbsp;Instagram.
             </h1>
             <p className="mt-6 max-w-md text-lg leading-8 text-cream/70">
-              Análise estratégica do seu perfil, com prioridades e um plano
-              claro do que mudar.
+              Não mostra só o que está errado. Mostra o que mudar, por que
+              mudar e como começar.
             </p>
           </div>
 
@@ -287,6 +391,11 @@ export default function Home() {
             <p className="mx-auto mt-4 max-w-2xl text-sm leading-6 text-cream/60">
               Depois de ver como a leitura funciona, aqui está exatamente o
               que está incluso.
+            </p>
+            <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-cream/60">
+              Você não paga para saber uma nota. O score é só o ponto de
+              partida — você paga para entender por que ele é esse, o que
+              está causando isso e como corrigir.
             </p>
             <div className="mt-8">
               <PricingCard />
@@ -436,6 +545,32 @@ export default function Home() {
                   </p>
                   <p className="mt-1.5 text-sm text-cream/55">{point.hint}</p>
                 </div>
+              ))}
+            </div>
+          </Reveal>
+        </section>
+
+        <section className="py-16 sm:py-24">
+          <div className="hairline" />
+          <Reveal className="mt-10 sm:mt-14">
+            <SectionHeading kicker="Perguntas frequentes" title="Antes de perguntar, leia aqui." />
+
+            <div className="mt-8 grid gap-3">
+              {FAQ_ITEMS.map((item) => (
+                <details
+                  className="card group rounded-lg border border-white/10 bg-white/[0.03] backdrop-blur-sm"
+                  key={item.question}
+                >
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-5 text-sm font-semibold text-cream">
+                    {item.question}
+                    <span className="shrink-0 font-mono text-lg leading-none text-accent transition-transform group-open:rotate-45">
+                      +
+                    </span>
+                  </summary>
+                  <p className="px-5 pb-5 text-sm leading-6 text-cream/65">
+                    {item.answer}
+                  </p>
+                </details>
               ))}
             </div>
           </Reveal>
