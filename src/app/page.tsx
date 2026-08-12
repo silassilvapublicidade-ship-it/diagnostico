@@ -593,30 +593,42 @@ export default function Home() {
         <section className="py-16 sm:py-24">
           <div className="hairline" />
           <Reveal className="mt-10 sm:mt-14">
-            <SectionHeading
-              kicker="Sobre a metodologia"
-              title="Criada por quem já viveu esse problema na prática."
-            />
-            <p className="mt-4 max-w-2xl text-sm leading-6 text-cream/65">
-              Silas Silva é Técnico em Marketing pelo SENAC e atua com
-              estratégia de conteúdo, posicionamento digital e produção
-              audiovisual.
-            </p>
-            <p className="mt-4 max-w-2xl text-sm leading-6 text-cream/65">
-              A metodologia surgiu da prática, analisando perfis que
-              produzem conteúdo, mas nem sempre conseguem enxergar o que
-              funciona, o que está limitando seus resultados e o que
-              deveria mudar primeiro.
-            </p>
-            <p className="mt-4 max-w-2xl text-sm leading-6 text-cream/65">
-              Essa experiência foi transformada em uma leitura estruturada
-              por 8 Dimensões Estratégicas, hoje potencializada por
-              inteligência artificial.
-            </p>
-            <p className="mt-4 text-xs font-medium text-cream/40">
-              Marketing · Mídias Digitais · Branding &amp; Growth ·
-              Audiovisual · Fotografia
-            </p>
+            <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+              <div>
+                <SectionHeading
+                  kicker="Sobre a metodologia"
+                  title="Criada por quem já viveu esse problema na prática."
+                />
+                <p className="mt-4 max-w-2xl text-sm leading-6 text-cream/65">
+                  Silas Silva é Técnico em Marketing pelo SENAC e atua com
+                  estratégia de conteúdo, posicionamento digital e produção
+                  audiovisual.
+                </p>
+                <p className="mt-4 max-w-2xl text-sm leading-6 text-cream/65">
+                  A metodologia surgiu da prática, analisando perfis que
+                  produzem conteúdo, mas nem sempre conseguem enxergar o que
+                  funciona, o que está limitando seus resultados e o que
+                  deveria mudar primeiro.
+                </p>
+                <p className="mt-4 max-w-2xl text-sm leading-6 text-cream/65">
+                  Essa experiência foi transformada em uma leitura
+                  estruturada por 8 Dimensões Estratégicas, hoje
+                  potencializada por inteligência artificial.
+                </p>
+                <p className="mt-4 text-xs font-medium text-cream/40">
+                  Marketing · Mídias Digitais · Branding &amp; Growth ·
+                  Audiovisual · Fotografia
+                </p>
+              </div>
+
+              <Image
+                alt="Silas Silva, criador da Metodologia Silas Silva de Diagnóstico Estratégico"
+                className="mx-auto h-auto w-full max-w-xs rounded-lg border border-white/10 lg:mx-0 lg:ml-auto lg:max-w-sm"
+                height={627}
+                src="/silassilva.png"
+                width={627}
+              />
+            </div>
           </Reveal>
         </section>
 
