@@ -99,6 +99,11 @@ export default async function AdminDiagnosisDetailPage({ params }: PageProps) {
               Precisa de revisão
             </span>
           ) : null}
+          {jobs.length > 1 ? (
+            <span className="rounded-full border border-white/15 px-3 py-1 text-xs font-semibold text-cream/60">
+              {jobs.length} tentativas (reprocessado)
+            </span>
+          ) : null}
         </div>
       </div>
 

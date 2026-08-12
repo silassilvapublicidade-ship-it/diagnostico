@@ -4,7 +4,7 @@ import { ANALYSIS_STATUSES, type AnalysisStatus, type ProfileType } from "@/doma
 import { STATUS_COPY } from "@/modules/analysis/status";
 import { listDiagnosticsForAdmin } from "@/modules/admin/diagnostics";
 
-import { formatDurationMs, formatNumber, formatUsdCents, shortId } from "../format";
+import { formatNumber, formatUsdCents, shortId } from "../format";
 
 export const dynamic = "force-dynamic";
 
@@ -128,28 +128,23 @@ export default async function AdminDiagnosticsPage({ searchParams }: PageProps) 
       </div>
 
       <div className="overflow-x-auto rounded-lg border border-white/10">
-        <table className="w-full min-w-[1100px] border-collapse text-sm">
+        <table className="w-full min-w-[760px] border-collapse text-sm">
           <thead>
             <tr className="border-b border-white/10 bg-white/[0.03] text-left text-xs uppercase tracking-[0.06em] text-cream/45">
-              <th className="px-4 py-3">ID</th>
-              <th className="px-4 py-3">Data</th>
-              <th className="px-4 py-3">Usuário</th>
+              <th className="px-4 py-3">Cliente</th>
               <th className="px-4 py-3">Instagram</th>
               <th className="px-4 py-3">Tipo</th>
               <th className="px-4 py-3">Status</th>
               <th className="px-4 py-3">Score</th>
-              <th className="px-4 py-3">Revisão</th>
-              <th className="px-4 py-3">Modelo / Prompt</th>
-              <th className="px-4 py-3">Tokens</th>
-              <th className="px-4 py-3">Duração</th>
               <th className="px-4 py-3">Custo</th>
-              <th className="px-4 py-3">Tentativas</th>
+              <th className="px-4 py-3">Data</th>
+              <th className="px-4 py-3">Ação</th>
             </tr>
           </thead>
           <tbody>
             {rows.length === 0 ? (
               <tr>
-                <td className="px-4 py-8 text-center text-cream/50" colSpan={13}>
+                <td className="px-4 py-8 text-center text-cream/50" colSpan={8}>
                   Nenhum diagnóstico encontrado com esses filtros.
                 </td>
               </tr>
@@ -159,16 +154,8 @@ export default async function AdminDiagnosticsPage({ searchParams }: PageProps) 
                   className="border-b border-white/5 text-cream/80 transition hover:bg-white/[0.02]"
                   key={row.id}
                 >
-                  <td className="px-4 py-3 font-mono text-xs">
-                    <Link className="text-accent hover:underline" href={`/admin/diagnosticos/${row.id}`}>
-                      {shortId(row.id)}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-xs text-cream/55">
-                    {new Date(row.createdAt).toLocaleDateString("pt-BR")}
-                  </td>
                   <td className="px-4 py-3">
-                    <p className="text-xs">{row.userFullName ?? "—"}</p>
+                    <p className="text-xs font-semibold text-cream">{row.userFullName ?? "—"}</p>
                     <p className="text-[11px] text-cream/40">{row.userEmail ?? "—"}</p>
                   </td>
                   <td className="px-4 py-3 max-w-[160px] truncate text-xs">
@@ -179,23 +166,19 @@ export default async function AdminDiagnosticsPage({ searchParams }: PageProps) 
                   </td>
                   <td className="px-4 py-3 text-xs">{STATUS_COPY[row.status].title}</td>
                   <td className="px-4 py-3 font-mono text-xs">{row.score ?? "—"}</td>
-                  <td className="px-4 py-3 text-xs">
-                    {row.requiresReview ? (
-                      <span className="rounded-full border border-accent/40 bg-accent/10 px-2 py-0.5 text-accent">
-                        Sim
-                      </span>
-                    ) : (
-                      "—"
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-[11px] text-cream/60">
-                    <p>{row.modelName ?? "—"}</p>
-                    <p className="text-cream/40">{row.promptVersion ?? "—"}</p>
-                  </td>
-                  <td className="px-4 py-3 font-mono text-xs">{formatNumber(row.totalTokens)}</td>
-                  <td className="px-4 py-3 font-mono text-xs">{formatDurationMs(row.durationMs)}</td>
                   <td className="px-4 py-3 font-mono text-xs">{formatUsdCents(row.estimatedCostUsdCents)}</td>
-                  <td className="px-4 py-3 text-xs">{row.attemptCount}</td>
+                  <td className="px-4 py-3 whitespace-nowrap text-xs text-cream/55">
+                    {new Date(row.createdAt).toLocaleDateString("pt-BR")}
+                  </td>
+                  <td className="px-4 py-3">
+                    <Link
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-accent hover:underline"
+                      href={`/admin/diagnosticos/${row.id}`}
+                    >
+                      Ver diagnóstico →
+                    </Link>
+                    <p className="mt-0.5 font-mono text-[10px] text-cream/30">{shortId(row.id)}</p>
+                  </td>
                 </tr>
               ))
             )}
