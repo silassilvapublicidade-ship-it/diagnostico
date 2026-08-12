@@ -250,7 +250,7 @@ export function FullResultPreview() {
       <div className="lux-panel p-5">
         <p className="kicker text-accent">Resumo executivo</p>
         <p className="mt-2.5 text-sm leading-6 text-cream/75">
-          Identidade e Primeira Impressão já sustentam o perfil — o gargalo
+          Identidade e Primeira Impressão já sustentam o perfil. O gargalo
           real está na Conversão: quem chega entende e confia, mas não sabe
           qual é o próximo passo.
         </p>

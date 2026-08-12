@@ -80,7 +80,7 @@ const RECEIVE_ITEMS = [
   {
     icon: Gauge,
     title: "Score real do perfil",
-    hint: "Não é uma nota solta — é por dimensão",
+    hint: "Não é uma nota solta, é por dimensão",
   },
   {
     icon: Target,
@@ -95,7 +95,7 @@ const RECEIVE_ITEMS = [
   {
     icon: Wrench,
     title: "Solução pronta pra aplicar",
-    hint: "Não só o problema — o exemplo de correção",
+    hint: "Não só o problema, o exemplo de correção",
   },
   {
     icon: CalendarCheck,
@@ -163,7 +163,7 @@ const DIMENSIONS = [
     code: "CVR",
     icon: MousePointerClick,
     label: "Conversão",
-    description: "Se a atenção vira próxima ação — seguir, comprar, agendar.",
+    description: "Se a atenção vira próxima ação: seguir, comprar, agendar.",
   },
   {
     code: "REL",
@@ -198,7 +198,7 @@ const COMPARISON_ROWS = [
   { without: "Feed mais bonito.", with: "Identidade forte, gargalo é outro." },
   {
     without: "Uma IA genérica já faz isso.",
-    with: "Nada é inventado — é evidência cruzada entre as dimensões.",
+    with: "Nada é inventado. É evidência cruzada entre as dimensões.",
   },
 ] as const;
 
@@ -220,7 +220,7 @@ const FAQ_ITEMS = [
   {
     question: "Por que meu Instagram não converte mesmo com bom alcance?",
     answer:
-      "Alcance e conversão são dimensões diferentes. Muitas vezes o problema não é quem vê o perfil, e sim o que acontece depois — bio sem proposta clara, destaques sem caminho, nenhuma chamada para ação. O diagnóstico aponta exatamente onde esse caminho quebra.",
+      "Alcance e conversão são dimensões diferentes. Muitas vezes o problema não é quem vê o perfil, e sim o que acontece depois: bio sem proposta clara, destaques sem caminho, nenhuma chamada para ação. O diagnóstico aponta exatamente onde esse caminho quebra.",
   },
   {
     question: "Como saber se minha bio está ruim?",
@@ -230,7 +230,7 @@ const FAQ_ITEMS = [
   {
     question: "O diagnóstico funciona para perfil pequeno?",
     answer:
-      "Sim. A leitura avalia posicionamento, identidade, conteúdo e os outros pontos estratégicos do perfil — não depende do número de seguidores.",
+      "Sim. A leitura avalia posicionamento, identidade, conteúdo e os outros pontos estratégicos do perfil. Não depende do número de seguidores.",
   },
   {
     question: "Preciso enviar métricas do Instagram (Insights)?",
@@ -240,7 +240,7 @@ const FAQ_ITEMS = [
   {
     question: "Isso substitui uma consultoria completa?",
     answer:
-      "Não. É um guia inicial direto — mostra o que está funcionando, o que está travando e como corrigir. Para uma consultoria contínua e aprofundada, o caminho é outro.",
+      "Não. É um guia inicial direto: mostra o que está funcionando, o que está travando e como corrigir. Para uma consultoria contínua e aprofundada, o caminho é outro.",
   },
 ] as const;
 
@@ -485,7 +485,7 @@ export default function Home() {
               </p>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-cream/60">
                 Você não paga para saber uma nota. O score é só o ponto de
-                partida — você paga para entender por que ele é esse, o que
+                partida. Você paga para entender por que ele é esse, o que
                 está causando isso e como corrigir.
               </p>
               <div className="mt-8">
@@ -562,7 +562,7 @@ export default function Home() {
               <p className="mt-2 text-sm leading-6 text-cream/70">
                 As 8 dimensões não são analisadas isoladamente. Um perfil com
                 Identidade forte, boa Primeira Impressão e Conteúdo relevante,
-                mas Conversão baixa, não tem oito notas soltas — tem um
+                mas Conversão baixa, não tem oito notas soltas. Tem um
                 diagnóstico: o problema não é chamar atenção, é transformar
                 essa atenção em ação.
               </p>
