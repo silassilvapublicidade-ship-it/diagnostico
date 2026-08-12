@@ -19,6 +19,13 @@ const aiResultMetadataMigration = readFileSync(
   ),
   "utf8",
 );
+const adminFoundationsMigration = readFileSync(
+  new URL(
+    "../../supabase/migrations/0006_admin_foundations.sql",
+    import.meta.url,
+  ),
+  "utf8",
+);
 
 describe("initial Supabase migration", () => {
   it("declares the expected enums, tables, function, triggers, indexes, and policies", () => {
@@ -180,5 +187,46 @@ describe("initial Supabase migration", () => {
     expect(aiResultMetadataMigration).toContain(
       "check (output_tokens is null or output_tokens >= 0)",
     );
+  });
+
+  it("syncs public.profiles from auth.users on both insert and identity-changing update", () => {
+    expect(adminFoundationsMigration).toContain(
+      "create or replace function public.handle_new_user()",
+    );
+    expect(adminFoundationsMigration).toContain(
+      "after insert on auth.users",
+    );
+    expect(adminFoundationsMigration).toContain(
+      "create or replace function public.handle_user_identity_update()",
+    );
+    expect(adminFoundationsMigration).toContain(
+      "after update on auth.users",
+    );
+    expect(adminFoundationsMigration).toContain(
+      "new.email is distinct from old.email",
+    );
+    expect(adminFoundationsMigration).toContain(
+      "security definer",
+    );
+    expect(adminFoundationsMigration).toContain(
+      "insert into public.profiles (id, full_name, email)\nselect id, raw_user_meta_data ->> 'full_name', email\nfrom auth.users",
+    );
+  });
+
+  it("adds admin query indexes without touching existing tables or policies", () => {
+    for (const index of [
+      "create index if not exists analysis_requests_status_idx on public.analysis_requests (status);",
+      "create index if not exists analysis_requests_created_at_idx on public.analysis_requests (created_at);",
+      "create index if not exists analysis_jobs_status_started_at_idx on public.analysis_jobs (status, started_at);",
+      "create index if not exists analysis_results_generated_at_idx on public.analysis_results (generated_at);",
+      "create index if not exists analysis_results_model_prompt_idx on public.analysis_results (model_name, prompt_version);",
+      "create index if not exists profiles_created_at_idx on public.profiles (created_at);",
+    ]) {
+      expect(adminFoundationsMigration).toContain(index);
+    }
+
+    expect(adminFoundationsMigration).not.toContain("drop table");
+    expect(adminFoundationsMigration).not.toContain("drop policy");
+    expect(adminFoundationsMigration).not.toContain("alter table public.profiles\n  alter column");
   });
 });

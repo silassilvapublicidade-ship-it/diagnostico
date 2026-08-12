@@ -88,11 +88,39 @@ const RLS_SELECT_POLICIES: Record<
   },
 };
 
-function applyEqFilters(
-  rows: FakeRow[],
-  filters: Array<{ col: string; val: unknown }>,
-) {
-  return rows.filter((row) => filters.every((f) => row[f.col] === f.val));
+type FakeFilter =
+  | { kind: "eq"; col: string; val: unknown }
+  | { kind: "neq"; col: string; val: unknown }
+  | { kind: "in"; col: string; vals: unknown[] }
+  | { kind: "gte"; col: string; val: unknown }
+  | { kind: "lte"; col: string; val: unknown }
+  | { kind: "ilike"; col: string; pattern: string };
+
+function ilikeToRegExp(pattern: string): RegExp {
+  const escaped = pattern.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`^${escaped.replace(/%/g, ".*").replace(/_/g, ".")}$`, "i");
+}
+
+function matchesFilter(row: FakeRow, filter: FakeFilter): boolean {
+  const value = row[filter.col];
+  switch (filter.kind) {
+    case "eq":
+      return value === filter.val;
+    case "neq":
+      return value !== filter.val;
+    case "in":
+      return filter.vals.includes(value);
+    case "gte":
+      return value != null && (value as string | number) >= (filter.val as string | number);
+    case "lte":
+      return value != null && (value as string | number) <= (filter.val as string | number);
+    case "ilike":
+      return typeof value === "string" && ilikeToRegExp(filter.pattern).test(value);
+  }
+}
+
+function applyFilters(rows: FakeRow[], filters: FakeFilter[]) {
+  return rows.filter((row) => filters.every((f) => matchesFilter(row, f)));
 }
 
 function applyRls(
@@ -114,10 +142,12 @@ function createQueryBuilder(table: string, store: FakeStore, mode: ClientMode) {
     op?: "insert" | "update" | "select";
     payload?: FakeRow | FakeRow[];
     selectAfterWrite?: string;
-    filters: Array<{ col: string; val: unknown }>;
+    filters: FakeFilter[];
     orderCol?: string;
     orderAsc: boolean;
     limitN?: number;
+    rangeFrom?: number;
+    rangeTo?: number;
     single: boolean;
     countMode?: "exact";
     head: boolean;
@@ -162,21 +192,14 @@ function createQueryBuilder(table: string, store: FakeStore, mode: ClientMode) {
     }
 
     if (state.op === "update") {
-      const matched = applyEqFilters(rows, state.filters);
+      const matched = applyFilters(rows, state.filters);
       matched.forEach((row) => Object.assign(row, state.payload));
       return { data: null, error: null };
     }
 
-    let visible = applyEqFilters(rows, state.filters);
+    let visible = applyFilters(rows, state.filters);
     visible = applyRls(table, visible, store, mode);
-
-    if (state.countMode) {
-      return {
-        data: state.head ? null : visible,
-        error: null,
-        count: visible.length,
-      };
-    }
+    const totalCount = visible.length;
 
     if (state.orderCol) {
       const col = state.orderCol;
@@ -189,11 +212,22 @@ function createQueryBuilder(table: string, store: FakeStore, mode: ClientMode) {
       });
     }
 
-    if (state.limitN != null) {
-      visible = visible.slice(0, state.limitN);
+    let page = visible;
+    if (state.rangeFrom != null) {
+      page = visible.slice(state.rangeFrom, (state.rangeTo ?? visible.length - 1) + 1);
+    } else if (state.limitN != null) {
+      page = visible.slice(0, state.limitN);
     }
 
-    return finalizeSelect(visible);
+    if (state.countMode) {
+      return {
+        data: state.head ? null : page.map((row) => ({ ...row })),
+        error: null,
+        count: totalCount,
+      };
+    }
+
+    return finalizeSelect(page);
   }
 
   const builder = {
@@ -218,7 +252,27 @@ function createQueryBuilder(table: string, store: FakeStore, mode: ClientMode) {
       return builder;
     },
     eq(col: string, val: unknown) {
-      state.filters.push({ col, val });
+      state.filters.push({ kind: "eq", col, val });
+      return builder;
+    },
+    neq(col: string, val: unknown) {
+      state.filters.push({ kind: "neq", col, val });
+      return builder;
+    },
+    in(col: string, vals: unknown[]) {
+      state.filters.push({ kind: "in", col, vals });
+      return builder;
+    },
+    gte(col: string, val: unknown) {
+      state.filters.push({ kind: "gte", col, val });
+      return builder;
+    },
+    lte(col: string, val: unknown) {
+      state.filters.push({ kind: "lte", col, val });
+      return builder;
+    },
+    ilike(col: string, pattern: string) {
+      state.filters.push({ kind: "ilike", col, pattern });
       return builder;
     },
     order(col: string, opts?: { ascending?: boolean }) {
@@ -228,6 +282,11 @@ function createQueryBuilder(table: string, store: FakeStore, mode: ClientMode) {
     },
     limit(n: number) {
       state.limitN = n;
+      return builder;
+    },
+    range(from: number, to: number) {
+      state.rangeFrom = from;
+      state.rangeTo = to;
       return builder;
     },
     single() {

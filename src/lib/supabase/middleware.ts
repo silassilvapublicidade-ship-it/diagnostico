@@ -41,7 +41,9 @@ export async function updateSession(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  const isPrivateRoute = request.nextUrl.pathname.startsWith("/app");
+  const isAdminRoute = request.nextUrl.pathname.startsWith("/admin");
+  const isPrivateRoute =
+    request.nextUrl.pathname.startsWith("/app") || isAdminRoute;
   const isAuthRoute = [
     "/entrar",
     "/cadastro",
@@ -53,6 +55,17 @@ export async function updateSession(request: NextRequest) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/entrar";
     redirectUrl.searchParams.set("next", request.nextUrl.pathname);
+    return NextResponse.redirect(redirectUrl);
+  }
+
+  // Defense in depth: requireAdmin() re-checks this server-side in the
+  // /admin layout and in every admin Server Action, so a bypass here alone
+  // would never grant real access -- this redirect just avoids rendering
+  // any part of the admin tree for a non-admin session.
+  if (isAdminRoute && user && (user.app_metadata as { role?: string } | undefined)?.role !== "admin") {
+    const redirectUrl = request.nextUrl.clone();
+    redirectUrl.pathname = "/app";
+    redirectUrl.search = "";
     return NextResponse.redirect(redirectUrl);
   }
 

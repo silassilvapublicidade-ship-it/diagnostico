@@ -27,4 +27,17 @@ describe("private route protection", () => {
     expect(middlewareSource).not.toContain("SERVICE_ROLE");
     expect(middlewareSource).toContain("NEXT_PUBLIC_SUPABASE_ANON_KEY");
   });
+
+  it("treats /admin as a private route and redirects anonymous visitors to /entrar", () => {
+    expect(middlewareSource).toContain('pathname.startsWith("/admin")');
+    expect(middlewareSource).toContain(
+      'request.nextUrl.pathname.startsWith("/app") || isAdminRoute',
+    );
+  });
+
+  it("redirects an authenticated non-admin session away from /admin, never revealing why", () => {
+    expect(middlewareSource).toContain("isAdminRoute && user");
+    expect(middlewareSource).toContain('role !== "admin"');
+    expect(middlewareSource).toContain('redirectUrl.pathname = "/app"');
+  });
 });
