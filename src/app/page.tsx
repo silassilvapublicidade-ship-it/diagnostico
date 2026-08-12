@@ -352,7 +352,7 @@ export default function Home() {
       </header>
 
       <div className="mx-auto w-full max-w-[1440px] px-6 sm:px-10 lg:px-16 xl:px-20">
-        <section className="grid gap-10 py-20 sm:py-28 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-12">
+        <section className="grid gap-10 py-14 sm:py-20 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-12">
           <div>
             <h1 className="display-title text-balance text-4xl leading-[1.08] text-cream sm:text-5xl">
               Descubra o que está travando seu&nbsp;Instagram.
