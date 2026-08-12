@@ -4,13 +4,16 @@ import {
   ClipboardList,
   Compass,
   Eye,
+  FileCheck,
   Handshake,
   Layers,
   Lightbulb,
+  Lock,
   MousePointerClick,
   PenLine,
   ScanSearch,
   Upload,
+  UserCheck,
 } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
@@ -169,9 +172,17 @@ const COMPARISON_ROWS = [
 ] as const;
 
 const TRUST_POINTS = [
-  { title: "Evidências privadas", hint: "Nunca publicadas ou compartilhadas" },
-  { title: "Sem inventar dado", hint: "Falta de evidência fica clara" },
-  { title: "Você decide", hint: "A aplicação é sua escolha" },
+  {
+    icon: Lock,
+    title: "Evidências privadas",
+    hint: "Nunca publicadas ou compartilhadas",
+  },
+  {
+    icon: FileCheck,
+    title: "Sem inventar dado",
+    hint: "Falta de evidência fica clara",
+  },
+  { icon: UserCheck, title: "Você decide", hint: "A aplicação é sua escolha" },
 ] as const;
 
 const FAQ_ITEMS = [
@@ -637,11 +648,16 @@ export default function Home() {
           <Reveal className="mt-10 sm:mt-14">
             <SectionHeading kicker="Privacidade" title="Privado, do seu jeito." />
 
-            <div className="mt-8 grid gap-5 sm:grid-cols-3">
+            <div className="mt-8 grid gap-3.5 sm:grid-cols-3">
               {TRUST_POINTS.map((point) => (
-                <div key={point.title}>
-                  <div className="hairline mb-4" />
-                  <p className="text-base font-semibold text-cream">
+                <div
+                  className="card rounded-lg border border-white/10 bg-white/[0.03] p-5 backdrop-blur-sm"
+                  key={point.title}
+                >
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-accent/30 bg-accent/10 text-accent">
+                    <point.icon aria-hidden className="h-[18px] w-[18px]" />
+                  </span>
+                  <p className="mt-3 text-base font-semibold text-cream">
                     {point.title}
                   </p>
                   <p className="mt-1.5 text-sm text-cream/55">{point.hint}</p>
