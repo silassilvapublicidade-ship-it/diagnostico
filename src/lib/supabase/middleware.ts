@@ -47,6 +47,7 @@ export async function updateSession(request: NextRequest) {
   const isAuthRoute = [
     "/entrar",
     "/cadastro",
+    "/comecar",
     "/recuperar-acesso",
     "/atualizar-senha",
   ].some((path) => request.nextUrl.pathname.startsWith(path));

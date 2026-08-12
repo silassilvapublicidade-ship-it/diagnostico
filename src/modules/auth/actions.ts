@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 
 import { getServerEnv } from "@/lib/env";
+import { sanitizeInternalPath } from "@/lib/safe-redirect";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 function field(formData: FormData, key: string): string {
@@ -54,6 +55,35 @@ export async function signUpAction(formData: FormData) {
   }
 
   redirect("/app");
+}
+
+export async function signInWithMagicLinkAction(formData: FormData) {
+  const email = field(formData, "email");
+  const fullName = field(formData, "fullName");
+  // The hidden `next` field is only a hint from the client -- it is never
+  // trusted as-is. sanitizeInternalPath() is the same function the callback
+  // route re-validates against, so a tampered value here can only ever
+  // resolve to a same-origin path, never an external redirect.
+  const next = sanitizeInternalPath(field(formData, "next") || null, "/app");
+  const env = getServerEnv();
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.auth.signInWithOtp({
+    email,
+    options: {
+      emailRedirectTo: `${env.NEXT_PUBLIC_APP_URL}/auth/callback?next=${encodeURIComponent(next)}`,
+      // Only set on first creation (raw_user_meta_data); an existing user's
+      // name is left untouched. Omitted entirely when blank -- e.g. the
+      // /entrar shortcut, which only asks for email -- rather than sent as
+      // an empty string.
+      ...(fullName ? { data: { full_name: fullName } } : {}),
+    },
+  });
+
+  if (error) {
+    redirectWithError("/comecar", "Nao foi possivel enviar o link de acesso.");
+  }
+
+  redirect("/comecar?enviado=1");
 }
 
 export async function signOutAction() {

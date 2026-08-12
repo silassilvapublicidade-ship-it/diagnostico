@@ -279,7 +279,7 @@ function PricingCard() {
       </ul>
       <Link
         className="action-primary action-accent btn-pulse pricing-cta"
-        href="/cadastro"
+        href="/comecar"
       >
         Analisar meu perfil
       </Link>
@@ -374,7 +374,7 @@ export default function Home() {
             </Link>
             <Link
               className="action-primary action-accent px-4 py-2.5 text-xs"
-              href="/cadastro"
+              href="/comecar"
             >
               Analisar meu perfil
             </Link>
@@ -737,7 +737,7 @@ export default function Home() {
               <span className="block whitespace-nowrap">perdendo oportunidades.</span>
             </h2>
             <div className="mt-10">
-              <Link className="action-primary action-accent" href="/cadastro">
+              <Link className="action-primary action-accent" href="/comecar">
                 Analisar meu perfil
               </Link>
             </div>

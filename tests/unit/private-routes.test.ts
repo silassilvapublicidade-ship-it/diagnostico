@@ -40,4 +40,8 @@ describe("private route protection", () => {
     expect(middlewareSource).toContain('role !== "admin"');
     expect(middlewareSource).toContain('redirectUrl.pathname = "/app"');
   });
+
+  it("treats /comecar (magic link entry) as an auth route, redirecting logged-in users to /app", () => {
+    expect(middlewareSource).toContain('"/comecar"');
+  });
 });

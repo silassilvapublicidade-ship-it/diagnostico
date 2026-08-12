@@ -12,6 +12,7 @@ export default function robots(): MetadataRoute.Robots {
           "/app/",
           "/entrar",
           "/cadastro",
+          "/comecar",
           "/recuperar-acesso",
           "/atualizar-senha",
           "/auth/",
