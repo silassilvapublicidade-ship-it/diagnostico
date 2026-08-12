@@ -590,14 +590,25 @@ export default function Home() {
           <Reveal className="mt-10 sm:mt-14">
             <SectionHeading
               kicker="Sobre a metodologia"
-              title="Não é uma opinião genérica de IA."
+              title="Criada por quem já viveu esse problema na prática."
             />
             <p className="mt-4 max-w-2xl text-sm leading-6 text-cream/65">
-              A Metodologia Silas Silva de Diagnóstico Estratégico cruza as
-              evidências do seu perfil com 8 dimensões estratégicas para
-              responder quatro perguntas: o que está acontecendo, por que
-              isso importa, o que precisa mudar primeiro e como executar essa
-              mudança. Diagnosticar. Priorizar. Corrigir. Evoluir.
+              A Metodologia Silas Silva de Diagnóstico Estratégico nasceu da
+              experiência prática de Silas Silva com estratégia de conteúdo,
+              marketing e produção audiovisual — Técnico em Marketing pelo
+              SENAC, com formação também em Mídias Digitais, Branding e
+              Growth, Produção Audiovisual e Fotografia. O problema era
+              sempre o mesmo: perfis que publicam constantemente, mas não
+              conseguem ver com clareza o que funciona, o que trava o
+              resultado e o que deveria mudar primeiro. Disso nasceu a
+              leitura em 8 Dimensões Estratégicas.
+            </p>
+            <p className="mt-4 max-w-2xl text-sm leading-6 text-cream/65">
+              O Diagnóstico Estratégico de Perfil combina essa metodologia
+              com inteligência artificial para ampliar a profundidade da
+              análise, sem virar resposta genérica. A tecnologia processa a
+              evidência — a metodologia decide o que analisar, como sustentar
+              a conclusão e como transformar diagnóstico em ação.
             </p>
           </Reveal>
         </section>
