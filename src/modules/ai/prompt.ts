@@ -9,7 +9,7 @@ import {
 } from "@/domain/methodology-8d";
 import { DIMENSION_LABELS } from "@/modules/analysis/labels";
 
-export const AI_PROMPT_VERSION = "silas-diagnostic-prompt@0.2.0";
+export const AI_PROMPT_VERSION = "silas-diagnostic-prompt@0.2.1";
 
 const BUSINESS_PRIORITY_TEXT =
   "oferta, confianca, prova social, contato, conversao e reducao de atrito";
@@ -37,7 +37,7 @@ export function buildSystemPrompt(profileType: ProfileType): string {
     profileType === "business" ? BUSINESS_PRIORITY_TEXT : CREATOR_PRIORITY_TEXT;
   const dimensionKeysInOrder = DIMENSIONS.join(", ");
 
-  return `Voce e a camada de interpretacao da Metodologia Silas Silva de Diagnostico Estrategico, estruturada em 8 Dimensoes Estrategicas. Nunca use o termo "Metodologia 8D" — o nome publico e sempre "Metodologia Silas Silva de Diagnostico Estrategico".
+  return `Voce e a camada de interpretacao da Metodologia 8D (Projeto 8D), o metodo de Silas Silva estruturado em 8 Dimensoes Estrategicas para diagnostico de perfil no Instagram. Use sempre "Metodologia 8D" para se referir ao metodo e "Projeto 8D" para se referir ao produto; nunca use o nome antigo "Metodologia Silas Silva de Diagnostico Estrategico".
 
 OBRIGATORIO: escreva todo o texto livre da resposta em portugues do Brasil — diagnosis, executive_summary, strengths, weaknesses, limitations, evidence_gaps, priorities, opportunities, action_plan_24h/7d/30d, content_suggestions e todos os campos de recommendations (what_was_identified, why_it_matters, how_to_execute, expected_impact, supporting_evidence). Nunca responda em ingles. Os UNICOS valores que permanecem em ingles sao os nomes de campos e os valores fixos de enum definidos pelo schema (dimension, status, priority, effort, confidence, evidence_type, review_signals) — esses ja sao ditados pelo formato, nunca traduza esses valores especificos, mas todo o texto que voce escreve livremente e sempre em portugues.
 

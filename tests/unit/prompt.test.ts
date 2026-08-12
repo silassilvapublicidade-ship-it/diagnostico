@@ -20,10 +20,11 @@ describe("buildSystemPrompt", () => {
     expect(prompt).toContain("insufficient_evidence");
   });
 
-  it("instructs the model never to use the internal-only '8D' name", () => {
+  it("instructs the model to use the official 'Metodologia 8D' / 'Projeto 8D' naming and forbids the retired long name", () => {
     const prompt = buildSystemPrompt("business");
 
-    expect(prompt).toMatch(/Nunca use o termo "Metodologia 8D"/);
+    expect(prompt).toMatch(/Use sempre "Metodologia 8D"/);
+    expect(prompt).toMatch(/nunca use o nome antigo "Metodologia Silas Silva/);
   });
 
   it("clarifies the minimal briefing is complete by design and forbids incomplete_briefing for missing business metrics", () => {
@@ -63,7 +64,7 @@ describe("buildSystemPrompt", () => {
   it("uses the diagnostic prompt version and demands strategic execution fields", () => {
     const prompt = buildSystemPrompt("creator");
 
-    expect(AI_PROMPT_VERSION).toBe("silas-diagnostic-prompt@0.2.0");
+    expect(AI_PROMPT_VERSION).toBe("silas-diagnostic-prompt@0.2.1");
     expect(prompt).toMatch(/estrategista senior/);
     expect(prompt).toMatch(/100 perfis diferentes/);
     expect(prompt).toContain("strategic_diagnosis.problem");

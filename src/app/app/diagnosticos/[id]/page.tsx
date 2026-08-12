@@ -187,7 +187,7 @@ export default async function DiagnosisDetailPage({
                 label="Confianca"
                 value={CONFIDENCE_COPY[result.confidence]}
               />
-              <StatusChip label="Metodo" value="Metodologia Silas Silva" />
+              <StatusChip label="Método" value="Metodologia 8D" />
               <StatusChip
                 label="Versao atual"
                 value={currentMethodologyVersion}

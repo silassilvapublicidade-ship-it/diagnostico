@@ -39,7 +39,7 @@ export default async function Image() {
             textAlign: "center",
           }}
         >
-          Diagnóstico Estratégico de Perfil
+          Projeto 8D
         </div>
         <div
           style={{
@@ -49,7 +49,7 @@ export default async function Image() {
             textAlign: "center",
           }}
         >
-          Metodologia Silas Silva de Diagnóstico Estratégico
+          Diagnóstico Estratégico de Perfil · Metodologia 8D
         </div>
       </div>
     ),

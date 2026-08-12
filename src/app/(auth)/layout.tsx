@@ -9,15 +9,15 @@ export default function AuthLayout({
       <section className="mx-auto grid min-h-screen w-full max-w-6xl px-6 py-8 sm:px-10 lg:grid-cols-[0.9fr_1.1fr] lg:px-12">
         <aside className="dark-panel hidden p-8 lg:flex lg:flex-col lg:justify-between">
           <Link className="kicker text-cream/62" href="/">
-            Diagnostico Estrategico de Perfil
+            Projeto 8D
           </Link>
           <div className="pb-10">
-            <p className="kicker mb-5 text-accent">Area privada</p>
+            <p className="kicker mb-5 text-accent">Área privada</p>
             <h1 className="display-title max-w-md text-5xl leading-[0.9]">
-              Entre na sala de diagnostico.
+              Entre na sala de diagnóstico.
             </h1>
             <p className="mt-5 max-w-sm text-sm leading-6 text-cream/64">
-              Contexto, evidencias e leitura estrategica no mesmo ambiente.
+              Contexto, evidências e leitura estratégica no mesmo ambiente.
             </p>
           </div>
         </aside>

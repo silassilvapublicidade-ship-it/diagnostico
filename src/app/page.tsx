@@ -30,7 +30,7 @@ import { FullResultPreview, HeroResultPreview } from "./landing-result-preview";
 import { SITE_NAME, SITE_URL } from "./site-config";
 
 const PAGE_TITLE =
-  "Diagnóstico Estratégico de Perfil no Instagram | Metodologia Silas Silva";
+  "Diagnóstico Estratégico de Perfil no Instagram | Projeto 8D";
 const PAGE_DESCRIPTION =
   "Descubra o que está travando seu Instagram: score estratégico, pontos críticos com evidência e um plano de ação claro do que mudar. Diagnóstico completo por R$ 99.";
 
@@ -340,7 +340,7 @@ export default function Home() {
           <Link className="flex items-center gap-3" href="/">
             <span className="relative h-12 w-12 shrink-0 sm:h-14 sm:w-14">
               <Image
-                alt="Metodologia Silas Silva"
+                alt="Projeto 8D"
                 className="object-contain"
                 fill
                 priority
@@ -349,7 +349,7 @@ export default function Home() {
               />
             </span>
             <span className="kicker hidden text-cream/60 sm:inline">
-              Diagnóstico Estratégico de Perfil
+              Projeto 8D
             </span>
           </Link>
 
@@ -643,7 +643,7 @@ export default function Home() {
             <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
               <div>
                 <SectionHeading
-                  kicker="Sobre a metodologia"
+                  kicker="Metodologia 8D"
                   title="Criada por quem já viveu esse problema na prática."
                 />
                 <p className="mt-4 max-w-2xl text-justify text-sm leading-6 text-cream/65">
@@ -652,7 +652,7 @@ export default function Home() {
                   audiovisual.
                 </p>
                 <p className="mt-4 max-w-2xl text-justify text-sm leading-6 text-cream/65">
-                  A metodologia surgiu da prática, analisando perfis que
+                  A Metodologia 8D surgiu da prática, analisando perfis que
                   produzem conteúdo, mas nem sempre conseguem enxergar o que
                   funciona, o que está limitando seus resultados e o que
                   deveria mudar primeiro.
@@ -669,7 +669,7 @@ export default function Home() {
               </div>
 
               <Image
-                alt="Silas Silva, criador da Metodologia Silas Silva de Diagnóstico Estratégico"
+                alt="Silas Silva, criador da Metodologia 8D"
                 className="h-auto w-full rounded-lg border border-white/10"
                 height={627}
                 src="/silassilva.png"
@@ -748,7 +748,7 @@ export default function Home() {
           <div className="flex items-center gap-3">
             <span className="relative h-9 w-9 shrink-0">
               <Image
-                alt="Metodologia Silas Silva"
+                alt="Projeto 8D"
                 className="object-contain"
                 fill
                 sizes="36px"
@@ -756,7 +756,7 @@ export default function Home() {
               />
             </span>
             <p className="text-xs leading-5 text-cream/50">
-              Metodologia Silas Silva de Diagnóstico Estratégico
+              Projeto 8D · Metodologia 8D · Desenvolvida por Silas Silva
             </p>
           </div>
           <Link

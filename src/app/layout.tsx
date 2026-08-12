@@ -2,13 +2,13 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
 
-import { SITE_URL } from "./site-config";
+import { SITE_NAME, SITE_URL } from "./site-config";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: "Diagnostico Estrategico de Perfil",
+  title: `${SITE_NAME} | Diagnóstico Estratégico de Perfil`,
   description:
-    "Diagnostico privado pela Metodologia Silas Silva de Diagnostico Estrategico.",
+    "Diagnóstico Estratégico de Perfil pela Metodologia 8D, desenvolvida por Silas Silva.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

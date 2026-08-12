@@ -490,7 +490,7 @@ export function NewDiagnosisForm() {
             <StepHeading
               eyebrow="Tipo de leitura"
               title="Qual e o seu perfil?"
-              subtitle="Essa escolha define os pesos da Metodologia Silas Silva: negocio e criador nao sao avaliados do mesmo jeito."
+              subtitle="Essa escolha define os pesos da Metodologia 8D: negócio e criador não são avaliados do mesmo jeito."
             />
             <div className="grid gap-4 sm:grid-cols-3">
               {PROFILE_CARDS.map((card) => (

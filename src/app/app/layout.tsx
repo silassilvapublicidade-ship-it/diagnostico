@@ -23,7 +23,7 @@ export default async function PrivateLayout({
               <div className="flex items-center gap-3">
                 <span className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-accent/40 bg-black/40 shadow-[0_0_45px_rgba(255,90,0,0.28)]">
                   <Image
-                    alt="Metodologia Silas Silva"
+                    alt="Projeto 8D"
                     className="object-contain"
                     fill
                     priority
@@ -32,16 +32,16 @@ export default async function PrivateLayout({
                   />
                 </span>
                 <div>
-                  <p className="kicker text-accent">Diagnostico</p>
+                  <p className="kicker text-accent">Projeto 8D</p>
                   <p className="mt-1 text-sm font-semibold text-cream">
-                    Estrategico de Perfil
+                    Diagnóstico Estratégico de Perfil
                   </p>
                 </div>
               </div>
             </Link>
 
             <div className="mt-8 rounded-xl border border-accent/35 bg-[linear-gradient(135deg,rgba(255,90,0,0.18),rgba(255,90,0,0.04)_46%,rgba(255,255,255,0.035))] p-4 shadow-[0_22px_70px_rgba(0,0,0,0.22)]">
-              <p className="kicker text-accent">Metodo Silas Silva</p>
+              <p className="kicker text-accent">Metodologia 8D</p>
               <p className="mt-4 flex items-baseline gap-3 text-accent">
                 <span className="display-title text-6xl leading-none">8</span>
                 <span className="font-mono text-[11px] font-black uppercase tracking-[0.16em]">
