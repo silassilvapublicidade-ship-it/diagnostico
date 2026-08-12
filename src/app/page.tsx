@@ -1,19 +1,24 @@
 import {
   BadgeCheck,
+  CalendarCheck,
   CheckCircle2,
   ClipboardList,
   Compass,
   Eye,
   FileCheck,
+  Gauge,
   Handshake,
   Layers,
   Lightbulb,
+  ListChecks,
   Lock,
   MousePointerClick,
   PenLine,
   ScanSearch,
+  Target,
   Upload,
   UserCheck,
+  Wrench,
 } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
@@ -71,11 +76,31 @@ const PAIN_POINTS = [
 ] as const;
 
 const RECEIVE_ITEMS = [
-  "Score real do perfil",
-  "Pontos críticos",
-  "Prioridades",
-  "Solução pronta pra aplicar",
-  "Plano de ação",
+  {
+    icon: Gauge,
+    title: "Score real do perfil",
+    hint: "Não é uma nota solta — é por dimensão",
+  },
+  {
+    icon: Target,
+    title: "Pontos críticos",
+    hint: "O que trava resultado, com evidência",
+  },
+  {
+    icon: ListChecks,
+    title: "Prioridades",
+    hint: "O que resolver primeiro, não 20 itens",
+  },
+  {
+    icon: Wrench,
+    title: "Solução pronta pra aplicar",
+    hint: "Não só o problema — o exemplo de correção",
+  },
+  {
+    icon: CalendarCheck,
+    title: "Plano de ação",
+    hint: "24h, 7 dias e 30 dias",
+  },
 ] as const;
 
 const HOW_IT_WORKS = [
@@ -403,18 +428,23 @@ export default function Home() {
           <Reveal className="mt-10 sm:mt-14">
             <SectionHeading kicker="O que você recebe" title="Clareza sobre o que fazer." />
 
-            <div className="mt-8 grid gap-3 sm:grid-cols-2">
-              {RECEIVE_ITEMS.map((item, index) => (
+            <div className="mt-8 grid gap-3.5 sm:grid-cols-2">
+              {RECEIVE_ITEMS.map((item) => (
                 <div
                   className="card flex items-center gap-4 rounded-lg border border-white/10 bg-white/[0.03] p-4 backdrop-blur-sm"
-                  key={item}
+                  key={item.title}
                 >
-                  <span className="font-mono text-base font-black text-accent">
-                    {String(index + 1).padStart(2, "0")}
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-accent/30 bg-accent/10 text-accent">
+                    <item.icon aria-hidden className="h-[18px] w-[18px]" />
                   </span>
-                  <span className="text-base font-semibold text-cream">
-                    {item}
-                  </span>
+                  <div>
+                    <p className="text-base font-semibold text-cream">
+                      {item.title}
+                    </p>
+                    <p className="mt-0.5 text-xs text-cream/50">
+                      {item.hint}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>
