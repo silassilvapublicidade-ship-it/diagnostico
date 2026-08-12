@@ -36,7 +36,10 @@ export function useInView<T extends HTMLElement>(
 }
 
 export function useCountUp(target: number, active: boolean, duration = 900) {
-  const [value, setValue] = useState(0);
+  // Starts at the real target, never 0: the count-up-from-zero motion only
+  // ever happens client-side inside the effect below, so SSR output, a
+  // pre-hydration paint, or a no-JS visitor always sees the correct number.
+  const [value, setValue] = useState(target);
   const startedRef = useRef(false);
 
   useEffect(() => {
@@ -65,6 +68,42 @@ export function useCountUp(target: number, active: boolean, duration = 900) {
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
   }, [active, target, duration]);
+
+  return value;
+}
+
+// For the score bars: unlike the counter (which re-renders every frame),
+// a progress bar should animate via a single CSS `transition: width`, not
+// a JS-driven per-frame width update (that fights the transition and lags
+// behind). Starts at the real target (SSR-safe), then briefly drops to 0
+// and back up once in view so the CSS transition plays the "grow in"
+// motion - both state changes happen inside rAF callbacks, never
+// synchronously in the effect body.
+export function useGrowIn(target: number, active: boolean) {
+  const [value, setValue] = useState(target);
+  const startedRef = useRef(false);
+
+  useEffect(() => {
+    if (!active || startedRef.current) return;
+    startedRef.current = true;
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      return;
+    }
+
+    let raf2: number;
+    const raf1 = requestAnimationFrame(() => {
+      setValue(0);
+      raf2 = requestAnimationFrame(() => {
+        setValue(target);
+      });
+    });
+
+    return () => {
+      cancelAnimationFrame(raf1);
+      cancelAnimationFrame(raf2);
+    };
+  }, [active, target]);
 
   return value;
 }

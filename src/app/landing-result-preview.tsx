@@ -1,6 +1,6 @@
 "use client";
 
-import { useCountUp, useInView } from "./landing-motion";
+import { useCountUp, useGrowIn, useInView } from "./landing-motion";
 
 function ExampleScoreRing({
   score,
@@ -37,13 +37,13 @@ function ExampleScoreRing({
 
 function ExampleScoreBar({ score }: { score: number }) {
   const [ref, inView] = useInView<HTMLDivElement>(0.6);
-  const animated = useCountUp(score, inView, 700);
-  const width = Math.max(0, Math.min(100, animated));
+  const grown = useGrowIn(score, inView);
+  const width = Math.max(0, Math.min(100, grown));
 
   return (
     <div className="h-1.5 w-full overflow-hidden rounded-full bg-cream/10" ref={ref}>
       <div
-        className="h-full rounded-full bg-accent transition-[width] duration-100"
+        className="h-full rounded-full bg-accent transition-[width] duration-[800ms] ease-out"
         style={{ width: `${width}%` }}
       />
     </div>
@@ -67,9 +67,7 @@ export function HeroResultPreview() {
       <div className="mt-4 flex items-center gap-4">
         <ExampleScoreRing score={65} size="sm" />
         <div>
-          <p className="text-base font-black text-cream">
-            Abaixo do potencial
-          </p>
+          <p className="text-base font-black text-cream">Consistente</p>
           <p className="mt-1 text-xs text-cream/50">Score estratégico</p>
         </div>
       </div>
@@ -77,13 +75,18 @@ export function HeroResultPreview() {
       <div className="mt-4 space-y-2.5">
         {(
           [
-            { label: "Conversão", score: 38 },
-            { label: "Identidade", score: 82 },
+            { label: "Conversão", score: 38, tag: "Maior gargalo" },
+            { label: "Identidade", score: 82, tag: "Maior força" },
           ] as const
         ).map((row) => (
           <div key={row.label}>
             <div className="flex items-center justify-between text-xs">
-              <span className="font-semibold text-cream/80">{row.label}</span>
+              <span className="flex items-center gap-1.5 font-semibold text-cream/80">
+                {row.label}
+                <span className="font-mono text-[9px] font-normal tracking-[0.06em] text-accent/70 uppercase">
+                  {row.tag}
+                </span>
+              </span>
               <span className="text-cream/50">{row.score}</span>
             </div>
             <div className="mt-1.5">
@@ -157,17 +160,30 @@ function ExampleDimensionCard({
 
 function InsightBlock({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-cream/10 bg-black/18 p-3.5 shadow-[inset_3px_0_0_rgba(255,90,0,0.45)] transition duration-300 hover:-translate-y-0.5 hover:border-accent/25 hover:bg-black/28">
+    <div className="card rounded-lg border border-white/10 bg-black/18 p-3.5 shadow-[inset_3px_0_0_rgba(255,90,0,0.45)]">
       <p className="kicker text-[9px] text-accent">{label}</p>
       <p className="mt-1.5 text-sm leading-5 text-cream/72">{value}</p>
     </div>
   );
 }
 
-function ExampleList({ title, items }: { title: string; items: string[] }) {
+function ExampleList({
+  title,
+  caption,
+  items,
+}: {
+  title: string;
+  caption?: string;
+  items: string[];
+}) {
   return (
     <div className="lux-panel p-5">
-      <p className="kicker text-accent">{title}</p>
+      <div className="flex items-baseline justify-between gap-3">
+        <p className="kicker text-accent">{title}</p>
+        {caption ? (
+          <p className="text-[11px] text-cream/45">{caption}</p>
+        ) : null}
+      </div>
       <ul className="mt-4 space-y-2.5 text-sm text-cream/75">
         {items.map((item) => (
           <li className="flex gap-2.5" key={item}>
@@ -212,16 +228,15 @@ export function FullResultPreview() {
         <div className="flex items-center gap-5">
           <ExampleScoreRing score={65} />
           <div>
-            <p className="text-2xl font-black text-cream">
-              Abaixo do potencial
-            </p>
+            <p className="text-2xl font-black text-cream">Consistente</p>
             <p className="mt-1 text-xs text-cream/45">Score estratégico</p>
           </div>
         </div>
-        <div className="grid gap-3 sm:grid-cols-3">
-          <MiniStat label="Classificação" value="Abaixo do potencial" />
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <MiniStat label="Classificação" value="Consistente" />
           <MiniStat label="Dimensões" value="8 de 8" />
-          <MiniStat label="Método" value="Metodologia Silas Silva" />
+          <MiniStat label="Maior força" value="Identidade · 82" />
+          <MiniStat label="Maior gargalo" value="Conversão · 38" />
         </div>
       </div>
 
@@ -249,16 +264,43 @@ export function FullResultPreview() {
         />
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <ExampleList
-          items={["Bio com proposta clara", "Prova de autoridade", "Uma chamada por post"]}
-          title="Prioridades"
-        />
+      <ExampleList
+        caption="Nunca mais de 2-3 por vez"
+        items={["Bio com proposta clara", "Prova de autoridade", "Uma chamada por post"]}
+        title="Prioridades"
+      />
+
+      <div className="grid gap-4 sm:grid-cols-3">
         <ExamplePlan
           items={["Reescrever a bio", "Fixar prova de autoridade", "Definir a chamada principal"]}
           timeframe="24 horas"
         />
+        <ExamplePlan
+          items={[
+            "Testar 3 variações de CTA nos posts",
+            "Publicar 1 story de bastidores",
+            "Revisar destaques com o novo direcionamento",
+          ]}
+          timeframe="7 dias"
+        />
+        <ExamplePlan
+          items={[
+            "Medir a resposta ao novo CTA",
+            "Fixar a prova de autoridade em destaque",
+            "Reavaliar prioridades com base no resultado",
+          ]}
+          timeframe="30 dias"
+        />
       </div>
+
+      <ExampleList
+        items={[
+          "Carrossel 'antes x depois' do posicionamento, fechando com o link da bio.",
+          "Story fixo respondendo a dúvida mais comum de quem chega no perfil.",
+          "Post mostrando o processo de trabalho, com uma prova real de resultado.",
+        ]}
+        title="Oportunidades de conteúdo prontas"
+      />
     </div>
   );
 }
