@@ -109,6 +109,7 @@ export function HeroResultPreview() {
 function ExampleDimensionCard({
   label,
   score,
+  priority,
   problem,
   evidence,
   consequence,
@@ -119,6 +120,7 @@ function ExampleDimensionCard({
 }: {
   label: string;
   score: number;
+  priority: "Alta" | "Média";
   problem: string;
   evidence: string;
   consequence: string;
@@ -135,7 +137,12 @@ function ExampleDimensionCard({
       <summary className="flex cursor-pointer list-none items-center gap-4 p-5 transition hover:bg-accent/8">
         <div className="flex-1">
           <div className="flex items-center justify-between gap-3">
-            <p className="text-lg font-black text-cream">{label}</p>
+            <div className="flex items-center gap-2.5">
+              <p className="text-lg font-black text-cream">{label}</p>
+              <span className="rounded-full border border-accent/30 bg-accent/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.08em] text-accent">
+                Prioridade {priority}
+              </span>
+            </div>
             <p className="shrink-0 text-sm text-cream/56">{score} pontos</p>
           </div>
           <div className="mt-3">
@@ -234,34 +241,19 @@ export function FullResultPreview() {
         </div>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <MiniStat label="Classificação" value="Consistente" />
-          <MiniStat label="Dimensões" value="8 de 8" />
           <MiniStat label="Maior força" value="Identidade · 82" />
           <MiniStat label="Maior gargalo" value="Conversão · 38" />
+          <MiniStat label="Maior oportunidade" value="Prova social" />
         </div>
       </div>
 
-      <div className="grid gap-3">
-        <ExampleDimensionCard
-          consequence="Cada visita se perde em silêncio."
-          correction="Uma única chamada, repetida em todo lugar."
-          defaultOpen
-          evidence="Bio e destaques sem nenhuma chamada clara."
-          example="Bio: 'Ajudo [X] a [Y]. Comece aqui ↓'"
-          label="Conversão"
-          nextStep="Reescrever a bio hoje."
-          problem="Atenção não vira ação."
-          score={38}
-        />
-        <ExampleDimensionCard
-          consequence="Competência sem contexto esfria a decisão."
-          correction="Mostrar processo e trajetória, mesmo que breve."
-          evidence="Nenhuma credencial ou bastidor no perfil."
-          example="Destaque 'Quem sou' com 3-4 stories."
-          label="Autoridade"
-          nextStep="Gravar um story sobre sua trajetória."
-          problem="Mostra resultado, não mostra por que confiar."
-          score={54}
-        />
+      <div className="lux-panel p-5">
+        <p className="kicker text-accent">Resumo executivo</p>
+        <p className="mt-2.5 text-sm leading-6 text-cream/75">
+          Identidade e Primeira Impressão já sustentam o perfil — o gargalo
+          real está na Conversão: quem chega entende e confia, mas não sabe
+          qual é o próximo passo.
+        </p>
       </div>
 
       <ExampleList
@@ -290,6 +282,32 @@ export function FullResultPreview() {
             "Reavaliar prioridades com base no resultado",
           ]}
           timeframe="30 dias"
+        />
+      </div>
+
+      <div className="grid gap-3">
+        <ExampleDimensionCard
+          consequence="Cada visita se perde em silêncio."
+          correction="Uma única chamada, repetida em todo lugar."
+          defaultOpen
+          evidence="Bio e destaques sem nenhuma chamada clara."
+          example="Bio: 'Ajudo [X] a [Y]. Comece aqui ↓'"
+          label="Conversão"
+          nextStep="Reescrever a bio hoje."
+          priority="Alta"
+          problem="Atenção não vira ação."
+          score={38}
+        />
+        <ExampleDimensionCard
+          consequence="Competência sem contexto esfria a decisão."
+          correction="Mostrar processo e trajetória, mesmo que breve."
+          evidence="Nenhuma credencial ou bastidor no perfil."
+          example="Destaque 'Quem sou' com 3-4 stories."
+          label="Autoridade"
+          nextStep="Gravar um story sobre sua trajetória."
+          priority="Média"
+          problem="Mostra resultado, não mostra por que confiar."
+          score={54}
         />
       </div>
 

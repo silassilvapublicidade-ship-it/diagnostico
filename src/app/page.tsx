@@ -95,14 +95,54 @@ const HOW_IT_WORKS = [
 ] as const;
 
 const DIMENSIONS = [
-  { code: "POS", icon: Compass, label: "Posicionamento" },
-  { code: "IMP", icon: Eye, label: "Primeira Impressão" },
-  { code: "AUT", icon: BadgeCheck, label: "Autoridade" },
-  { code: "CON", icon: PenLine, label: "Conteúdo" },
-  { code: "IDE", icon: Layers, label: "Identidade" },
-  { code: "CVR", icon: MousePointerClick, label: "Conversão" },
-  { code: "REL", icon: Handshake, label: "Relacionamento" },
-  { code: "OPR", icon: Lightbulb, label: "Oportunidades" },
+  {
+    code: "POS",
+    icon: Compass,
+    label: "Posicionamento",
+    description: "Quem você é, para quem fala e por que escolher você.",
+  },
+  {
+    code: "IMP",
+    icon: Eye,
+    label: "Primeira Impressão",
+    description: "O que fica claro nos primeiros segundos de visita.",
+  },
+  {
+    code: "AUT",
+    icon: BadgeCheck,
+    label: "Autoridade",
+    description: "Sinais de confiança, credibilidade e prova social.",
+  },
+  {
+    code: "CON",
+    icon: PenLine,
+    label: "Conteúdo",
+    description: "Direção, consistência e utilidade do que é publicado.",
+  },
+  {
+    code: "IDE",
+    icon: Layers,
+    label: "Identidade",
+    description: "Reconhecimento visual e de linguagem do perfil.",
+  },
+  {
+    code: "CVR",
+    icon: MousePointerClick,
+    label: "Conversão",
+    description: "Se a atenção vira próxima ação — seguir, comprar, agendar.",
+  },
+  {
+    code: "REL",
+    icon: Handshake,
+    label: "Relacionamento",
+    description: "Proximidade, interação e vínculo com a audiência.",
+  },
+  {
+    code: "OPR",
+    icon: Lightbulb,
+    label: "Oportunidades",
+    description: "Ativos e potenciais ainda pouco explorados.",
+  },
 ] as const;
 
 const PROFILE_TYPES = [
@@ -458,8 +498,22 @@ export default function Home() {
                   <p className="mt-1 text-sm font-semibold text-cream">
                     {dimension.label}
                   </p>
+                  <p className="mt-1.5 text-xs leading-4 text-cream/50">
+                    {dimension.description}
+                  </p>
                 </div>
               ))}
+            </div>
+
+            <div className="mt-6 rounded-lg border border-accent/20 bg-accent/5 p-5">
+              <p className="kicker text-[10px] text-accent">Leitura cruzada</p>
+              <p className="mt-2 text-sm leading-6 text-cream/70">
+                As 8 dimensões não são analisadas isoladamente. Um perfil com
+                Identidade forte, boa Primeira Impressão e Conteúdo relevante,
+                mas Conversão baixa, não tem oito notas soltas — tem um
+                diagnóstico: o problema não é chamar atenção, é transformar
+                essa atenção em ação.
+              </p>
             </div>
           </Reveal>
         </section>
@@ -528,6 +582,23 @@ export default function Home() {
                 </div>
               ))}
             </div>
+          </Reveal>
+        </section>
+
+        <section className="py-16 sm:py-24">
+          <div className="hairline" />
+          <Reveal className="mt-10 sm:mt-14">
+            <SectionHeading
+              kicker="Sobre a metodologia"
+              title="Não é uma opinião genérica de IA."
+            />
+            <p className="mt-4 max-w-2xl text-sm leading-6 text-cream/65">
+              A Metodologia Silas Silva de Diagnóstico Estratégico cruza as
+              evidências do seu perfil com 8 dimensões estratégicas para
+              responder quatro perguntas: o que está acontecendo, por que
+              isso importa, o que precisa mudar primeiro e como executar essa
+              mudança. Diagnosticar. Priorizar. Corrigir. Evoluir.
+            </p>
           </Reveal>
         </section>
 
