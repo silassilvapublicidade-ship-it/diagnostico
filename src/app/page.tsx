@@ -623,7 +623,7 @@ export default function Home() {
 
               <Image
                 alt="Silas Silva, criador da Metodologia Silas Silva de Diagnóstico Estratégico"
-                className="mx-auto h-auto w-full max-w-xs rounded-lg border border-white/10 lg:mx-0 lg:ml-auto lg:max-w-sm"
+                className="h-auto w-full rounded-lg border border-white/10"
                 height={627}
                 src="/silassilva.png"
                 width={627}
