@@ -599,18 +599,18 @@ export default function Home() {
                   kicker="Sobre a metodologia"
                   title="Criada por quem já viveu esse problema na prática."
                 />
-                <p className="mt-4 max-w-2xl text-sm leading-6 text-cream/65">
+                <p className="mt-4 max-w-2xl text-justify text-sm leading-6 text-cream/65">
                   Silas Silva é Técnico em Marketing pelo SENAC e atua com
                   estratégia de conteúdo, posicionamento digital e produção
                   audiovisual.
                 </p>
-                <p className="mt-4 max-w-2xl text-sm leading-6 text-cream/65">
+                <p className="mt-4 max-w-2xl text-justify text-sm leading-6 text-cream/65">
                   A metodologia surgiu da prática, analisando perfis que
                   produzem conteúdo, mas nem sempre conseguem enxergar o que
                   funciona, o que está limitando seus resultados e o que
                   deveria mudar primeiro.
                 </p>
-                <p className="mt-4 max-w-2xl text-sm leading-6 text-cream/65">
+                <p className="mt-4 max-w-2xl text-justify text-sm leading-6 text-cream/65">
                   Essa experiência foi transformada em uma leitura
                   estruturada por 8 Dimensões Estratégicas, hoje
                   potencializada por inteligência artificial.
