@@ -15,6 +15,7 @@ import {
   MousePointerClick,
   PenLine,
   ScanSearch,
+  Sparkles,
   Target,
   Upload,
   UserCheck,
@@ -100,6 +101,11 @@ const RECEIVE_ITEMS = [
     icon: CalendarCheck,
     title: "Plano de ação",
     hint: "24h, 7 dias e 30 dias",
+  },
+  {
+    icon: Sparkles,
+    title: "Oportunidades de conteúdo",
+    hint: "Ideias que nascem do seu diagnóstico",
   },
 ] as const;
 
