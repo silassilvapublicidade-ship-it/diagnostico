@@ -424,21 +424,26 @@ export default function Home() {
           </Reveal>
         </section>
 
-        <section className="py-16 sm:py-24 text-center">
+        <section className="py-20 sm:py-28">
           <div className="hairline" />
           <Reveal className="mt-10 sm:mt-14">
-            <SectionHeading kicker="A oferta" title="Isso é o que você recebe." />
-            <p className="mx-auto mt-4 max-w-2xl text-sm leading-6 text-cream/60">
-              Depois de ver como a leitura funciona, aqui está exatamente o
-              que está incluso.
-            </p>
-            <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-cream/60">
-              Você não paga para saber uma nota. O score é só o ponto de
-              partida — você paga para entender por que ele é esse, o que
-              está causando isso e como corrigir.
-            </p>
-            <div className="mt-8">
-              <PricingCard />
+            <div className="dark-panel flex flex-col items-center px-6 py-14 text-center sm:px-12 sm:py-20">
+              <p className="kicker text-accent">A oferta</p>
+              <h2 className="display-title mt-3 text-2xl leading-[1.1] text-cream sm:text-3xl">
+                Isso é o que você recebe.
+              </h2>
+              <p className="mt-4 max-w-2xl text-sm leading-6 text-cream/60">
+                Depois de ver como a leitura funciona, aqui está exatamente o
+                que está incluso.
+              </p>
+              <p className="mt-3 max-w-2xl text-sm leading-6 text-cream/60">
+                Você não paga para saber uma nota. O score é só o ponto de
+                partida — você paga para entender por que ele é esse, o que
+                está causando isso e como corrigir.
+              </p>
+              <div className="mt-8">
+                <PricingCard />
+              </div>
             </div>
           </Reveal>
         </section>
@@ -593,22 +598,24 @@ export default function Home() {
               title="Criada por quem já viveu esse problema na prática."
             />
             <p className="mt-4 max-w-2xl text-sm leading-6 text-cream/65">
-              A Metodologia Silas Silva de Diagnóstico Estratégico nasceu da
-              experiência prática de Silas Silva com estratégia de conteúdo,
-              marketing e produção audiovisual — Técnico em Marketing pelo
-              SENAC, com formação também em Mídias Digitais, Branding e
-              Growth, Produção Audiovisual e Fotografia. O problema era
-              sempre o mesmo: perfis que publicam constantemente, mas não
-              conseguem ver com clareza o que funciona, o que trava o
-              resultado e o que deveria mudar primeiro. Disso nasceu a
-              leitura em 8 Dimensões Estratégicas.
+              Silas Silva é Técnico em Marketing pelo SENAC e atua com
+              estratégia de conteúdo, posicionamento digital e produção
+              audiovisual.
             </p>
             <p className="mt-4 max-w-2xl text-sm leading-6 text-cream/65">
-              O Diagnóstico Estratégico de Perfil combina essa metodologia
-              com inteligência artificial para ampliar a profundidade da
-              análise, sem virar resposta genérica. A tecnologia processa a
-              evidência — a metodologia decide o que analisar, como sustentar
-              a conclusão e como transformar diagnóstico em ação.
+              A metodologia surgiu da prática, analisando perfis que
+              produzem conteúdo, mas nem sempre conseguem enxergar o que
+              funciona, o que está limitando seus resultados e o que
+              deveria mudar primeiro.
+            </p>
+            <p className="mt-4 max-w-2xl text-sm leading-6 text-cream/65">
+              Essa experiência foi transformada em uma leitura estruturada
+              por 8 Dimensões Estratégicas, hoje potencializada por
+              inteligência artificial.
+            </p>
+            <p className="mt-4 text-xs font-medium text-cream/40">
+              Marketing · Mídias Digitais · Branding &amp; Growth ·
+              Audiovisual · Fotografia
             </p>
           </Reveal>
         </section>
