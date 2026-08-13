@@ -16,6 +16,7 @@ const rawServerEnvSchema = z.object({
   ANTHROPIC_MODEL: z.string().min(1).default("claude-sonnet-5"),
   MERCADO_PAGO_PUBLIC_KEY: z.string().min(1).optional(),
   MERCADO_PAGO_ACCESS_TOKEN: z.string().min(1).optional(),
+  MERCADO_PAGO_WEBHOOK_SECRET: z.string().min(1).optional(),
 });
 
 const publicEnvSchema = z.object({
@@ -36,6 +37,7 @@ export type ServerEnv = {
   ANTHROPIC_MODEL: string;
   MERCADO_PAGO_PUBLIC_KEY: string | undefined;
   MERCADO_PAGO_ACCESS_TOKEN: string | undefined;
+  MERCADO_PAGO_WEBHOOK_SECRET: string | undefined;
 };
 export type PublicEnv = z.infer<typeof publicEnvSchema>;
 
@@ -69,6 +71,7 @@ export function getServerEnv(): ServerEnv {
     ANTHROPIC_MODEL: env.ANTHROPIC_MODEL,
     MERCADO_PAGO_PUBLIC_KEY: env.MERCADO_PAGO_PUBLIC_KEY,
     MERCADO_PAGO_ACCESS_TOKEN: env.MERCADO_PAGO_ACCESS_TOKEN,
+    MERCADO_PAGO_WEBHOOK_SECRET: env.MERCADO_PAGO_WEBHOOK_SECRET,
   };
 }
 

@@ -60,16 +60,40 @@ vi.mock("@/modules/ai/client", () => ({
 
 const BUCKET = "analysis-assets";
 
+function seedPaidOrder(store: FakeStore, ownerId: string) {
+  const order = seedRow(store, "orders", {
+    user_id: ownerId,
+    status: "paid",
+    amount_cents: 999,
+    currency: "BRL",
+  });
+  seedRow(store, "payments", {
+    order_id: order.id,
+    status: "approved",
+    amount_cents: 999,
+    currency: "BRL",
+  });
+  return order;
+}
+
 function seedRequestWithAsset(
   store: FakeStore,
   ownerId: string,
   extra: Record<string, unknown> = {},
 ) {
+  // Every test in this file predates the payment gate and exercises
+  // something else (ownership, retries, persistence) -- default to an
+  // already-paid order so those tests keep testing what they always
+  // tested. Gate-specific tests opt out by passing order_id explicitly
+  // (including `order_id: null`) via extra.
+  const order = "order_id" in extra ? null : seedPaidOrder(store, ownerId);
+
   const request = seedRow(store, "analysis_requests", {
     user_id: ownerId,
     profile_type: "business",
     instagram_url: "https://instagram.com/acme",
     status: "ready",
+    order_id: order?.id ?? null,
     ...extra,
   });
 
@@ -468,5 +492,71 @@ describe("runDiagnosisAnalysisAction", () => {
     expect(updatedRequest.status).toBe("failed");
 
     expect(harness.store.analysis_results ?? []).toHaveLength(0);
+  });
+
+  describe("payment gate", () => {
+    it("never reaches generateAiDiagnosis for a request with no order at all", async () => {
+      const request = seedRequestWithAsset(harness.store, "user-1", {
+        order_id: null,
+      });
+
+      const digest = await captureRedirectDigest(
+        runDiagnosisAnalysisAction(buildFormData(request.id as string)),
+      );
+
+      expect(digest).toContain(`/app/diagnosticos/${request.id}?erro=`);
+      expect(harness.store.analysis_jobs ?? []).toHaveLength(0);
+      expect(mockStream).not.toHaveBeenCalled();
+      expect(harness.store.analysis_results ?? []).toHaveLength(0);
+    });
+
+    it("never reaches generateAiDiagnosis when the order is not paid", async () => {
+      const order = seedRow(harness.store, "orders", {
+        user_id: "user-1",
+        status: "pending",
+        amount_cents: 999,
+        currency: "BRL",
+      });
+      const request = seedRequestWithAsset(harness.store, "user-1", {
+        order_id: order.id,
+      });
+
+      await captureRedirectDigest(
+        runDiagnosisAnalysisAction(buildFormData(request.id as string)),
+      );
+
+      expect(mockStream).not.toHaveBeenCalled();
+      expect(harness.store.analysis_jobs ?? []).toHaveLength(0);
+    });
+
+    it("blocks a payment approved for a different diagnosis from unlocking this one", async () => {
+      // A second, fully-paid diagnosis exists for the same user.
+      seedRequestWithAsset(harness.store, "user-1");
+
+      // This diagnosis has no order of its own.
+      const request = seedRequestWithAsset(harness.store, "user-1", {
+        order_id: null,
+      });
+
+      await captureRedirectDigest(
+        runDiagnosisAnalysisAction(buildFormData(request.id as string)),
+      );
+
+      expect(mockStream).not.toHaveBeenCalled();
+    });
+
+    it("allows processing once the order is paid with a consistent approved payment", async () => {
+      const request = seedRequestWithAsset(harness.store, "user-1");
+      mockSuccessfulResponse();
+
+      const digest = await captureRedirectDigest(
+        runDiagnosisAnalysisAction(buildFormData(request.id as string)),
+      );
+
+      expect(digest).toContain(`/app/diagnosticos/${request.id}`);
+      expect(digest).not.toContain("erro=");
+      expect(mockStream).toHaveBeenCalledTimes(1);
+      expect(harness.store.analysis_results ?? []).toHaveLength(1);
+    });
   });
 });

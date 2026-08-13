@@ -404,10 +404,14 @@ async function createInitialAnalysisJob(params: {
     return job.id;
   }
 
+  // Production path (fixtures off): the diagnosis is complete but not
+  // processed -- it waits for a confirmed payment before
+  // assertDiagnosisCanBeProcessed() will ever allow generateAiDiagnosis to
+  // run. See src/modules/billing/gate.ts.
   const { error: updateError } = await admin
     .from("analysis_requests")
     .update({
-      status: "ready" satisfies AnalysisStatus,
+      status: "waiting_payment" satisfies AnalysisStatus,
     })
     .eq("id", params.analysisRequestId);
 
@@ -747,10 +751,11 @@ export async function createDiagnosisFromForm(formData: FormData) {
         profileType: briefing.profileType,
       });
     } else {
+      // Same production-path gate as completePreparedDiagnosisUpload above.
       const { error: updateError } = await admin
         .from("analysis_requests")
         .update({
-          status: "ready" satisfies AnalysisStatus,
+          status: "waiting_payment" satisfies AnalysisStatus,
         })
         .eq("id", request.id);
 

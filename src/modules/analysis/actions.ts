@@ -7,6 +7,10 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { generateAiDiagnosis } from "@/modules/ai/run-analysis";
 import type { UploadCandidate } from "@/modules/assets/validation";
 import { requireUser } from "@/modules/auth/session";
+import {
+  assertDiagnosisCanBeProcessed,
+  PaymentRequiredError,
+} from "@/modules/billing/gate";
 
 import {
   completePreparedDiagnosisUpload,
@@ -103,7 +107,10 @@ export async function runDiagnosisAnalysisAction(formData: FormData) {
   // Ownership is checked explicitly here (not via RLS): this write path uses
   // the service-role client, which bypasses RLS by design. Without this
   // check a crafted requestId from another user's diagnosis would let this
-  // action analyze someone else's private evidence.
+  // action analyze someone else's private evidence. This also keeps a
+  // non-owner's redirect generic (the list page, never revealing whether
+  // requestId exists) -- the payment gate below only runs once ownership
+  // is already confirmed, so its own redirect can safely be specific.
   const { data: request, error: requestError } = await admin
     .from("analysis_requests")
     .select("id, user_id")
@@ -112,6 +119,30 @@ export async function runDiagnosisAnalysisAction(formData: FormData) {
 
   if (requestError || !request || request.user_id !== user.id) {
     redirect("/app/diagnosticos");
+  }
+
+  // The payment gate is the single, centralized authorization check for
+  // this action -- it re-derives ownership, order, and payment state
+  // entirely server-side (see assertDiagnosisCanBeProcessed's own doc
+  // comment). This must run before any other branch that could reach
+  // generateAiDiagnosis; it is intentionally not just a UI-level check,
+  // since this Server Action is directly callable regardless of what the
+  // page renders.
+  try {
+    await assertDiagnosisCanBeProcessed(requestId, user.id);
+  } catch (error) {
+    if (error instanceof PaymentRequiredError) {
+      console.error(
+        `[billing] blocked analysis for request ${requestId}:`,
+        error.message,
+      );
+      redirect(
+        `/app/diagnosticos/${requestId}?erro=${encodeURIComponent(
+          "Pagamento necessario para liberar esta analise.",
+        )}`,
+      );
+    }
+    throw error;
   }
 
   const { count: processingCount, error: processingError } = await admin

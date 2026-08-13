@@ -67,7 +67,7 @@ describe("createDiagnosisFromForm", () => {
     expect(digest).toContain(`/app/diagnosticos/${request.id}`);
     expect(request.user_id).toBe("user-1");
     expect(request.profile_type).toBe("business");
-    expect(request.status).toBe("ready");
+    expect(request.status).toBe("waiting_payment");
 
     const answers = harness.store.analysis_answers ?? [];
     expect(answers.length).toBeGreaterThan(0);
@@ -170,7 +170,7 @@ describe("createDiagnosisFromForm", () => {
     );
 
     const request = (harness.store.analysis_requests ?? [])[0]!;
-    expect(request.status).toBe("ready");
+    expect(request.status).toBe("waiting_payment");
     expect(harness.store.analysis_results ?? []).toHaveLength(0);
   });
 
@@ -263,7 +263,7 @@ describe("direct browser evidence upload flow", () => {
     );
 
     const updatedRequest = (harness.store.analysis_requests ?? [])[0]!;
-    expect(updatedRequest.status).toBe("ready");
+    expect(updatedRequest.status).toBe("waiting_payment");
 
     const assets = harness.store.analysis_assets ?? [];
     expect(assets).toHaveLength(1);

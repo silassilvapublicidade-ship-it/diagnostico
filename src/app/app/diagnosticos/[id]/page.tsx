@@ -18,8 +18,14 @@ import {
   CONFIDENCE_COPY,
   STATUS_COPY,
 } from "@/modules/analysis/status";
+import {
+  formatPriceDisplay,
+  INITIAL_PRICE_AMOUNT_CENTS,
+} from "@/modules/billing";
+import { startCheckoutAction } from "@/modules/billing/actions";
 
 import { AnalyzeButton } from "./analyze-button";
+import { CheckoutButton } from "./checkout-button";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -47,6 +53,16 @@ export default async function DiagnosisDetailPage({
 
   const query = (await searchParams) ?? {};
   const errorParam = Array.isArray(query.erro) ? query.erro[0] : query.erro;
+  // Mercado Pago's own back_url query params (payment_id/status/etc.) are
+  // never proof of payment -- assertDiagnosisCanBeProcessed and the webhook
+  // are the only things that ever authorize anything. This only decides
+  // which *copy* to show while status is still waiting_payment; it cannot
+  // change what the user is allowed to do.
+  const isReturningFromMercadoPago =
+    diagnosis.request.status === "waiting_payment" &&
+    (query.payment_id !== undefined ||
+      query.collection_id !== undefined ||
+      query.status !== undefined);
 
   const state = STATUS_COPY[diagnosis.request.status];
   const parsedResult = diagnosis.result
@@ -92,26 +108,52 @@ export default async function DiagnosisDetailPage({
         </p>
       ) : null}
 
-      <form
-        action={runDiagnosisAnalysisAction}
-        className="lux-panel flex flex-col gap-3 p-5"
-      >
-        <div className="flex items-center gap-4">
+      {diagnosis.request.status === "waiting_payment" && isReturningFromMercadoPago ? (
+        <section className="lux-panel flex flex-col gap-3 p-5">
+          <div className="flex items-center gap-3">
+            <span className="h-3 w-3 animate-spin rounded-full border-2 border-accent/30 border-t-accent" />
+            <p className="text-base font-black text-cream">Confirmando pagamento...</p>
+          </div>
+          <p className="max-w-md text-sm text-graphite/56">
+            Isso costuma levar poucos instantes. Atualize esta página em
+            breve - a análise é liberada automaticamente assim que o
+            pagamento for confirmado.
+          </p>
+        </section>
+      ) : diagnosis.request.status === "waiting_payment" ? (
+        <form
+          action={startCheckoutAction}
+          className="lux-panel flex flex-col gap-3 p-5"
+        >
           <input name="requestId" type="hidden" value={diagnosis.request.id} />
-          <AnalyzeButton hasResult={Boolean(result)} />
-          {diagnosis.request.status === "processing" ? (
-            <span className="text-sm text-graphite/56">
-              Ja existe uma analise em andamento.
-            </span>
-          ) : null}
-        </div>
-        <p className="max-w-md text-sm text-graphite/56">
-          A leitura pode levar alguns minutos, porque analisamos as evidencias
-          enviadas com cuidado. Nao feche esta pagina - o botao fica
-          desabilitado enquanto a analise roda e o resultado aparece aqui assim
-          que estiver pronto.
-        </p>
-      </form>
+          <CheckoutButton priceLabel={formatPriceDisplay(INITIAL_PRICE_AMOUNT_CENTS)} />
+          <p className="max-w-md text-sm text-graphite/56">
+            Pagamento único, sem assinatura. A análise só é liberada depois
+            da confirmação do pagamento.
+          </p>
+        </form>
+      ) : (
+        <form
+          action={runDiagnosisAnalysisAction}
+          className="lux-panel flex flex-col gap-3 p-5"
+        >
+          <div className="flex items-center gap-4">
+            <input name="requestId" type="hidden" value={diagnosis.request.id} />
+            <AnalyzeButton hasResult={Boolean(result)} />
+            {diagnosis.request.status === "processing" ? (
+              <span className="text-sm text-graphite/56">
+                Ja existe uma analise em andamento.
+              </span>
+            ) : null}
+          </div>
+          <p className="max-w-md text-sm text-graphite/56">
+            A leitura pode levar alguns minutos, porque analisamos as evidencias
+            enviadas com cuidado. Nao feche esta pagina - o botao fica
+            desabilitado enquanto a analise roda e o resultado aparece aqui assim
+            que estiver pronto.
+          </p>
+        </form>
+      )}
 
       {isDevelopmentFixture ? (
         <Callout title="Development fixture">

@@ -14,8 +14,8 @@ export const STATUS_COPY: Record<
     tone: "neutral",
   },
   waiting_payment: {
-    title: "Aguardando liberacao",
-    body: "O pagamento ainda nao faz parte desta fase.",
+    title: "Aguardando pagamento",
+    body: "Confirme o pagamento para liberar a analise deste diagnostico.",
     tone: "info",
   },
   waiting_briefing: {
@@ -29,8 +29,8 @@ export const STATUS_COPY: Record<
     tone: "info",
   },
   ready: {
-    title: "Pronto para processamento",
-    body: "O material foi recebido e esta pronto para a proxima etapa.",
+    title: "Pagamento confirmado",
+    body: "Pronto para processar. Clique abaixo para gerar sua analise.",
     tone: "neutral",
   },
   processing: {

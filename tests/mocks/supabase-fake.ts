@@ -149,19 +149,26 @@ function createQueryBuilder(table: string, store: FakeStore, mode: ClientMode) {
     rangeFrom?: number;
     rangeTo?: number;
     single: boolean;
+    maybeSingle: boolean;
     countMode?: "exact";
     head: boolean;
-  } = { filters: [], orderAsc: true, single: false, head: false };
+  } = {
+    filters: [],
+    orderAsc: true,
+    single: false,
+    maybeSingle: false,
+    head: false,
+  };
 
   function finalizeSelect(rows: FakeRow[]): FakeResult {
-    if (state.single) {
-      if (rows.length !== 1) {
-        return {
-          data: null,
-          error: new Error(
-            rows.length === 0 ? "Row not found" : "Multiple rows returned",
-          ),
-        };
+    if (state.single || state.maybeSingle) {
+      if (rows.length === 0) {
+        return state.maybeSingle
+          ? { data: null, error: null }
+          : { data: null, error: new Error("Row not found") };
+      }
+      if (rows.length > 1) {
+        return { data: null, error: new Error("Multiple rows returned") };
       }
       return { data: { ...rows[0] }, error: null };
     }
@@ -194,7 +201,9 @@ function createQueryBuilder(table: string, store: FakeStore, mode: ClientMode) {
     if (state.op === "update") {
       const matched = applyFilters(rows, state.filters);
       matched.forEach((row) => Object.assign(row, state.payload));
-      return { data: null, error: null };
+      return state.selectAfterWrite !== undefined
+        ? finalizeSelect(matched)
+        : { data: null, error: null };
     }
 
     let visible = applyFilters(rows, state.filters);
@@ -242,7 +251,7 @@ function createQueryBuilder(table: string, store: FakeStore, mode: ClientMode) {
       return builder;
     },
     select(cols?: string, opts?: { count?: "exact"; head?: boolean }) {
-      if (state.op === "insert") {
+      if (state.op === "insert" || state.op === "update") {
         state.selectAfterWrite = cols ?? "*";
         return builder;
       }
@@ -252,6 +261,13 @@ function createQueryBuilder(table: string, store: FakeStore, mode: ClientMode) {
       return builder;
     },
     eq(col: string, val: unknown) {
+      state.filters.push({ kind: "eq", col, val });
+      return builder;
+    },
+    is(col: string, val: unknown) {
+      // Postgrest's IS is a null/true/false exact-match comparator; JS
+      // strict equality already covers those exactly, so it reuses the eq
+      // filter kind rather than needing a fifth branch in matchesFilter.
       state.filters.push({ kind: "eq", col, val });
       return builder;
     },
@@ -291,6 +307,10 @@ function createQueryBuilder(table: string, store: FakeStore, mode: ClientMode) {
     },
     single() {
       state.single = true;
+      return Promise.resolve(execute());
+    },
+    maybeSingle() {
+      state.maybeSingle = true;
       return Promise.resolve(execute());
     },
     then<TResult1 = FakeResult, TResult2 = never>(

@@ -25,14 +25,19 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 
+import {
+  formatPriceDisplay,
+  formatPriceMachine,
+  INITIAL_PRICE_AMOUNT_CENTS,
+} from "@/modules/billing";
+
 import { AmbientBackground, Reveal } from "./landing-motion";
 import { FullResultPreview, HeroResultPreview } from "./landing-result-preview";
 import { SITE_NAME, SITE_URL } from "./site-config";
 
 const PAGE_TITLE =
   "Diagnóstico Estratégico de Perfil no Instagram | Projeto 8D";
-const PAGE_DESCRIPTION =
-  "Descubra o que está travando seu Instagram: score estratégico, pontos críticos com evidência e um plano de ação claro do que mudar. Diagnóstico completo por R$ 99.";
+const PAGE_DESCRIPTION = `Descubra o que está travando seu Instagram: score estratégico, pontos críticos com evidência e um plano de ação claro do que mudar. Diagnóstico completo por R$ ${formatPriceDisplay(INITIAL_PRICE_AMOUNT_CENTS)}.`;
 
 export const metadata: Metadata = {
   title: PAGE_TITLE,
@@ -55,8 +60,8 @@ export const metadata: Metadata = {
   },
 };
 
-// Preco provisorio - sera atualizado quando o valor final for definido.
-const PRICE_NUMBER = "99";
+const PRICE_DISPLAY = formatPriceDisplay(INITIAL_PRICE_AMOUNT_CENTS);
+const PRICE_MACHINE = formatPriceMachine(INITIAL_PRICE_AMOUNT_CENTS);
 
 const OFFER_INCLUDES = [
   "Score Estratégico por dimensão",
@@ -267,7 +272,7 @@ function PricingCard() {
       <span className="pricing-badge">DIAGNÓSTICO COMPLETO</span>
       <div className="pricing-value">
         <span className="pricing-currency">R$</span>
-        <span className="pricing-number">{PRICE_NUMBER}</span>
+        <span className="pricing-number">{PRICE_DISPLAY}</span>
       </div>
       <p className="pricing-sub">pagamento único · sem assinatura</p>
       <ul className="pricing-list">
@@ -301,7 +306,7 @@ export default function Home() {
     serviceType: "Consultoria de estratégia de perfil no Instagram",
     offers: {
       "@type": "Offer",
-      price: PRICE_NUMBER,
+      price: PRICE_MACHINE,
       priceCurrency: "BRL",
       url: SITE_URL,
     },
