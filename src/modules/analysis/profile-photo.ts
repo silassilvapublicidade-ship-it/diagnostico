@@ -5,8 +5,13 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 const STORAGE_BUCKET = "analysis-assets";
 const FETCH_TIMEOUT_MS = 5000;
 const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
-const USER_AGENT =
-  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
+// Instagram only server-renders og:* meta tags for recognized link-preview
+// crawler user agents (the same thing that happens when you paste an IG
+// link into WhatsApp/Slack/Facebook) -- a normal browser UA gets the JS-only
+// shell with no og:image tag at all. Verified directly: identical request,
+// browser UA has zero "og:" tags in the response; this UA has og:image with
+// a working photo URL.
+const USER_AGENT = "facebookexternalhit/1.1";
 const RESERVED_PATH_SEGMENTS = new Set([
   "p",
   "reel",
