@@ -4,8 +4,8 @@ import { profileTypeSchema } from "@/domain/methodology-8d";
 
 export const diagnosisBriefingSchema = z.object({
   profileType: profileTypeSchema,
-  instagramUrl: z.string().trim().url("Informe uma URL valida do perfil."),
-  niche: z.string().trim().min(2, "Conte rapidamente como voce se apresenta."),
+  instagramUrl: z.string().trim().url("Informe uma URL válida do perfil."),
+  niche: z.string().trim().min(2, "Conte rapidamente como você se apresenta."),
   mainObjective: z
     .array(z.string().trim().min(1))
     .min(1, "Selecione ao menos um objetivo."),
@@ -16,7 +16,7 @@ export const diagnosisBriefingSchema = z.object({
 
 export const consentSchema = z.object({
   processingConsent: z.literal("on", {
-    error: "O consentimento de processamento e obrigatorio.",
+    error: "O consentimento de processamento é obrigatório.",
   }),
 });
 

@@ -17,7 +17,7 @@ export function CheckoutButton({ priceLabel }: { priceLabel: string }) {
           Preparando pagamento...
         </>
       ) : (
-        `Pagar R$ ${priceLabel} e liberar analise`
+        `Pagar R$ ${priceLabel} e liberar análise`
       )}
     </button>
   );

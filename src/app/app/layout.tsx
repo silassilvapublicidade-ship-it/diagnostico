@@ -16,7 +16,7 @@ export default async function PrivateLayout({
   return (
     <main className="min-h-screen bg-ink text-cream">
       <div className="mx-auto grid min-h-screen w-full max-w-[1540px] lg:grid-cols-[340px_1fr]">
-        <aside className="relative flex flex-col justify-between gap-10 overflow-hidden border-b border-cream/10 bg-panel-deep px-5 py-5 sm:px-8 lg:min-h-screen lg:border-b-0 lg:border-r lg:px-7 lg:py-8">
+        <aside className="relative flex flex-col justify-between gap-10 overflow-hidden border-b border-cream/10 bg-panel-deep px-5 py-5 sm:px-8 lg:sticky lg:top-0 lg:min-h-screen lg:self-start lg:border-b-0 lg:border-r lg:px-7 lg:py-8">
           <div className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-[radial-gradient(circle_at_20%_0%,rgba(255,90,0,0.22),transparent_17rem)]" />
           <div className="relative">
             <Link className="group block" href="/app">
@@ -45,12 +45,12 @@ export default async function PrivateLayout({
               <p className="mt-4 flex items-baseline gap-3 text-accent">
                 <span className="display-title text-6xl leading-none">8</span>
                 <span className="font-mono text-[11px] font-black uppercase tracking-[0.16em]">
-                  Dimensoes
+                  Dimensões
                 </span>
               </p>
               <p className="mt-4 text-sm leading-6 text-cream/66">
-                O diagnostico cruza evidencia, score, confianca e prioridade de
-                acao sem misturar leitura tecnica com achismo.
+                O diagnóstico cruza evidência, score, confiança e prioridade de
+                ação sem misturar leitura técnica com achismo.
               </p>
             </div>
 
@@ -58,7 +58,7 @@ export default async function PrivateLayout({
 
             <div className="mt-8 border-t border-white/10 pt-6">
               <div className="flex items-center justify-between gap-4">
-                <p className="kicker text-accent">8 Dimensoes Estrategicas</p>
+                <p className="kicker text-accent">8 Dimensões Estratégicas</p>
                 <span className="font-mono text-[10px] font-black text-cream/34">
                   SCORE 8D
                 </span>

@@ -93,7 +93,7 @@ export default async function DiagnosisDetailPage({
   return (
     <div className="space-y-10">
       <header className="dark-panel p-6 text-cream sm:p-8">
-        <p className="kicker text-accent">Dossie estrategico</p>
+        <p className="kicker text-accent">Dossiê estratégico</p>
         <h1 className="display-title mt-4 max-w-4xl text-5xl leading-[0.9] sm:text-6xl">
           {state.title}
         </h1>
@@ -142,14 +142,14 @@ export default async function DiagnosisDetailPage({
             <AnalyzeButton hasResult={Boolean(result)} />
             {diagnosis.request.status === "processing" ? (
               <span className="text-sm text-graphite/56">
-                Ja existe uma analise em andamento.
+                Já existe uma análise em andamento.
               </span>
             ) : null}
           </div>
           <p className="max-w-md text-sm text-graphite/56">
-            A leitura pode levar alguns minutos, porque analisamos as evidencias
-            enviadas com cuidado. Nao feche esta pagina - o botao fica
-            desabilitado enquanto a analise roda e o resultado aparece aqui assim
+            A leitura pode levar alguns minutos, porque analisamos as evidências
+            enviadas com cuidado. Não feche esta página - o botão fica
+            desabilitado enquanto a análise roda e o resultado aparece aqui assim
             que estiver pronto.
           </p>
         </form>
@@ -158,17 +158,17 @@ export default async function DiagnosisDetailPage({
       {isDevelopmentFixture ? (
         <Callout title="Development fixture">
           Este resultado usa fixture de desenvolvimento. Ele valida pipeline,
-          pesos, score, confidence e versionamento; nao e diagnostico real e nao
+          pesos, score, confidence e versionamento; não é diagnóstico real e não
           interpreta screenshots ou briefing.
         </Callout>
       ) : null}
 
       {isTestAnalysis ? (
-        <Callout title="Analise de teste controlado">
-          Este resultado veio de uma chamada real a IA em modo de teste
-          controlado. Nesta fase nao existe cobranca nem entrega comercial -
-          serve para validar a qualidade da leitura antes de qualquer automacao
-          publica.
+        <Callout title="Análise de teste controlado">
+          Este resultado veio de uma chamada real à IA em modo de teste
+          controlado. Nesta fase não existe cobrança nem entrega comercial -
+          serve para validar a qualidade da leitura antes de qualquer automação
+          pública.
         </Callout>
       ) : null}
 
@@ -180,7 +180,7 @@ export default async function DiagnosisDetailPage({
             "pt-BR",
           )}
         />
-        <Metric label="Evidencias" value={String(diagnosis.assets.length)} />
+        <Metric label="Evidências" value={String(diagnosis.assets.length)} />
       </section>
 
       {profileTopAsset ? (
@@ -189,15 +189,15 @@ export default async function DiagnosisDetailPage({
               per-owner evidence served through our own authenticated route,
               not a static/remote asset next/image can optimize. */}
           <img
-            alt="Topo do perfil enviado como evidencia"
+            alt="Topo do perfil enviado como evidência"
             className="w-full max-w-[240px] border border-accent/35"
             src={`/app/diagnosticos/${diagnosis.request.id}/assets/${profileTopAsset.id}`}
           />
           <div>
             <p className="kicker text-accent">Perfil enviado</p>
             <p className="mt-2 max-w-md text-sm leading-6 text-cream/68">
-              Topo do perfil enviado como evidencia - foto e bio ficam aqui como
-              referencia enquanto voce le o diagnostico.
+              Topo do perfil enviado como evidência - foto e bio ficam aqui como
+              referência enquanto você lê o diagnóstico.
             </p>
           </div>
         </section>
@@ -209,35 +209,35 @@ export default async function DiagnosisDetailPage({
             <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
               <ScoreRing score={result.score} />
               <div>
-                <p className="kicker text-accent">Lente estrategica</p>
+                <p className="kicker text-accent">Lente estratégica</p>
                 <h2 className="mt-3 max-w-md text-3xl font-black leading-tight">
-                  O perfil foi lido pelas 8 Dimensoes Estrategicas.
+                  O perfil foi lido pelas 8 Dimensões Estratégicas.
                 </h2>
                 <p className="mt-3 text-sm leading-6 text-cream/58">
                   {result.scoreKind === "complete"
-                    ? "Score completo, com todas as dimensoes consideradas."
-                    : "Score parcial, calculado apenas com dimensoes avaliaveis."}
+                    ? "Score completo, com todas as dimensões consideradas."
+                    : "Score parcial, calculado apenas com dimensões avaliáveis."}
                 </p>
               </div>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <StatusChip
-                label="Classificacao"
+                label="Classificação"
                 value={CLASSIFICATION_COPY[result.classification]}
               />
               <StatusChip
-                label="Confianca"
+                label="Confiança"
                 value={CONFIDENCE_COPY[result.confidence]}
               />
               <StatusChip label="Método" value="Metodologia 8D" />
               <StatusChip
-                label="Versao atual"
+                label="Versão atual"
                 value={currentMethodologyVersion}
               />
               {generatedMethodologyVersion &&
               result.methodologyVersion !== METHODOLOGY_VERSION ? (
                 <StatusChip
-                  label="Registro historico"
+                  label="Registro histórico"
                   value={generatedMethodologyVersion}
                 />
               ) : null}
@@ -252,7 +252,7 @@ export default async function DiagnosisDetailPage({
                     <p className="kicker text-accent">Resumo executivo</p>
                     <p className="mt-4 text-sm leading-6 text-cream/54">
                       A leitura abaixo resume o gargalo central antes do plano
-                      de acao.
+                      de ação.
                     </p>
                   </div>
                   <p className="max-w-4xl text-xl font-semibold leading-9 text-cream/88 sm:text-2xl">
@@ -286,7 +286,7 @@ export default async function DiagnosisDetailPage({
               </div>
 
               <ChecklistCard
-                title="Sugestoes de conteudo"
+                title="Sugestões de conteúdo"
                 items={webPayload.contentSuggestions}
               />
             </section>
@@ -295,12 +295,12 @@ export default async function DiagnosisDetailPage({
           <section>
             <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <p className="kicker text-accent">8 Dimensoes Estrategicas</p>
+                <p className="kicker text-accent">8 Dimensões Estratégicas</p>
                 <h2 className="mt-2 text-4xl font-black">Leitura inicial</h2>
               </div>
               {result.requiresReview ? (
                 <p className="text-sm font-semibold text-accent">
-                  Revisao obrigatoria
+                  Revisão obrigatória
                 </p>
               ) : null}
             </div>
@@ -332,7 +332,7 @@ export default async function DiagnosisDetailPage({
           </section>
 
           {result.reviewReasons.length > 0 ? (
-            <Callout title="Pontos de atencao desta leitura">
+            <Callout title="Pontos de atenção desta leitura">
               <ul className="space-y-2">
                 {result.reviewReasons.map((reason) => (
                   <li key={reason}>{REVIEW_REASON_LABELS[reason] ?? reason}</li>
@@ -343,11 +343,11 @@ export default async function DiagnosisDetailPage({
         </>
       ) : (
         <section className="lux-panel p-6">
-          <h2 className="text-3xl font-black">Resultado ainda nao liberado.</h2>
+          <h2 className="text-3xl font-black">Resultado ainda não liberado.</h2>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-graphite/64">
-            A analise existe, mas ainda nao ha resultado consultavel para o
-            usuario. Isso acontece quando o processamento ainda nao ocorreu ou
-            quando a entrega esta bloqueada por revisao.
+            A análise existe, mas ainda não há resultado consultável para o
+            usuário. Isso acontece quando o processamento ainda não ocorreu ou
+            quando a entrega está bloqueada por revisão.
           </p>
           {diagnosis.request.review_reasons?.length ? (
             <p className="mt-4 text-sm font-semibold text-accent">
@@ -456,7 +456,7 @@ function DimensionCard({
           <div className="flex items-center justify-between gap-3">
             <p className="text-xl font-black">{label}</p>
             <p className="shrink-0 text-sm text-cream/56">
-              {score !== null ? `${score} pontos` : "Evidencia insuficiente"}
+              {score !== null ? `${score} pontos` : "Evidência insuficiente"}
             </p>
           </div>
           <div className="mt-3">
@@ -471,19 +471,19 @@ function DimensionCard({
         {strategicDiagnosis ? (
           <div className="grid gap-3 lg:grid-cols-2">
             <InsightBlock
-              label="Diagnostico"
+              label="Diagnóstico"
               value={strategicDiagnosis.problem}
             />
             <InsightBlock
-              label="Evidencia"
+              label="Evidência"
               value={strategicDiagnosis.evidence}
             />
             <InsightBlock
-              label="Consequencia"
+              label="Consequência"
               value={strategicDiagnosis.consequence}
             />
             <InsightBlock
-              label="Correcao"
+              label="Correção"
               value={strategicDiagnosis.correction}
             />
             <InsightBlock

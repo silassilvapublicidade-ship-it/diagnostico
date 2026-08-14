@@ -439,7 +439,7 @@ describe("runDiagnosisAnalysisAction", () => {
     expect(retryJob.trigger_reason).toBe("retry");
   });
 
-  it("persists analysis_results/scores/reports with tokens and is_test_analysis on success", async () => {
+  it("persists analysis_results/scores/reports with tokens, never marked as a test analysis once payment is confirmed", async () => {
     const request = seedRequestWithAsset(harness.store, "user-1");
     mockSuccessfulResponse();
 
@@ -452,7 +452,10 @@ describe("runDiagnosisAnalysisAction", () => {
     const results = harness.store.analysis_results ?? [];
     expect(results).toHaveLength(1);
     expect(results[0]!.result_origin).toBe("ai_generated");
-    expect(results[0]!.is_test_analysis).toBe(true);
+    // assertDiagnosisCanBeProcessed already confirmed payment before this
+    // code runs, so this is a real delivery -- the "test" banner must never
+    // reach a paying customer.
+    expect(results[0]!.is_test_analysis).toBe(false);
     expect(results[0]!.input_tokens).toBe(4200);
     expect(results[0]!.output_tokens).toBe(1800);
 

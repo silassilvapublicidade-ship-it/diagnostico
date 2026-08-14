@@ -203,9 +203,11 @@ export async function runDiagnosisAnalysisAction(formData: FormData) {
       resultOrigin: "ai_generated",
       rawOutput: generated.rawOutput,
       webPayload: generated.webPayload,
-      // No billing exists yet (Fase 2B) — every real AI analysis run today
-      // is, by definition, a controlled test rather than a paid delivery.
-      isTestAnalysis: true,
+      // assertDiagnosisCanBeProcessed above already confirmed this request
+      // is paid before any of this code runs, so this is a real delivery,
+      // not a controlled test -- the "test" banner must never reach a
+      // paying customer.
+      isTestAnalysis: false,
       usage: generated.usage,
     });
   } catch (error) {

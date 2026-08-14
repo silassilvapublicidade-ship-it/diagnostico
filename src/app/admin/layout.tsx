@@ -14,7 +14,7 @@ export default async function AdminLayout({
   return (
     <main className="min-h-screen bg-ink text-cream">
       <div className="mx-auto grid min-h-screen w-full max-w-[1540px] lg:grid-cols-[280px_1fr]">
-        <aside className="relative flex flex-col justify-between gap-8 overflow-hidden border-b border-cream/10 bg-panel-deep px-5 py-5 sm:px-8 lg:min-h-screen lg:border-b-0 lg:border-r lg:px-6 lg:py-8">
+        <aside className="relative flex flex-col justify-between gap-8 overflow-hidden border-b border-cream/10 bg-panel-deep px-5 py-5 sm:px-8 lg:sticky lg:top-0 lg:min-h-screen lg:self-start lg:border-b-0 lg:border-r lg:px-6 lg:py-8">
           <div>
             <Link className="group block" href="/admin">
               <p className="kicker text-accent">Projeto 8D</p>

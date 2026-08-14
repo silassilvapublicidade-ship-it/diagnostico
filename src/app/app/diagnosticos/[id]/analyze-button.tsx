@@ -17,7 +17,7 @@ export function AnalyzeButton({ hasResult }: { hasResult: boolean }) {
           Analisando...
         </>
       ) : hasResult ? (
-        "Reprocessar analise"
+        "Reprocessar análise"
       ) : (
         "Analisar agora"
       )}

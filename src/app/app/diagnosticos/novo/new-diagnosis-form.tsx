@@ -45,11 +45,11 @@ const steps = [
   },
   {
     label: "Perfil",
-    detail: "O tipo de leitura estrategica.",
+    detail: "O tipo de leitura estratégica.",
   },
   {
-    label: "Apresentacao",
-    detail: "Como voce se posiciona hoje.",
+    label: "Apresentação",
+    detail: "Como você se posiciona hoje.",
   },
   {
     label: "Desafio",
@@ -60,8 +60,8 @@ const steps = [
     detail: "Onde a leitura acontece.",
   },
   {
-    label: "Evidencias",
-    detail: "As provas visuais da analise.",
+    label: "Evidências",
+    detail: "As provas visuais da análise.",
   },
 ];
 
@@ -73,8 +73,8 @@ const MAIN_OBJECTIVE_OPTIONS = [
   },
   {
     icon: Trophy,
-    label: "Ser visto como referencia",
-    description: "Aumentar percepcao de autoridade.",
+    label: "Ser visto como referência",
+    description: "Aumentar percepção de autoridade.",
   },
   {
     icon: TrendingUp,
@@ -89,12 +89,12 @@ const MAIN_OBJECTIVE_OPTIONS = [
   {
     icon: BadgeCheck,
     label: "Deixar meu perfil mais profissional",
-    description: "Organizar presenca, mensagem e prova.",
+    description: "Organizar presença, mensagem e prova.",
   },
   {
     icon: Lightbulb,
-    label: "Criar conteudos melhores",
-    description: "Encontrar temas com funcao estrategica.",
+    label: "Criar conteúdos melhores",
+    description: "Encontrar temas com função estratégica.",
   },
 ] as const satisfies readonly IconOption[];
 
@@ -109,8 +109,8 @@ const PROFILE_CARDS: {
     id: "business",
     value: "business",
     icon: Building2,
-    label: "Tenho uma empresa ou negocio",
-    description: "Leitura orientada para oferta, prova e conversao.",
+    label: "Tenho uma empresa ou negócio",
+    description: "Leitura orientada para oferta, prova e conversão.",
   },
   {
     id: "personal",
@@ -124,40 +124,40 @@ const PROFILE_CARDS: {
     id: "content",
     value: "creator",
     icon: Video,
-    label: "Produzo conteudo para internet",
-    description: "Leitura orientada para narrativa, conteudo e crescimento.",
+    label: "Produzo conteúdo para internet",
+    description: "Leitura orientada para narrativa, conteúdo e crescimento.",
   },
 ];
 
 const MAIN_DIFFICULTY_OPTIONS = [
   {
     icon: EyeOff,
-    label: "Meu perfil nao mostra meu valor",
-    description: "A percepcao de autoridade nao aparece com clareza.",
+    label: "Meu perfil não mostra meu valor",
+    description: "A percepção de autoridade não aparece com clareza.",
   },
   {
     icon: PenLine,
-    label: "Nao sei que conteudo criar",
+    label: "Não sei que conteúdo criar",
     description: "Falta um caminho editorial para decidir pautas.",
   },
   {
     icon: CircleDollarSign,
     label: "Tenho seguidores, mas poucos resultados",
-    description: "A audiencia existe, mas a conversao nao acompanha.",
+    description: "A audiência existe, mas a conversão não acompanha.",
   },
   {
     icon: MessageCircleQuestion,
-    label: "Minha comunicacao esta confusa",
+    label: "Minha comunicação está confusa",
     description: "Oferta, narrativa ou promessa parecem dispersas.",
   },
   {
     icon: Compass,
     label: "Quero me destacar dos concorrentes",
-    description: "A diferenciacao ainda nao esta evidente no perfil.",
+    description: "A diferenciação ainda não está evidente no perfil.",
   },
   {
     icon: MousePointerClick,
-    label: "Nao sei por onde comecar",
+    label: "Não sei por onde começar",
     description: "Precisa de prioridade clara para agir primeiro.",
   },
 ] as const satisfies readonly IconOption[];
@@ -212,7 +212,7 @@ export function NewDiagnosisForm() {
       stepToValidate === 2 &&
       String(formData.get("niche") ?? "").trim().length < 8
     ) {
-      return "Descreva brevemente como voce se apresenta hoje.";
+      return "Descreva brevemente como você se apresenta hoje.";
     }
 
     if (
@@ -231,16 +231,16 @@ export function NewDiagnosisForm() {
           parsedUrl.protocol === "https:" || parsedUrl.protocol === "http:";
 
         if (!isHttpUrl || !parsedUrl.hostname) {
-          return "Informe um link valido do Instagram.";
+          return "Informe um link válido do Instagram.";
         }
       } catch {
-        return "Informe um link valido do Instagram.";
+        return "Informe um link válido do Instagram.";
       }
     }
 
     if (stepToValidate === 5) {
       if (formData.get("processingConsent") !== "on") {
-        return "Autorize o processamento para enviar o diagnostico.";
+        return "Autorize o processamento para enviar o diagnóstico.";
       }
 
       try {
@@ -256,7 +256,7 @@ export function NewDiagnosisForm() {
       } catch (error) {
         return error instanceof Error
           ? error.message
-          : "Envie pelo menos uma evidencia do perfil.";
+          : "Envie pelo menos uma evidência do perfil.";
       }
     }
 
@@ -305,7 +305,7 @@ export function NewDiagnosisForm() {
     setStepError(null);
     setIsSubmitting(true);
     setSubmissionError(null);
-    setSubmissionStatus("Preparando envio seguro das evidencias...");
+    setSubmissionStatus("Preparando envio seguro das evidências...");
 
     try {
       const form = event.currentTarget;
@@ -339,7 +339,7 @@ export function NewDiagnosisForm() {
       preparedRequestId = prepared.data.requestId;
 
       if (prepared.data.uploads.length !== files.length) {
-        throw new Error("Nao foi possivel preparar todos os arquivos.");
+        throw new Error("Não foi possível preparar todos os arquivos.");
       }
 
       const supabase = createSupabaseBrowserClient();
@@ -347,7 +347,7 @@ export function NewDiagnosisForm() {
       for (const [index, file] of files.entries()) {
         const upload = prepared.data.uploads[index]!;
         setSubmissionStatus(
-          `Enviando evidencia ${index + 1} de ${files.length}...`,
+          `Enviando evidência ${index + 1} de ${files.length}...`,
         );
 
         const { error: uploadError } = await supabase.storage
@@ -362,7 +362,7 @@ export function NewDiagnosisForm() {
         }
       }
 
-      setSubmissionStatus("Finalizando diagnostico...");
+      setSubmissionStatus("Finalizando diagnóstico...");
 
       const completed = await completeDiagnosisUploadAction({
         requestId: prepared.data.requestId,
@@ -385,7 +385,7 @@ export function NewDiagnosisForm() {
       const message =
         error instanceof Error
           ? error.message
-          : "Nao foi possivel enviar as evidencias.";
+          : "Não foi possível enviar as evidências.";
 
       if (preparedRequestId) {
         await markDiagnosisUploadFailedAction({
@@ -414,7 +414,7 @@ export function NewDiagnosisForm() {
       <input name="profileType" type="hidden" value={profileType} />
 
       <aside className="diagnostic-rail w-full min-w-0 max-w-full p-5 lg:sticky lg:top-8 lg:self-start">
-        <p className="kicker text-accent">Trilha de decisao</p>
+        <p className="kicker text-accent">Trilha de decisão</p>
         <div className="mt-8">
           <p className="display-title text-5xl leading-none">{progress}%</p>
           <p className="mt-2 text-sm leading-6 text-cream/58">
@@ -477,8 +477,8 @@ export function NewDiagnosisForm() {
           <div className={step === 0 ? "space-y-7" : "hidden"}>
             <StepHeading
               eyebrow="Primeira decisao"
-              title="O que voce quer destravar no seu perfil?"
-              subtitle="Escolha uma ou mais prioridades. O diagnostico usa isso para separar desejo, gargalo e evidencias."
+              title="O que você quer destravar no seu perfil?"
+              subtitle="Escolha uma ou mais prioridades. O diagnóstico usa isso para separar desejo, gargalo e evidências."
             />
             <MarkerCheckboxGroup
               name="mainObjective"
@@ -489,7 +489,7 @@ export function NewDiagnosisForm() {
           <div className={step === 1 ? "space-y-7" : "hidden"}>
             <StepHeading
               eyebrow="Tipo de leitura"
-              title="Qual e o seu perfil?"
+              title="Qual é o seu perfil?"
               subtitle="Essa escolha define os pesos da Metodologia 8D: negócio e criador não são avaliados do mesmo jeito."
             />
             <div className="grid gap-4 sm:grid-cols-3">
@@ -531,8 +531,8 @@ export function NewDiagnosisForm() {
           <div className={step === 2 ? "space-y-7" : "hidden"}>
             <StepHeading
               eyebrow="Posicionamento atual"
-              title="Como voce se apresenta hoje?"
-              subtitle="Escreva como voce explicaria sua oferta para alguem que acabou de chegar no perfil."
+              title="Como você se apresenta hoje?"
+              subtitle="Escreva como você explicaria sua oferta para alguém que acabou de chegar no perfil."
             />
             <TextArea
               label="Fale com suas palavras"
@@ -546,8 +546,8 @@ export function NewDiagnosisForm() {
           <div className={step === 3 ? "space-y-7" : "hidden"}>
             <StepHeading
               eyebrow="Gargalo percebido"
-              title="Qual e o seu maior desafio hoje?"
-              subtitle="Aqui voce aponta o que sente. Depois as evidencias mostram se o perfil confirma ou contradiz essa percepcao."
+              title="Qual é o seu maior desafio hoje?"
+              subtitle="Aqui você aponta o que sente. Depois as evidências mostram se o perfil confirma ou contradiz essa percepção."
             />
             <CheckboxGroup
               name="mainDifficulty"
@@ -573,8 +573,8 @@ export function NewDiagnosisForm() {
           <div className={step === 5 ? "space-y-7" : "hidden"}>
             <StepHeading
               eyebrow="Provas visuais"
-              title="Agora envie as evidencias para analise."
-              subtitle="As imagens sustentam a leitura. Sem evidencia, a metodologia deve assumir limite e reduzir confianca."
+              title="Agora envie as evidências para análise."
+              subtitle="As imagens sustentam a leitura. Sem evidência, a metodologia deve assumir limite e reduzir confiança."
             />
 
             <div className="grid gap-4 sm:grid-cols-2">
@@ -609,9 +609,9 @@ export function NewDiagnosisForm() {
                 type="checkbox"
               />
               <span>
-                Autorizo o processamento dos dados e evidencias enviados para
-                produzir o Diagnostico Estrategico de Perfil, incluindo a
-                leitura por inteligencia artificial, com retencao inicial de 90
+                Autorizo o processamento dos dados e evidências enviados para
+                produzir o Diagnóstico Estratégico de Perfil, incluindo a
+                leitura por inteligência artificial, com retenção inicial de 90
                 dias.
               </span>
             </label>
@@ -620,7 +620,7 @@ export function NewDiagnosisForm() {
               className="action-primary action-accent w-full disabled:cursor-not-allowed disabled:opacity-55 sm:w-auto"
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Enviando..." : "Enviar diagnostico"}
+              {isSubmitting ? "Enviando..." : "Enviar diagnóstico"}
             </button>
 
             {submissionStatus ? (

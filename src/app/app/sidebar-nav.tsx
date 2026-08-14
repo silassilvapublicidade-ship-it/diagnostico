@@ -6,20 +6,20 @@ import { usePathname } from "next/navigation";
 const navItems = [
   {
     href: "/app",
-    label: "Inicio",
-    description: "Visao da sala",
+    label: "Início",
+    description: "Visão da sala",
     index: "01",
   },
   {
     href: "/app/diagnosticos",
-    label: "Meus diagnosticos",
+    label: "Meus diagnósticos",
     description: "Arquivo de leituras",
     index: "02",
   },
   {
     href: "/app/diagnosticos/novo",
-    label: "Novo diagnostico",
-    description: "Briefing e evidencias",
+    label: "Novo diagnóstico",
+    description: "Briefing e evidências",
     index: "03",
   },
 ];

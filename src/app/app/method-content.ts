@@ -1,10 +1,10 @@
 export const diagnosticDimensions = [
   { code: "POS", label: "Posicionamento" },
-  { code: "IMP", label: "Primeira Impressao" },
+  { code: "IMP", label: "Primeira Impressão" },
   { code: "AUT", label: "Autoridade" },
-  { code: "CON", label: "Conteudo" },
+  { code: "CON", label: "Conteúdo" },
   { code: "IDE", label: "Identidade" },
-  { code: "CVR", label: "Conversao" },
+  { code: "CVR", label: "Conversão" },
   { code: "REL", label: "Relacionamento" },
   { code: "OPR", label: "Oportunidades" },
 ] as const;

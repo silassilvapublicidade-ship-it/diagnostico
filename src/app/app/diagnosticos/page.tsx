@@ -12,20 +12,20 @@ export default async function DiagnosesPage() {
     <div className="space-y-8">
       <header className="dark-panel flex flex-col gap-6 p-6 text-cream sm:p-8 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <p className="kicker text-accent">Meus diagnosticos</p>
+          <p className="kicker text-accent">Meus diagnósticos</p>
           <h1 className="display-title mt-4 max-w-2xl text-5xl leading-[0.9] sm:text-6xl">
-            Arquivo de leituras estrategicas.
+            Arquivo de leituras estratégicas.
           </h1>
           <p className="mt-5 max-w-xl text-sm leading-6 text-cream/68">
-            Cada envio preserva contexto, evidencias, score e historico para
-            comparacao futura.
+            Cada envio preserva contexto, evidências, score e histórico para
+            comparação futura.
           </p>
         </div>
         <Link
           className="action-primary action-accent"
           href="/app/diagnosticos/novo"
         >
-          Novo diagnostico
+          Novo diagnóstico
         </Link>
       </header>
 
@@ -34,8 +34,8 @@ export default async function DiagnosesPage() {
           <p className="kicker text-accent">Sem registros</p>
           <h2 className="mt-4 text-3xl font-black">Nada enviado ainda.</h2>
           <p className="mt-3 max-w-xl text-sm leading-6 text-graphite/64">
-            O primeiro diagnostico cria o briefing, registra evidencias privadas
-            e prepara o pipeline para a futura camada de inteligencia.
+            O primeiro diagnóstico cria o briefing, registra evidências privadas
+            e prepara o pipeline para a futura camada de inteligência.
           </p>
         </section>
       ) : (
@@ -52,7 +52,7 @@ export default async function DiagnosesPage() {
               <div>
                 <p className="kicker text-graphite/46">
                   {diagnosis.profile_type === "business"
-                    ? "Negocio"
+                    ? "Negócio"
                     : "Criador"}
                 </p>
                 <h2 className="mt-2 text-2xl font-black">
@@ -68,7 +68,7 @@ export default async function DiagnosesPage() {
                 </p>
                 {diagnosis.requires_review ? (
                   <p className="mt-2 font-semibold text-accent">
-                    Revisao necessaria
+                    Revisão necessária
                   </p>
                 ) : null}
               </div>

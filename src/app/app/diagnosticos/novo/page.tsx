@@ -16,19 +16,19 @@ export default async function NewDiagnosisPage({ searchParams }: PageProps) {
       <header className="dark-panel w-full max-w-full overflow-hidden p-6 sm:p-8 lg:p-10">
         <div className="grid min-w-0 gap-8 lg:grid-cols-[1fr_18rem] lg:items-end">
           <div className="min-w-0">
-            <p className="kicker text-accent">Novo diagnostico</p>
+            <p className="kicker text-accent">Novo diagnóstico</p>
             <h1 className="display-title mt-4 max-w-[19rem] text-[2.25rem] leading-[0.94] sm:max-w-4xl sm:text-6xl lg:text-7xl">
               Briefing para encontrar o gargalo.
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-7 text-cream/70">
-              Uma sessao curta para reunir contexto e materiais antes da leitura
-              nas 8 dimensoes estrategicas.
+              Uma sessão curta para reunir contexto e materiais antes da leitura
+              nas 8 dimensões estratégicas.
             </p>
           </div>
           <div className="rounded-lg border border-accent/35 bg-accent/10 p-5">
             <p className="kicker text-accent">Entrada certa</p>
             <p className="mt-3 text-sm leading-6 text-cream/72">
-              O diagnostico fica mais forte quando objetivo, perfil, evidencias
+              O diagnóstico fica mais forte quando objetivo, perfil, evidências
               visuais e link conversam entre si.
             </p>
           </div>
@@ -36,9 +36,9 @@ export default async function NewDiagnosisPage({ searchParams }: PageProps) {
         <div className="hairline mt-8" />
         <div className="mt-5">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-            <p className="kicker text-accent">8 Dimensoes avaliadas</p>
+            <p className="kicker text-accent">8 Dimensões avaliadas</p>
             <p className="font-mono text-[10px] font-black uppercase tracking-[0.16em] text-cream/42">
-              score + confianca + evidencia
+              score + confiança + evidência
             </p>
           </div>
           <div className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
