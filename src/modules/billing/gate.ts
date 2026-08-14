@@ -1,5 +1,6 @@
 import "server-only";
 
+import { getServerEnv } from "@/lib/env";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 /**
@@ -8,6 +9,37 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
  * are handled in run-analysis.ts: logged in detail, generic message shown).
  */
 export class PaymentRequiredError extends Error {}
+
+/**
+ * Narrow, explicit test-account carve-out. Deliberately NOT used inside
+ * assertDiagnosisCanBeProcessed itself, which stays a pure, unconditional
+ * check for every real customer -- callers that want to let a specific,
+ * already-authenticated test account skip payment must check this
+ * themselves at the call site (see persistence.ts and analysis/actions.ts)
+ * and decide what to do. Matches only the verified Supabase Auth session
+ * email (never anything the browser could send/forge). Empty allowlist by
+ * default -- PAYMENT_BYPASS_TEST_EMAILS must be explicitly set.
+ *
+ * Fails closed: if the environment can't even be read, this returns false
+ * (payment still required) rather than throwing -- a config problem must
+ * never crash the request or, worse, be handled in a way that ends up
+ * skipping payment for someone it shouldn't.
+ */
+export function isPaymentBypassTestAccount(
+  email: string | null | undefined,
+): boolean {
+  if (!email) {
+    return false;
+  }
+
+  try {
+    return getServerEnv().PAYMENT_BYPASS_TEST_EMAILS.includes(
+      email.toLowerCase(),
+    );
+  } catch {
+    return false;
+  }
+}
 
 /**
  * The single, centralized authorization check for running a real analysis.

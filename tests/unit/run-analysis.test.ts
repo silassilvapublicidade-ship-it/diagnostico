@@ -561,5 +561,43 @@ describe("runDiagnosisAnalysisAction", () => {
       expect(mockStream).toHaveBeenCalledTimes(1);
       expect(harness.store.analysis_results ?? []).toHaveLength(1);
     });
+
+    it("an allowlisted test account skips the gate entirely, even with no order at all", async () => {
+      // isPaymentBypassTestAccount is not mocked here, so it makes a real
+      // getServerEnv() call -- needs its own required env vars stubbed.
+      vi.stubEnv("SUPABASE_SERVICE_ROLE_KEY", "test-service-role-key");
+      vi.stubEnv("SUPABASE_URL", "https://example.supabase.co");
+      vi.stubEnv("SUPABASE_ANON_KEY", "test-anon-key");
+      vi.stubEnv("PAYMENT_BYPASS_TEST_EMAILS", "bypass-user@example.com");
+      harness.userId = "bypass-user";
+      const request = seedRequestWithAsset(harness.store, "bypass-user", {
+        order_id: null,
+      });
+      mockSuccessfulResponse();
+
+      const digest = await captureRedirectDigest(
+        runDiagnosisAnalysisAction(buildFormData(request.id as string)),
+      );
+
+      expect(digest).toContain(`/app/diagnosticos/${request.id}`);
+      expect(digest).not.toContain("erro=");
+      expect(mockStream).toHaveBeenCalledTimes(1);
+    });
+
+    it("a non-allowlisted account with the same missing order is still blocked", async () => {
+      vi.stubEnv("PAYMENT_BYPASS_TEST_EMAILS", "bypass-user@example.com");
+      // "user-1" (the default harness identity) is deliberately not on the
+      // allowlist -- confirms the bypass never leaks beyond the exact
+      // configured email.
+      const request = seedRequestWithAsset(harness.store, "user-1", {
+        order_id: null,
+      });
+
+      await captureRedirectDigest(
+        runDiagnosisAnalysisAction(buildFormData(request.id as string)),
+      );
+
+      expect(mockStream).not.toHaveBeenCalled();
+    });
   });
 });

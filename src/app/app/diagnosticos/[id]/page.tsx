@@ -13,6 +13,7 @@ import {
   REVIEW_REASON_LABELS,
 } from "@/modules/analysis/labels";
 import { getDiagnosis } from "@/modules/analysis/persistence";
+import { extractInstagramUsername } from "@/modules/analysis/profile-photo";
 import {
   CLASSIFICATION_COPY,
   CONFIDENCE_COPY,
@@ -89,11 +90,29 @@ export default async function DiagnosisDetailPage({
       asset.asset_type === "profile_top" &&
       asset.mime_type.startsWith("image/"),
   );
+  const instagramUsername = diagnosis.request.instagram_url
+    ? extractInstagramUsername(diagnosis.request.instagram_url)
+    : null;
 
   return (
     <div className="space-y-10">
       <header className="dark-panel p-6 text-cream sm:p-8">
-        <p className="kicker text-accent">Dossiê estratégico</p>
+        <div className="flex items-center gap-4">
+          {diagnosis.request.profile_photo_storage_path ? (
+            // eslint-disable-next-line @next/next/no-img-element -- private, per-owner file served through our own authenticated route, not a static/remote asset next/image can optimize.
+            <img
+              alt="Foto do perfil analisado"
+              className="h-14 w-14 shrink-0 rounded-full border border-accent/40 object-cover"
+              src={`/app/diagnosticos/${diagnosis.request.id}/profile-photo`}
+            />
+          ) : null}
+          <div>
+            <p className="kicker text-accent">Dossiê estratégico</p>
+            {instagramUsername ? (
+              <p className="mt-1 text-sm text-cream/50">@{instagramUsername}</p>
+            ) : null}
+          </div>
+        </div>
         <h1 className="display-title mt-4 max-w-4xl text-5xl leading-[0.9] sm:text-6xl">
           {state.title}
         </h1>
@@ -108,16 +127,19 @@ export default async function DiagnosisDetailPage({
         </p>
       ) : null}
 
-      {diagnosis.request.status === "waiting_payment" && isReturningFromMercadoPago ? (
+      {diagnosis.request.status === "waiting_payment" &&
+      isReturningFromMercadoPago ? (
         <section className="lux-panel flex flex-col gap-3 p-5">
           <div className="flex items-center gap-3">
             <span className="h-3 w-3 animate-spin rounded-full border-2 border-accent/30 border-t-accent" />
-            <p className="text-base font-black text-cream">Confirmando pagamento...</p>
+            <p className="text-base font-black text-cream">
+              Confirmando pagamento...
+            </p>
           </div>
           <p className="max-w-md text-sm text-graphite/56">
-            Isso costuma levar poucos instantes. Atualize esta página em
-            breve - a análise é liberada automaticamente assim que o
-            pagamento for confirmado.
+            Isso costuma levar poucos instantes. Atualize esta página em breve -
+            a análise é liberada automaticamente assim que o pagamento for
+            confirmado.
           </p>
         </section>
       ) : diagnosis.request.status === "waiting_payment" ? (
@@ -126,10 +148,12 @@ export default async function DiagnosisDetailPage({
           className="lux-panel flex flex-col gap-3 p-5"
         >
           <input name="requestId" type="hidden" value={diagnosis.request.id} />
-          <CheckoutButton priceLabel={formatPriceDisplay(INITIAL_PRICE_AMOUNT_CENTS)} />
+          <CheckoutButton
+            priceLabel={formatPriceDisplay(INITIAL_PRICE_AMOUNT_CENTS)}
+          />
           <p className="max-w-md text-sm text-graphite/56">
-            Pagamento único, sem assinatura. A análise só é liberada depois
-            da confirmação do pagamento.
+            Pagamento único, sem assinatura. A análise só é liberada depois da
+            confirmação do pagamento.
           </p>
         </form>
       ) : (
@@ -138,7 +162,11 @@ export default async function DiagnosisDetailPage({
           className="lux-panel flex flex-col gap-3 p-5"
         >
           <div className="flex items-center gap-4">
-            <input name="requestId" type="hidden" value={diagnosis.request.id} />
+            <input
+              name="requestId"
+              type="hidden"
+              value={diagnosis.request.id}
+            />
             <AnalyzeButton hasResult={Boolean(result)} />
             {diagnosis.request.status === "processing" ? (
               <span className="text-sm text-graphite/56">
@@ -149,8 +177,8 @@ export default async function DiagnosisDetailPage({
           <p className="max-w-md text-sm text-graphite/56">
             A leitura pode levar alguns minutos, porque analisamos as evidências
             enviadas com cuidado. Não feche esta página - o botão fica
-            desabilitado enquanto a análise roda e o resultado aparece aqui assim
-            que estiver pronto.
+            desabilitado enquanto a análise roda e o resultado aparece aqui
+            assim que estiver pronto.
           </p>
         </form>
       )}

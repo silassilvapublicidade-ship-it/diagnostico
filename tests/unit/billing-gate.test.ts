@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { seedRow, type FakeStore } from "../mocks/supabase-fake";
 import { resetFakeStore } from "../mocks/persistence-harness";
@@ -194,5 +194,74 @@ describe("assertDiagnosisCanBeProcessed", () => {
     // rather than exercising new behavior.
     const { assertDiagnosisCanBeProcessed } = await import("@/modules/billing/gate");
     expect(assertDiagnosisCanBeProcessed.length).toBe(2);
+  });
+});
+
+describe("isPaymentBypassTestAccount", () => {
+  beforeEach(() => {
+    vi.stubEnv("SUPABASE_SERVICE_ROLE_KEY", "test-service-role-key");
+    vi.stubEnv("SUPABASE_URL", "https://example.supabase.co");
+    vi.stubEnv("SUPABASE_ANON_KEY", "test-anon-key");
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it("returns false for everyone when the allowlist is unset (default, safe state)", async () => {
+    const { isPaymentBypassTestAccount } = await import(
+      "@/modules/billing/gate"
+    );
+
+    expect(
+      isPaymentBypassTestAccount("silassilva.publicidade@gmail.com"),
+    ).toBe(false);
+  });
+
+  it("returns true only for an allowlisted email, case-insensitively", async () => {
+    vi.stubEnv(
+      "PAYMENT_BYPASS_TEST_EMAILS",
+      "Silassilva.Publicidade@gmail.com",
+    );
+
+    const { isPaymentBypassTestAccount } = await import(
+      "@/modules/billing/gate"
+    );
+
+    expect(
+      isPaymentBypassTestAccount("silassilva.publicidade@gmail.com"),
+    ).toBe(true);
+    expect(isPaymentBypassTestAccount("someone.else@example.com")).toBe(
+      false,
+    );
+  });
+
+  it("supports a comma-separated allowlist without matching partial/substring emails", async () => {
+    vi.stubEnv(
+      "PAYMENT_BYPASS_TEST_EMAILS",
+      "a@example.com, silassilva.publicidade@gmail.com ,b@example.com",
+    );
+
+    const { isPaymentBypassTestAccount } = await import(
+      "@/modules/billing/gate"
+    );
+
+    expect(
+      isPaymentBypassTestAccount("silassilva.publicidade@gmail.com"),
+    ).toBe(true);
+    expect(
+      isPaymentBypassTestAccount("notsilassilva.publicidade@gmail.com"),
+    ).toBe(false);
+  });
+
+  it("returns false for null/undefined without throwing", async () => {
+    vi.stubEnv("PAYMENT_BYPASS_TEST_EMAILS", "test@example.com");
+
+    const { isPaymentBypassTestAccount } = await import(
+      "@/modules/billing/gate"
+    );
+
+    expect(isPaymentBypassTestAccount(null)).toBe(false);
+    expect(isPaymentBypassTestAccount(undefined)).toBe(false);
   });
 });

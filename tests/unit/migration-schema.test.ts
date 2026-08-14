@@ -26,6 +26,13 @@ const adminFoundationsMigration = readFileSync(
   ),
   "utf8",
 );
+const profilePhotoMigration = readFileSync(
+  new URL(
+    "../../supabase/migrations/0007_add_profile_photo.sql",
+    import.meta.url,
+  ),
+  "utf8",
+);
 
 describe("initial Supabase migration", () => {
   it("declares the expected enums, tables, function, triggers, indexes, and policies", () => {
@@ -193,21 +200,15 @@ describe("initial Supabase migration", () => {
     expect(adminFoundationsMigration).toContain(
       "create or replace function public.handle_new_user()",
     );
-    expect(adminFoundationsMigration).toContain(
-      "after insert on auth.users",
-    );
+    expect(adminFoundationsMigration).toContain("after insert on auth.users");
     expect(adminFoundationsMigration).toContain(
       "create or replace function public.handle_user_identity_update()",
     );
-    expect(adminFoundationsMigration).toContain(
-      "after update on auth.users",
-    );
+    expect(adminFoundationsMigration).toContain("after update on auth.users");
     expect(adminFoundationsMigration).toContain(
       "new.email is distinct from old.email",
     );
-    expect(adminFoundationsMigration).toContain(
-      "security definer",
-    );
+    expect(adminFoundationsMigration).toContain("security definer");
     expect(adminFoundationsMigration).toContain(
       "insert into public.profiles (id, full_name, email)\nselect id, raw_user_meta_data ->> 'full_name', email\nfrom auth.users",
     );
@@ -227,6 +228,17 @@ describe("initial Supabase migration", () => {
 
     expect(adminFoundationsMigration).not.toContain("drop table");
     expect(adminFoundationsMigration).not.toContain("drop policy");
-    expect(adminFoundationsMigration).not.toContain("alter table public.profiles\n  alter column");
+    expect(adminFoundationsMigration).not.toContain(
+      "alter table public.profiles\n  alter column",
+    );
+  });
+
+  it("adds nullable profile photo columns to analysis_requests without touching other tables", () => {
+    expect(profilePhotoMigration).toContain(
+      "alter table public.analysis_requests\n  add column profile_photo_storage_path text,\n  add column profile_photo_mime_type text;",
+    );
+    expect(profilePhotoMigration).not.toContain("not null");
+    expect(profilePhotoMigration).not.toContain("drop table");
+    expect(profilePhotoMigration).not.toContain("drop policy");
   });
 });

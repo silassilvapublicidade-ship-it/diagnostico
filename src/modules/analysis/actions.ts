@@ -9,6 +9,7 @@ import type { UploadCandidate } from "@/modules/assets/validation";
 import { requireUser } from "@/modules/auth/session";
 import {
   assertDiagnosisCanBeProcessed,
+  isPaymentBypassTestAccount,
   PaymentRequiredError,
 } from "@/modules/billing/gate";
 
@@ -127,22 +128,26 @@ export async function runDiagnosisAnalysisAction(formData: FormData) {
   // comment). This must run before any other branch that could reach
   // generateAiDiagnosis; it is intentionally not just a UI-level check,
   // since this Server Action is directly callable regardless of what the
-  // page renders.
-  try {
-    await assertDiagnosisCanBeProcessed(requestId, user.id);
-  } catch (error) {
-    if (error instanceof PaymentRequiredError) {
-      console.error(
-        `[billing] blocked analysis for request ${requestId}:`,
-        error.message,
-      );
-      redirect(
-        `/app/diagnosticos/${requestId}?erro=${encodeURIComponent(
-          "Pagamento necessario para liberar esta analise.",
-        )}`,
-      );
+  // page renders. The one exception is an explicitly allowlisted test
+  // account (isPaymentBypassTestAccount) -- see the matching skip in
+  // persistence.ts's createInitialAnalysisJob.
+  if (!isPaymentBypassTestAccount(user.email)) {
+    try {
+      await assertDiagnosisCanBeProcessed(requestId, user.id);
+    } catch (error) {
+      if (error instanceof PaymentRequiredError) {
+        console.error(
+          `[billing] blocked analysis for request ${requestId}:`,
+          error.message,
+        );
+        redirect(
+          `/app/diagnosticos/${requestId}?erro=${encodeURIComponent(
+            "Pagamento necessario para liberar esta analise.",
+          )}`,
+        );
+      }
+      throw error;
     }
-    throw error;
   }
 
   const { count: processingCount, error: processingError } = await admin

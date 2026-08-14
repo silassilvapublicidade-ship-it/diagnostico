@@ -46,6 +46,13 @@ vi.mock("@/modules/auth/session", () => ({
   },
 }));
 
+// This module makes a real network call by design (see its own doc
+// comment) -- never let a unit test touch the real network. Its behavior is
+// covered on its own in profile-photo.test.ts.
+vi.mock("@/modules/analysis/profile-photo", () => ({
+  fetchAndStoreProfilePhotoBestEffort: vi.fn(async () => {}),
+}));
+
 describe("createDiagnosisFromForm", () => {
   beforeEach(() => {
     resetFakeStore(harness.store);
@@ -275,6 +282,50 @@ describe("direct browser evidence upload flow", () => {
     const jobs = harness.store.analysis_jobs ?? [];
     expect(jobs).toHaveLength(1);
     expect(jobs[0]!.status).toBe("ready");
+  });
+
+  it("skips straight to ready (no waiting_payment) for an allowlisted test account", async () => {
+    // isPaymentBypassTestAccount is not mocked in this file (unlike
+    // createSupabaseAdminClient/createSupabaseServerClient), so it makes a
+    // real getServerEnv() call -- needs its own required env vars stubbed.
+    vi.stubEnv("SUPABASE_SERVICE_ROLE_KEY", "test-service-role-key");
+    vi.stubEnv("SUPABASE_URL", "https://example.supabase.co");
+    vi.stubEnv("SUPABASE_ANON_KEY", "test-anon-key");
+    vi.stubEnv("PAYMENT_BYPASS_TEST_EMAILS", "user-1@example.com");
+
+    const metadata = buildBusinessFormData();
+    metadata.delete("asset_profile_top");
+
+    const prepared = await prepareDiagnosisUploadFromForm(metadata, [
+      {
+        assetType: "profile_top",
+        name: "print-celular.jpg",
+        type: "image/jpeg",
+        size: 4 * 1024 * 1024,
+      },
+    ]);
+
+    harness.store.__storage = [
+      {
+        bucket: prepared.uploads[0]!.storageBucket,
+        path: prepared.uploads[0]!.storagePath,
+      },
+    ];
+
+    await completePreparedDiagnosisUpload({
+      requestId: prepared.requestId,
+      assets: prepared.uploads.map((upload) => ({
+        assetType: upload.assetType,
+        storageBucket: upload.storageBucket,
+        storagePath: upload.storagePath,
+        originalFilename: upload.originalFilename,
+        mimeType: upload.mimeType,
+        fileSizeBytes: upload.fileSizeBytes,
+      })),
+    });
+
+    const updatedRequest = (harness.store.analysis_requests ?? [])[0]!;
+    expect(updatedRequest.status).toBe("ready");
   });
 });
 

@@ -10,6 +10,7 @@ import {
 } from "@/domain/methodology-8d";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { isPaymentBypassTestAccount } from "@/modules/billing/gate";
 import {
   collectUploadCandidates,
   getFileAssetType,
@@ -29,6 +30,7 @@ import {
   buildDevelopmentFixtureResult,
   isDevelopmentFixturesEnabled,
 } from "./development-fixture";
+import { fetchAndStoreProfilePhotoBestEffort } from "./profile-photo";
 import type { ResultOrigin } from "./result-origin";
 
 const STORAGE_BUCKET = "analysis-assets";
@@ -59,6 +61,7 @@ export type DiagnosisDetail = {
   request: DiagnosisListItem & {
     instagram_url: string | null;
     review_reasons: string[];
+    profile_photo_storage_path: string | null;
   };
   result: {
     id: string;
@@ -372,6 +375,7 @@ async function persistUploads(params: {
 async function createInitialAnalysisJob(params: {
   analysisRequestId: string;
   profileType: ProfileType;
+  bypassPayment: boolean;
 }) {
   const admin = createSupabaseAdminClient();
   const fixturesEnabled = isDevelopmentFixturesEnabled(process.env);
@@ -407,11 +411,16 @@ async function createInitialAnalysisJob(params: {
   // Production path (fixtures off): the diagnosis is complete but not
   // processed -- it waits for a confirmed payment before
   // assertDiagnosisCanBeProcessed() will ever allow generateAiDiagnosis to
-  // run. See src/modules/billing/gate.ts.
+  // run. See src/modules/billing/gate.ts. The one exception is an
+  // explicitly allowlisted test account (isPaymentBypassTestAccount): it
+  // goes straight to "ready" as if payment already happened, matching the
+  // same account's gate skip in runDiagnosisAnalysisAction.
   const { error: updateError } = await admin
     .from("analysis_requests")
     .update({
-      status: "waiting_payment" satisfies AnalysisStatus,
+      status: (params.bypassPayment
+        ? "ready"
+        : "waiting_payment") satisfies AnalysisStatus,
     })
     .eq("id", params.analysisRequestId);
 
@@ -458,6 +467,16 @@ export async function prepareDiagnosisUploadFromForm(
   if (requestError || !request) {
     throw requestError ?? new Error("Nao foi possivel criar o diagnostico.");
   }
+
+  // Best-effort, awaited so it actually runs before this serverless
+  // invocation ends, but never allowed to fail or slow down submission
+  // meaningfully -- see fetchAndStoreProfilePhotoBestEffort's own doc
+  // comment for why this can never throw.
+  await fetchAndStoreProfilePhotoBestEffort({
+    requestId: request.id,
+    userId: user.id,
+    instagramUrl: briefing.instagramUrl,
+  });
 
   try {
     const answerRows = toAnswerRows(briefing).map((row) => ({
@@ -603,6 +622,7 @@ export async function completePreparedDiagnosisUpload(params: {
     await createInitialAnalysisJob({
       analysisRequestId: request.id,
       profileType: request.profile_type,
+      bypassPayment: isPaymentBypassTestAccount(user.email),
     });
 
     return {
@@ -822,7 +842,7 @@ export async function getDiagnosis(
   const { data: request, error: requestError } = await supabase
     .from("analysis_requests")
     .select(
-      "id, profile_type, instagram_url, status, requires_review, review_reasons, created_at, completed_at",
+      "id, profile_type, instagram_url, status, requires_review, review_reasons, created_at, completed_at, profile_photo_storage_path",
     )
     .eq("id", id)
     .single();

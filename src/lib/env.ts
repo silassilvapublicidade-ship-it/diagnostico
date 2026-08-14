@@ -17,6 +17,7 @@ const rawServerEnvSchema = z.object({
   MERCADO_PAGO_PUBLIC_KEY: z.string().min(1).optional(),
   MERCADO_PAGO_ACCESS_TOKEN: z.string().min(1).optional(),
   MERCADO_PAGO_WEBHOOK_SECRET: z.string().min(1).optional(),
+  PAYMENT_BYPASS_TEST_EMAILS: z.string().optional(),
 });
 
 const publicEnvSchema = z.object({
@@ -38,6 +39,7 @@ export type ServerEnv = {
   MERCADO_PAGO_PUBLIC_KEY: string | undefined;
   MERCADO_PAGO_ACCESS_TOKEN: string | undefined;
   MERCADO_PAGO_WEBHOOK_SECRET: string | undefined;
+  PAYMENT_BYPASS_TEST_EMAILS: string[];
 };
 export type PublicEnv = z.infer<typeof publicEnvSchema>;
 
@@ -72,6 +74,10 @@ export function getServerEnv(): ServerEnv {
     MERCADO_PAGO_PUBLIC_KEY: env.MERCADO_PAGO_PUBLIC_KEY,
     MERCADO_PAGO_ACCESS_TOKEN: env.MERCADO_PAGO_ACCESS_TOKEN,
     MERCADO_PAGO_WEBHOOK_SECRET: env.MERCADO_PAGO_WEBHOOK_SECRET,
+    PAYMENT_BYPASS_TEST_EMAILS: (env.PAYMENT_BYPASS_TEST_EMAILS ?? "")
+      .split(",")
+      .map((email) => email.trim().toLowerCase())
+      .filter(Boolean),
   };
 }
 
