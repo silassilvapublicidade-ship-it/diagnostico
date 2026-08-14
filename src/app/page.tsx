@@ -313,6 +313,7 @@ export default function Home() {
       price: PRICE_MACHINE,
       priceCurrency: "BRL",
       url: SITE_URL,
+      availability: "https://schema.org/InStock",
     },
   };
 
