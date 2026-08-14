@@ -37,7 +37,7 @@ import { SITE_NAME, SITE_URL } from "./site-config";
 
 const PAGE_TITLE =
   "Diagnóstico Estratégico de Perfil no Instagram | Projeto 8D";
-const PAGE_DESCRIPTION = `Descubra o que está travando seu Instagram: score estratégico, pontos críticos com evidência e um plano de ação claro do que mudar. Diagnóstico completo por R$ ${formatPriceDisplay(INITIAL_PRICE_AMOUNT_CENTS)}.`;
+const PAGE_DESCRIPTION = `Descubra o que trava seu Instagram: score estratégico, pontos críticos com evidência e plano de ação em 24h, 7 e 30 dias. Diagnóstico completo por R$ ${formatPriceDisplay(INITIAL_PRICE_AMOUNT_CENTS)}.`;
 
 export const metadata: Metadata = {
   title: PAGE_TITLE,
@@ -301,6 +301,17 @@ export default function Home() {
     provider: {
       "@type": "Person",
       name: "Silas Silva",
+      jobTitle: "Criador da Metodologia 8D",
+      description:
+        "Técnico em Marketing pelo SENAC, atua com estratégia de conteúdo, posicionamento digital e produção audiovisual.",
+      knowsAbout: [
+        "Marketing",
+        "Mídias Digitais",
+        "Branding & Growth",
+        "Audiovisual",
+        "Fotografia",
+      ],
+      image: `${SITE_URL}/silassilva.png`,
     },
     areaServed: "BR",
     serviceType: "Consultoria de estratégia de perfil no Instagram",
