@@ -30,7 +30,7 @@ import {
   buildDevelopmentFixtureResult,
   isDevelopmentFixturesEnabled,
 } from "./development-fixture";
-import { fetchAndStoreProfilePhotoBestEffort } from "./profile-photo";
+import { extractProfilePhotoBestEffort } from "./profile-photo";
 import type { ResultOrigin } from "./result-origin";
 
 const STORAGE_BUCKET = "analysis-assets";
@@ -468,16 +468,6 @@ export async function prepareDiagnosisUploadFromForm(
     throw requestError ?? new Error("Nao foi possivel criar o diagnostico.");
   }
 
-  // Best-effort, awaited so it actually runs before this serverless
-  // invocation ends, but never allowed to fail or slow down submission
-  // meaningfully -- see fetchAndStoreProfilePhotoBestEffort's own doc
-  // comment for why this can never throw.
-  await fetchAndStoreProfilePhotoBestEffort({
-    requestId: request.id,
-    userId: user.id,
-    instagramUrl: briefing.instagramUrl,
-  });
-
   try {
     const answerRows = toAnswerRows(briefing).map((row) => ({
       analysis_request_id: request.id,
@@ -618,6 +608,27 @@ export async function completePreparedDiagnosisUpload(params: {
         throw assetError;
       }
     }
+
+    // Best-effort, awaited so it actually runs before this serverless
+    // invocation ends, but never allowed to fail or slow down submission --
+    // see extractProfilePhotoBestEffort's own doc comment for why this can
+    // never throw. Must run after the loop above: it needs the profile_top
+    // file to already exist in Storage, which this loop just confirmed.
+    const profileTopAsset = params.assets.find(
+      (asset) => asset.assetType === "profile_top",
+    );
+
+    await extractProfilePhotoBestEffort({
+      requestId: request.id,
+      userId: user.id,
+      profileTopAsset: profileTopAsset
+        ? {
+            storageBucket: profileTopAsset.storageBucket,
+            storagePath: profileTopAsset.storagePath,
+            mimeType: profileTopAsset.mimeType,
+          }
+        : undefined,
+    });
 
     await createInitialAnalysisJob({
       analysisRequestId: request.id,

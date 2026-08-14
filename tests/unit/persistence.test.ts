@@ -46,11 +46,11 @@ vi.mock("@/modules/auth/session", () => ({
   },
 }));
 
-// This module makes a real network call by design (see its own doc
-// comment) -- never let a unit test touch the real network. Its behavior is
-// covered on its own in profile-photo.test.ts.
+// This module makes a real Anthropic call by design -- never let a unit
+// test touch that. Its behavior is covered on its own in
+// profile-photo.test.ts.
 vi.mock("@/modules/analysis/profile-photo", () => ({
-  fetchAndStoreProfilePhotoBestEffort: vi.fn(async () => {}),
+  extractProfilePhotoBestEffort: vi.fn(async () => {}),
 }));
 
 describe("createDiagnosisFromForm", () => {

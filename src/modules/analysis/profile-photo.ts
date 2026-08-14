@@ -1,17 +1,14 @@
 import "server-only";
 
+import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
+import sharp from "sharp";
+import { z } from "zod";
+
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { createAnthropicClient, getAnthropicModel } from "@/modules/ai/client";
 
 const STORAGE_BUCKET = "analysis-assets";
-const FETCH_TIMEOUT_MS = 8000;
-const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
-// Instagram only server-renders og:* meta tags for recognized link-preview
-// crawler user agents (the same thing that happens when you paste an IG
-// link into WhatsApp/Slack/Facebook) -- a normal browser UA gets the JS-only
-// shell with no og:image tag at all. Verified directly: identical request,
-// browser UA has zero "og:" tags in the response; this UA has og:image with
-// a working photo URL.
-const USER_AGENT = "facebookexternalhit/1.1";
+const OUTPUT_SIZE_PX = 240;
 const RESERVED_PATH_SEGMENTS = new Set([
   "p",
   "reel",
@@ -24,9 +21,11 @@ const RESERVED_PATH_SEGMENTS = new Set([
 ]);
 
 /**
- * Extracts the @username from an Instagram profile URL. Returns null for
- * anything that isn't recognizably a profile URL (wrong host, reel/post/
- * story links, etc.) rather than guessing.
+ * Extracts the @username from an Instagram profile URL, purely for display
+ * (the "@username" line under the diagnosis header) -- unrelated to the
+ * photo itself, which comes from cropping the uploaded screenshot below.
+ * Returns null for anything that isn't recognizably a profile URL (wrong
+ * host, reel/post/story links, etc.) rather than guessing.
  */
 export function extractInstagramUsername(url: string): string | null {
   let parsed: URL;
@@ -50,170 +49,214 @@ export function extractInstagramUsername(url: string): string | null {
   return username;
 }
 
-type FetchOgImageResult =
-  | { ok: true; imageUrl: string }
-  | { ok: false; reason: string };
+const avatarBoundingBoxSchema = z.object({
+  avatar_found: z.boolean(),
+  // Fractions of the image's width/height (0-1), not pixels -- avoids ever
+  // needing to tell the model the image's actual pixel dimensions.
+  x: z.number(),
+  y: z.number(),
+  width: z.number(),
+  height: z.number(),
+});
 
-async function fetchOgImageUrl(username: string): Promise<FetchOgImageResult> {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+type AvatarBox = { x: number; y: number; width: number; height: number };
 
-  try {
-    const response = await fetch(
-      `https://www.instagram.com/${encodeURIComponent(username)}/`,
-      {
-        headers: { "User-Agent": USER_AGENT, Accept: "text/html" },
-        signal: controller.signal,
-      },
-    );
+const MIN_BOX_FRACTION = 0.03;
 
-    if (!response.ok) {
-      return { ok: false, reason: `page fetch returned HTTP ${response.status}` };
-    }
-
-    const html = await response.text();
-    const match = html.match(/<meta property="og:image" content="([^"]+)"/i);
-
-    if (!match) {
-      return {
-        ok: false,
-        reason: `no og:image tag in response (${html.length} bytes)`,
-      };
-    }
-
-    const imageUrl = match[1]!.replace(/&amp;/g, "&");
-
-    // Real per-user photos are always served from a "scontent*" CDN host.
-    // When Instagram can't/won't return the real photo for this request
-    // (observed happening specifically from cloud/datacenter IPs, even with
-    // the correct crawler UA -- confirmed by comparing an identical request
-    // from a residential IP, which got the real photo every time), it falls
-    // back to a generic asset (Instagram's own logo) served from a
-    // different, static host instead. Treating that as "no photo found"
-    // is the only way to guarantee we never store the wrong image.
-    let imageHost: string;
-
-    try {
-      imageHost = new URL(imageUrl).hostname;
-    } catch {
-      return { ok: false, reason: `og:image URL is not a valid URL: ${imageUrl}` };
-    }
-
-    if (!/^scontent[.-]/i.test(imageHost)) {
-      return {
-        ok: false,
-        reason: `og:image host "${imageHost}" is not a scontent CDN host -- likely Instagram's generic fallback, not the real photo`,
-      };
-    }
-
-    return { ok: true, imageUrl };
-  } catch (error) {
-    const reason =
-      error instanceof Error && error.name === "AbortError"
-        ? `page fetch timed out after ${FETCH_TIMEOUT_MS}ms`
-        : `page fetch threw: ${String(error)}`;
-    return { ok: false, reason };
-  } finally {
-    clearTimeout(timeout);
-  }
-}
-
-type DownloadImageResult =
-  | { ok: true; bytes: ArrayBuffer; mimeType: string }
-  | { ok: false; reason: string };
-
-async function downloadImage(imageUrl: string): Promise<DownloadImageResult> {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-
-  try {
-    const response = await fetch(imageUrl, { signal: controller.signal });
-
-    if (!response.ok) {
-      return { ok: false, reason: `image fetch returned HTTP ${response.status}` };
-    }
-
-    const mimeType = response.headers.get("content-type") ?? "image/jpeg";
-
-    if (!mimeType.startsWith("image/")) {
-      return { ok: false, reason: `unexpected content-type: ${mimeType}` };
-    }
-
-    const bytes = await response.arrayBuffer();
-
-    if (bytes.byteLength === 0) {
-      return { ok: false, reason: "downloaded 0 bytes" };
-    }
-
-    if (bytes.byteLength > MAX_PHOTO_BYTES) {
-      return { ok: false, reason: `image too large (${bytes.byteLength} bytes)` };
-    }
-
-    return { ok: true, bytes, mimeType };
-  } catch (error) {
-    const reason =
-      error instanceof Error && error.name === "AbortError"
-        ? `image fetch timed out after ${FETCH_TIMEOUT_MS}ms`
-        : `image fetch threw: ${String(error)}`;
-    return { ok: false, reason };
-  } finally {
-    clearTimeout(timeout);
-  }
+function clamp(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value));
 }
 
 /**
- * Best-effort only -- never throws. Fetches the public Instagram profile
- * photo via the page's og:image tag and re-hosts it in our own Storage (the
- * URL Instagram serves is signed and expires, so linking it directly would
- * eventually break on an old report). Any failure along the way (network,
- * timeout, private account, Instagram blocking the request, no og:image)
- * just leaves the request without a photo -- the UI already renders that as
- * "no photo", never as an error. Every stop point is logged (never the
- * bytes/content, just the reason) so a real failure is diagnosable from
- * Vercel logs instead of being a silent, unexplained no-op.
- *
- * Deliberately not inserted into analysis_assets: this is a trust decoration
- * ("yes, this is really your profile"), never evidence content handed to the
- * AI for the 8-dimension analysis.
+ * Sanity-checks the box the model returned before it's ever used to crop a
+ * real image -- the same "never trust AI output for something structural
+ * without verifying it geometrically" discipline used for the main
+ * diagnosis engine. Clamps into [0,1] and rejects anything degenerate
+ * (near-zero size, fully outside the image) rather than silently cropping
+ * garbage.
  */
-export async function fetchAndStoreProfilePhotoBestEffort(params: {
+function sanitizeBox(box: AvatarBox): AvatarBox | null {
+  const x = clamp(box.x, 0, 1);
+  const y = clamp(box.y, 0, 1);
+  const width = clamp(box.width, 0, 1 - x);
+  const height = clamp(box.height, 0, 1 - y);
+
+  if (width < MIN_BOX_FRACTION || height < MIN_BOX_FRACTION) {
+    return null;
+  }
+
+  return { x, y, width, height };
+}
+
+async function detectAvatarBoundingBox(params: {
+  base64: string;
+  mimeType: string;
+}): Promise<{ ok: true; box: AvatarBox } | { ok: false; reason: string }> {
+  const client = createAnthropicClient();
+  const model = getAnthropicModel();
+  const rawFormat = zodOutputFormat(avatarBoundingBoxSchema);
+
+  const response = await client.messages.create({
+    model,
+    max_tokens: 500,
+    system:
+      "Você recebe uma captura de tela do perfil do Instagram (feita no app ou no navegador). Localize a foto de perfil circular do usuário, que normalmente fica próxima ao topo da imagem. Responda com um retângulo delimitador (bounding box) ao redor apenas dessa foto circular, como frações da largura/altura da imagem (0 a 1) -- nunca em pixels. Se não conseguir identificar com clareza uma foto de perfil circular, defina avatar_found como false.",
+    messages: [
+      {
+        role: "user",
+        content: [
+          {
+            type: "image",
+            source: {
+              type: "base64",
+              media_type: params.mimeType as
+                "image/jpeg" | "image/png" | "image/gif" | "image/webp",
+              data: params.base64,
+            },
+          },
+          {
+            type: "text",
+            text: "Onde está a foto de perfil circular nesta captura de tela?",
+          },
+        ],
+      },
+    ],
+    output_config: {
+      format: { type: rawFormat.type, schema: rawFormat.schema },
+    },
+  });
+
+  const textBlock = response.content.find((block) => block.type === "text");
+
+  if (!textBlock || textBlock.type !== "text") {
+    return { ok: false, reason: "no text block in the model's response" };
+  }
+
+  let rawJson: unknown;
+
+  try {
+    rawJson = JSON.parse(textBlock.text);
+  } catch {
+    return { ok: false, reason: "response was not valid JSON" };
+  }
+
+  const parsed = avatarBoundingBoxSchema.safeParse(rawJson);
+
+  if (!parsed.success) {
+    return { ok: false, reason: `response failed schema validation` };
+  }
+
+  if (!parsed.data.avatar_found) {
+    return { ok: false, reason: "model reported no avatar found" };
+  }
+
+  const box = sanitizeBox(parsed.data);
+
+  if (!box) {
+    return { ok: false, reason: "bounding box was degenerate after clamping" };
+  }
+
+  return { ok: true, box };
+}
+
+async function cropAvatar(
+  imageBytes: Buffer,
+  box: AvatarBox,
+): Promise<Buffer | null> {
+  const metadata = await sharp(imageBytes).metadata();
+  const imgWidth = metadata.width;
+  const imgHeight = metadata.height;
+
+  if (!imgWidth || !imgHeight) {
+    return null;
+  }
+
+  const left = Math.round(box.x * imgWidth);
+  const top = Math.round(box.y * imgHeight);
+  const width = Math.min(
+    Math.max(1, Math.round(box.width * imgWidth)),
+    imgWidth - left,
+  );
+  const height = Math.min(
+    Math.max(1, Math.round(box.height * imgHeight)),
+    imgHeight - top,
+  );
+
+  return sharp(imageBytes)
+    .extract({ left, top, width, height })
+    .resize(OUTPUT_SIZE_PX, OUTPUT_SIZE_PX, { fit: "cover" })
+    .jpeg({ quality: 85 })
+    .toBuffer();
+}
+
+/**
+ * Best-effort only -- never throws. Crops the circular avatar out of the
+ * "topo do perfil" screenshot the customer already uploaded as evidence,
+ * using a small, cheap Claude call to locate it (no fixed pixel offsets:
+ * screenshots vary too much by device/app/browser for that to be reliable).
+ * Any failure (no profile_top asset, download error, model couldn't find
+ * the avatar, degenerate box, crop/resize failure, upload error) just
+ * leaves the request without a photo -- the UI already renders that as "no
+ * photo", never as an error. Every stop point is logged (never the image
+ * bytes) so a real failure is diagnosable from Vercel logs.
+ *
+ * Deliberately writes to the same profile_photo_storage_path/mime_type
+ * columns (and the same serving route) as the earlier live-Instagram-fetch
+ * approach did -- replaced here because that approach turned out to be
+ * unreliable from Vercel's own infrastructure (see git history). This
+ * approach has no external network dependency at all: the source image is
+ * evidence the customer already uploaded to our own Storage.
+ */
+export async function extractProfilePhotoBestEffort(params: {
   requestId: string;
   userId: string;
-  instagramUrl: string;
+  profileTopAsset:
+    | { storageBucket: string; storagePath: string; mimeType: string }
+    | undefined;
 }): Promise<void> {
   const log = (message: string) =>
     console.log(`[profile-photo] request=${params.requestId} ${message}`);
 
   try {
-    const username = extractInstagramUsername(params.instagramUrl);
-
-    if (!username) {
-      log(`skipped: "${params.instagramUrl}" is not a recognizable Instagram profile URL`);
+    if (!params.profileTopAsset) {
+      log("skipped: no profile_top evidence was uploaded");
       return;
     }
 
-    const pageResult = await fetchOgImageUrl(username);
-
-    if (!pageResult.ok) {
-      log(`stopped at page fetch for @${username}: ${pageResult.reason}`);
-      return;
-    }
-
-    const imageResult = await downloadImage(pageResult.imageUrl);
-
-    if (!imageResult.ok) {
-      log(`stopped at image download for @${username}: ${imageResult.reason}`);
-      return;
-    }
-
-    const extension = imageResult.mimeType === "image/png" ? "png" : "jpg";
-    const storagePath = `${params.userId}/${params.requestId}/profile-photo/${crypto.randomUUID()}.${extension}`;
     const admin = createSupabaseAdminClient();
+    const { data: blob, error: downloadError } = await admin.storage
+      .from(params.profileTopAsset.storageBucket)
+      .download(params.profileTopAsset.storagePath);
+
+    if (downloadError || !blob) {
+      log(`stopped: could not download the profile_top evidence file`);
+      return;
+    }
+
+    const sourceBuffer = Buffer.from(await blob.arrayBuffer());
+    const detection = await detectAvatarBoundingBox({
+      base64: sourceBuffer.toString("base64"),
+      mimeType: params.profileTopAsset.mimeType,
+    });
+
+    if (!detection.ok) {
+      log(`stopped at avatar detection: ${detection.reason}`);
+      return;
+    }
+
+    const croppedBuffer = await cropAvatar(sourceBuffer, detection.box);
+
+    if (!croppedBuffer) {
+      log("stopped: crop/resize failed");
+      return;
+    }
+
+    const storagePath = `${params.userId}/${params.requestId}/profile-photo/${crypto.randomUUID()}.jpg`;
 
     const { error: uploadError } = await admin.storage
       .from(STORAGE_BUCKET)
-      .upload(storagePath, imageResult.bytes, {
-        contentType: imageResult.mimeType,
+      .upload(storagePath, croppedBuffer, {
+        contentType: "image/jpeg",
         upsert: false,
       });
 
@@ -226,7 +269,7 @@ export async function fetchAndStoreProfilePhotoBestEffort(params: {
       .from("analysis_requests")
       .update({
         profile_photo_storage_path: storagePath,
-        profile_photo_mime_type: imageResult.mimeType,
+        profile_photo_mime_type: "image/jpeg",
       })
       .eq("id", params.requestId);
 
@@ -238,7 +281,7 @@ export async function fetchAndStoreProfilePhotoBestEffort(params: {
       return;
     }
 
-    log(`succeeded for @${username}`);
+    log("succeeded");
   } catch (error) {
     console.error("[profile-photo] unexpected failure:", error);
   }

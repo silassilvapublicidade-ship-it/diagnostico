@@ -1,12 +1,19 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import sharp from "sharp";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { seedRow, type FakeStore } from "../mocks/supabase-fake";
 import { resetFakeStore } from "../mocks/persistence-harness";
+import {
+  seedRow,
+  seedStorageFile,
+  type FakeStore,
+} from "../mocks/supabase-fake";
 import { extractInstagramUsername } from "@/modules/analysis/profile-photo";
 
 const harness = vi.hoisted(() => ({
   store: {} as FakeStore,
 }));
+
+const mockCreate = vi.hoisted(() => vi.fn());
 
 vi.mock("@/lib/supabase/admin", async () => {
   const { createFakeAdminClient } = await import("../mocks/supabase-fake");
@@ -15,15 +22,47 @@ vi.mock("@/lib/supabase/admin", async () => {
   };
 });
 
-function htmlWithOgImage(url: string) {
-  return `<html><head><meta property="og:image" content="${url}" /></head></html>`;
+vi.mock("@/modules/ai/client", () => ({
+  createAnthropicClient: () => ({ messages: { create: mockCreate } }),
+  getAnthropicModel: () => "claude-sonnet-5",
+}));
+
+const BUCKET = "analysis-assets";
+
+function boxResponse(box: {
+  avatar_found: boolean;
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+}) {
+  return {
+    content: [{ type: "text", text: JSON.stringify(box) }],
+  };
 }
 
-function jpegResponse(bytes: number) {
-  return new Response(new Uint8Array(bytes), {
-    status: 200,
-    headers: { "content-type": "image/jpeg" },
-  });
+async function makeTestScreenshot(): Promise<Uint8Array<ArrayBuffer>> {
+  // A real, valid 200x200 PNG -- sharp needs actual image bytes to extract
+  // from, not a fake/opaque buffer. Converted to a plain Uint8Array (not
+  // Buffer) so it satisfies seedStorageFile's BlobPart type.
+  const buffer = await sharp({
+    create: {
+      width: 200,
+      height: 200,
+      channels: 3,
+      background: { r: 20, g: 20, b: 20 },
+    },
+  })
+    .png()
+    .toBuffer();
+
+  // Buffer/sharp's output is typed as Uint8Array<ArrayBufferLike>, which
+  // TypeScript won't accept as a BlobPart (that requires a concrete
+  // ArrayBuffer, excluding SharedArrayBuffer) -- copy into a fresh
+  // ArrayBuffer-backed view to satisfy seedStorageFile's type.
+  const copy = new ArrayBuffer(buffer.byteLength);
+  new Uint8Array(copy).set(buffer);
+  return new Uint8Array(copy);
 }
 
 describe("extractInstagramUsername", () => {
@@ -68,46 +107,88 @@ describe("extractInstagramUsername", () => {
   });
 });
 
-describe("fetchAndStoreProfilePhotoBestEffort", () => {
-  const originalFetch = global.fetch;
-
+describe("extractProfilePhotoBestEffort", () => {
   beforeEach(() => {
     resetFakeStore(harness.store);
+    mockCreate.mockReset();
   });
 
-  afterEach(() => {
-    global.fetch = originalFetch;
-    vi.restoreAllMocks();
-  });
-
-  it("downloads the og:image and records the storage path on success", async () => {
+  it("skips (no throw, no store) when no profile_top asset was uploaded", async () => {
     const request = seedRow(harness.store, "analysis_requests", {
       user_id: "user-1",
-      instagram_url: "https://instagram.com/silassilva.click",
     });
 
-    const fetchMock = vi.fn(async (url: string | URL) => {
-      const href = url.toString();
-      if (href.includes("instagram.com/silassilva.click")) {
-        return new Response(
-          htmlWithOgImage("https://scontent.cdninstagram.com/photo.jpg"),
-          { status: 200, headers: { "content-type": "text/html" } },
-        );
-      }
-      if (href === "https://scontent.cdninstagram.com/photo.jpg") {
-        return jpegResponse(1024);
-      }
-      throw new Error(`Unexpected fetch: ${href}`);
-    });
-    global.fetch = fetchMock as unknown as typeof fetch;
-
-    const { fetchAndStoreProfilePhotoBestEffort } =
+    const { extractProfilePhotoBestEffort } =
       await import("@/modules/analysis/profile-photo");
 
-    await fetchAndStoreProfilePhotoBestEffort({
+    await expect(
+      extractProfilePhotoBestEffort({
+        requestId: request.id as string,
+        userId: "user-1",
+        profileTopAsset: undefined,
+      }),
+    ).resolves.toBeUndefined();
+
+    expect(mockCreate).not.toHaveBeenCalled();
+    expect(
+      (harness.store.analysis_requests ?? [])[0]!.profile_photo_storage_path,
+    ).toBeUndefined();
+  });
+
+  it("never throws and never stores when the evidence file can't be downloaded", async () => {
+    const request = seedRow(harness.store, "analysis_requests", {
+      user_id: "user-1",
+    });
+
+    const { extractProfilePhotoBestEffort } =
+      await import("@/modules/analysis/profile-photo");
+
+    await extractProfilePhotoBestEffort({
       requestId: request.id as string,
       userId: "user-1",
-      instagramUrl: "https://instagram.com/silassilva.click",
+      profileTopAsset: {
+        storageBucket: BUCKET,
+        storagePath: "user-1/req/profile_top/missing.png",
+        mimeType: "image/png",
+      },
+    });
+
+    expect(mockCreate).not.toHaveBeenCalled();
+    expect(
+      (harness.store.analysis_requests ?? [])[0]!.profile_photo_storage_path,
+    ).toBeUndefined();
+  });
+
+  it("crops, stores, and records the path when the model finds the avatar", async () => {
+    const request = seedRow(harness.store, "analysis_requests", {
+      user_id: "user-1",
+    });
+    const screenshot = await makeTestScreenshot();
+    seedStorageFile(harness.store, BUCKET, "user-1/req/profile_top/print.png", {
+      data: screenshot,
+      type: "image/png",
+    });
+    mockCreate.mockResolvedValueOnce(
+      boxResponse({
+        avatar_found: true,
+        x: 0.1,
+        y: 0.1,
+        width: 0.2,
+        height: 0.2,
+      }),
+    );
+
+    const { extractProfilePhotoBestEffort } =
+      await import("@/modules/analysis/profile-photo");
+
+    await extractProfilePhotoBestEffort({
+      requestId: request.id as string,
+      userId: "user-1",
+      profileTopAsset: {
+        storageBucket: BUCKET,
+        storagePath: "user-1/req/profile_top/print.png",
+        mimeType: "image/png",
+      },
     });
 
     const updated = (harness.store.analysis_requests ?? [])[0]!;
@@ -118,165 +199,28 @@ describe("fetchAndStoreProfilePhotoBestEffort", () => {
     expect(harness.store.__storage).toHaveLength(1);
   });
 
-  it("never throws and never touches the request when the URL is not an Instagram profile", async () => {
+  it("never throws and never stores when the model reports no avatar found", async () => {
     const request = seedRow(harness.store, "analysis_requests", {
       user_id: "user-1",
-      instagram_url: "https://example.com/nope",
     });
-    const fetchMock = vi.fn();
-    global.fetch = fetchMock as unknown as typeof fetch;
+    const screenshot = await makeTestScreenshot();
+    seedStorageFile(harness.store, BUCKET, "user-1/req/profile_top/print.png", {
+      data: screenshot,
+      type: "image/png",
+    });
+    mockCreate.mockResolvedValueOnce(boxResponse({ avatar_found: false }));
 
-    const { fetchAndStoreProfilePhotoBestEffort } =
+    const { extractProfilePhotoBestEffort } =
       await import("@/modules/analysis/profile-photo");
 
-    await expect(
-      fetchAndStoreProfilePhotoBestEffort({
-        requestId: request.id as string,
-        userId: "user-1",
-        instagramUrl: "https://example.com/nope",
-      }),
-    ).resolves.toBeUndefined();
-
-    expect(fetchMock).not.toHaveBeenCalled();
-    expect(
-      (harness.store.analysis_requests ?? [])[0]!.profile_photo_storage_path,
-    ).toBeUndefined();
-  });
-
-  it("never throws when Instagram blocks the request (non-200 response)", async () => {
-    const request = seedRow(harness.store, "analysis_requests", {
-      user_id: "user-1",
-      instagram_url: "https://instagram.com/silassilva.click",
-    });
-    global.fetch = vi.fn(
-      async () => new Response("blocked", { status: 429 }),
-    ) as unknown as typeof fetch;
-
-    const { fetchAndStoreProfilePhotoBestEffort } =
-      await import("@/modules/analysis/profile-photo");
-
-    await expect(
-      fetchAndStoreProfilePhotoBestEffort({
-        requestId: request.id as string,
-        userId: "user-1",
-        instagramUrl: "https://instagram.com/silassilva.click",
-      }),
-    ).resolves.toBeUndefined();
-
-    expect(
-      (harness.store.analysis_requests ?? [])[0]!.profile_photo_storage_path,
-    ).toBeUndefined();
-  });
-
-  it("never throws when the page has no og:image tag (e.g. private account)", async () => {
-    const request = seedRow(harness.store, "analysis_requests", {
-      user_id: "user-1",
-      instagram_url: "https://instagram.com/silassilva.click",
-    });
-    global.fetch = vi.fn(
-      async () =>
-        new Response("<html><head></head></html>", {
-          status: 200,
-          headers: { "content-type": "text/html" },
-        }),
-    ) as unknown as typeof fetch;
-
-    const { fetchAndStoreProfilePhotoBestEffort } =
-      await import("@/modules/analysis/profile-photo");
-
-    await fetchAndStoreProfilePhotoBestEffort({
+    await extractProfilePhotoBestEffort({
       requestId: request.id as string,
       userId: "user-1",
-      instagramUrl: "https://instagram.com/silassilva.click",
-    });
-
-    expect(
-      (harness.store.analysis_requests ?? [])[0]!.profile_photo_storage_path,
-    ).toBeUndefined();
-  });
-
-  it("never throws when fetch itself throws (network error, timeout/abort)", async () => {
-    const request = seedRow(harness.store, "analysis_requests", {
-      user_id: "user-1",
-      instagram_url: "https://instagram.com/silassilva.click",
-    });
-    global.fetch = vi.fn(async () => {
-      throw new Error("network blip");
-    }) as unknown as typeof fetch;
-
-    const { fetchAndStoreProfilePhotoBestEffort } =
-      await import("@/modules/analysis/profile-photo");
-
-    await expect(
-      fetchAndStoreProfilePhotoBestEffort({
-        requestId: request.id as string,
-        userId: "user-1",
-        instagramUrl: "https://instagram.com/silassilva.click",
-      }),
-    ).resolves.toBeUndefined();
-  });
-
-  it("never throws and never stores when the fetched content is not an image", async () => {
-    const request = seedRow(harness.store, "analysis_requests", {
-      user_id: "user-1",
-      instagram_url: "https://instagram.com/silassilva.click",
-    });
-    global.fetch = vi.fn(async (url: string | URL) => {
-      const href = url.toString();
-      if (href.includes("instagram.com/silassilva.click")) {
-        return new Response(
-          htmlWithOgImage("https://scontent.cdninstagram.com/notreally.jpg"),
-          { status: 200, headers: { "content-type": "text/html" } },
-        );
-      }
-      return new Response("<html>login wall</html>", {
-        status: 200,
-        headers: { "content-type": "text/html" },
-      });
-    }) as unknown as typeof fetch;
-
-    const { fetchAndStoreProfilePhotoBestEffort } =
-      await import("@/modules/analysis/profile-photo");
-
-    await fetchAndStoreProfilePhotoBestEffort({
-      requestId: request.id as string,
-      userId: "user-1",
-      instagramUrl: "https://instagram.com/silassilva.click",
-    });
-
-    expect(
-      (harness.store.analysis_requests ?? [])[0]!.profile_photo_storage_path,
-    ).toBeUndefined();
-  });
-
-  it("never stores Instagram's generic fallback image (og:image from a non-scontent host)", async () => {
-    const request = seedRow(harness.store, "analysis_requests", {
-      user_id: "user-1",
-      instagram_url: "https://instagram.com/silassilva.click",
-    });
-
-    global.fetch = vi.fn(async (url: string | URL) => {
-      const href = url.toString();
-      if (href.includes("instagram.com/silassilva.click")) {
-        // Observed in production: when Instagram won't return the real
-        // photo, it serves its own generic logo from a static asset host
-        // instead of a "scontent*" CDN host.
-        return new Response(
-          htmlWithOgImage("https://static.cdninstagram.com/rsrc.php/logo.png"),
-          { status: 200, headers: { "content-type": "text/html" } },
-        );
-      }
-      throw new Error("should never fetch a non-scontent image URL");
-    }) as unknown as typeof fetch;
-
-    const { fetchAndStoreProfilePhotoBestEffort } = await import(
-      "@/modules/analysis/profile-photo"
-    );
-
-    await fetchAndStoreProfilePhotoBestEffort({
-      requestId: request.id as string,
-      userId: "user-1",
-      instagramUrl: "https://instagram.com/silassilva.click",
+      profileTopAsset: {
+        storageBucket: BUCKET,
+        storagePath: "user-1/req/profile_top/print.png",
+        mimeType: "image/png",
+      },
     });
 
     expect(
@@ -285,32 +229,127 @@ describe("fetchAndStoreProfilePhotoBestEffort", () => {
     expect(harness.store.__storage ?? []).toHaveLength(0);
   });
 
-  it("never throws when the Storage upload itself fails", async () => {
+  it("never throws and never stores when the model's box is degenerate (near-zero size)", async () => {
     const request = seedRow(harness.store, "analysis_requests", {
       user_id: "user-1",
-      instagram_url: "https://instagram.com/silassilva.click",
     });
-    harness.store.__storageShouldFail = true;
+    const screenshot = await makeTestScreenshot();
+    seedStorageFile(harness.store, BUCKET, "user-1/req/profile_top/print.png", {
+      data: screenshot,
+      type: "image/png",
+    });
+    mockCreate.mockResolvedValueOnce(
+      boxResponse({ avatar_found: true, x: 0.5, y: 0.5, width: 0, height: 0 }),
+    );
 
-    global.fetch = vi.fn(async (url: string | URL) => {
-      const href = url.toString();
-      if (href.includes("instagram.com/silassilva.click")) {
-        return new Response(
-          htmlWithOgImage("https://scontent.cdninstagram.com/photo.jpg"),
-          { status: 200, headers: { "content-type": "text/html" } },
-        );
-      }
-      return jpegResponse(1024);
-    }) as unknown as typeof fetch;
+    const { extractProfilePhotoBestEffort } =
+      await import("@/modules/analysis/profile-photo");
 
-    const { fetchAndStoreProfilePhotoBestEffort } =
+    await extractProfilePhotoBestEffort({
+      requestId: request.id as string,
+      userId: "user-1",
+      profileTopAsset: {
+        storageBucket: BUCKET,
+        storagePath: "user-1/req/profile_top/print.png",
+        mimeType: "image/png",
+      },
+    });
+
+    expect(
+      (harness.store.analysis_requests ?? [])[0]!.profile_photo_storage_path,
+    ).toBeUndefined();
+  });
+
+  it("never throws and never stores when the model's response is not valid JSON", async () => {
+    const request = seedRow(harness.store, "analysis_requests", {
+      user_id: "user-1",
+    });
+    const screenshot = await makeTestScreenshot();
+    seedStorageFile(harness.store, BUCKET, "user-1/req/profile_top/print.png", {
+      data: screenshot,
+      type: "image/png",
+    });
+    mockCreate.mockResolvedValueOnce({
+      content: [{ type: "text", text: "not json" }],
+    });
+
+    const { extractProfilePhotoBestEffort } =
+      await import("@/modules/analysis/profile-photo");
+
+    await extractProfilePhotoBestEffort({
+      requestId: request.id as string,
+      userId: "user-1",
+      profileTopAsset: {
+        storageBucket: BUCKET,
+        storagePath: "user-1/req/profile_top/print.png",
+        mimeType: "image/png",
+      },
+    });
+
+    expect(
+      (harness.store.analysis_requests ?? [])[0]!.profile_photo_storage_path,
+    ).toBeUndefined();
+  });
+
+  it("never throws when the Anthropic call itself throws (network error, timeout)", async () => {
+    const request = seedRow(harness.store, "analysis_requests", {
+      user_id: "user-1",
+    });
+    const screenshot = await makeTestScreenshot();
+    seedStorageFile(harness.store, BUCKET, "user-1/req/profile_top/print.png", {
+      data: screenshot,
+      type: "image/png",
+    });
+    mockCreate.mockRejectedValueOnce(new Error("network blip"));
+
+    const { extractProfilePhotoBestEffort } =
       await import("@/modules/analysis/profile-photo");
 
     await expect(
-      fetchAndStoreProfilePhotoBestEffort({
+      extractProfilePhotoBestEffort({
         requestId: request.id as string,
         userId: "user-1",
-        instagramUrl: "https://instagram.com/silassilva.click",
+        profileTopAsset: {
+          storageBucket: BUCKET,
+          storagePath: "user-1/req/profile_top/print.png",
+          mimeType: "image/png",
+        },
+      }),
+    ).resolves.toBeUndefined();
+  });
+
+  it("never throws when the Storage upload itself fails", async () => {
+    const request = seedRow(harness.store, "analysis_requests", {
+      user_id: "user-1",
+    });
+    const screenshot = await makeTestScreenshot();
+    seedStorageFile(harness.store, BUCKET, "user-1/req/profile_top/print.png", {
+      data: screenshot,
+      type: "image/png",
+    });
+    harness.store.__storageShouldFail = true;
+    mockCreate.mockResolvedValueOnce(
+      boxResponse({
+        avatar_found: true,
+        x: 0.1,
+        y: 0.1,
+        width: 0.2,
+        height: 0.2,
+      }),
+    );
+
+    const { extractProfilePhotoBestEffort } =
+      await import("@/modules/analysis/profile-photo");
+
+    await expect(
+      extractProfilePhotoBestEffort({
+        requestId: request.id as string,
+        userId: "user-1",
+        profileTopAsset: {
+          storageBucket: BUCKET,
+          storagePath: "user-1/req/profile_top/print.png",
+          mimeType: "image/png",
+        },
       }),
     ).resolves.toBeUndefined();
 
@@ -322,27 +361,33 @@ describe("fetchAndStoreProfilePhotoBestEffort", () => {
   it("is never inserted into analysis_assets -- it must never be treated as AI evidence", async () => {
     const request = seedRow(harness.store, "analysis_requests", {
       user_id: "user-1",
-      instagram_url: "https://instagram.com/silassilva.click",
     });
+    const screenshot = await makeTestScreenshot();
+    seedStorageFile(harness.store, BUCKET, "user-1/req/profile_top/print.png", {
+      data: screenshot,
+      type: "image/png",
+    });
+    mockCreate.mockResolvedValueOnce(
+      boxResponse({
+        avatar_found: true,
+        x: 0.1,
+        y: 0.1,
+        width: 0.2,
+        height: 0.2,
+      }),
+    );
 
-    global.fetch = vi.fn(async (url: string | URL) => {
-      const href = url.toString();
-      if (href.includes("instagram.com/silassilva.click")) {
-        return new Response(
-          htmlWithOgImage("https://scontent.cdninstagram.com/photo.jpg"),
-          { status: 200, headers: { "content-type": "text/html" } },
-        );
-      }
-      return jpegResponse(1024);
-    }) as unknown as typeof fetch;
-
-    const { fetchAndStoreProfilePhotoBestEffort } =
+    const { extractProfilePhotoBestEffort } =
       await import("@/modules/analysis/profile-photo");
 
-    await fetchAndStoreProfilePhotoBestEffort({
+    await extractProfilePhotoBestEffort({
       requestId: request.id as string,
       userId: "user-1",
-      instagramUrl: "https://instagram.com/silassilva.click",
+      profileTopAsset: {
+        storageBucket: BUCKET,
+        storagePath: "user-1/req/profile_top/print.png",
+        mimeType: "image/png",
+      },
     });
 
     expect(harness.store.analysis_assets ?? []).toHaveLength(0);
