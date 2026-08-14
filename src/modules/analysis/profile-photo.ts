@@ -3,7 +3,7 @@ import "server-only";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 const STORAGE_BUCKET = "analysis-assets";
-const FETCH_TIMEOUT_MS = 5000;
+const FETCH_TIMEOUT_MS = 8000;
 const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
 // Instagram only server-renders og:* meta tags for recognized link-preview
 // crawler user agents (the same thing that happens when you paste an IG
@@ -50,7 +50,11 @@ export function extractInstagramUsername(url: string): string | null {
   return username;
 }
 
-async function fetchOgImageUrl(username: string): Promise<string | null> {
+type FetchOgImageResult =
+  | { ok: true; imageUrl: string }
+  | { ok: false; reason: string };
+
+async function fetchOgImageUrl(username: string): Promise<FetchOgImageResult> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
@@ -64,23 +68,36 @@ async function fetchOgImageUrl(username: string): Promise<string | null> {
     );
 
     if (!response.ok) {
-      return null;
+      return { ok: false, reason: `page fetch returned HTTP ${response.status}` };
     }
 
     const html = await response.text();
     const match = html.match(/<meta property="og:image" content="([^"]+)"/i);
 
-    return match ? match[1]!.replace(/&amp;/g, "&") : null;
-  } catch {
-    return null;
+    if (!match) {
+      return {
+        ok: false,
+        reason: `no og:image tag in response (${html.length} bytes)`,
+      };
+    }
+
+    return { ok: true, imageUrl: match[1]!.replace(/&amp;/g, "&") };
+  } catch (error) {
+    const reason =
+      error instanceof Error && error.name === "AbortError"
+        ? `page fetch timed out after ${FETCH_TIMEOUT_MS}ms`
+        : `page fetch threw: ${String(error)}`;
+    return { ok: false, reason };
   } finally {
     clearTimeout(timeout);
   }
 }
 
-async function downloadImage(
-  imageUrl: string,
-): Promise<{ bytes: ArrayBuffer; mimeType: string } | null> {
+type DownloadImageResult =
+  | { ok: true; bytes: ArrayBuffer; mimeType: string }
+  | { ok: false; reason: string };
+
+async function downloadImage(imageUrl: string): Promise<DownloadImageResult> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
 
@@ -88,24 +105,32 @@ async function downloadImage(
     const response = await fetch(imageUrl, { signal: controller.signal });
 
     if (!response.ok) {
-      return null;
+      return { ok: false, reason: `image fetch returned HTTP ${response.status}` };
     }
 
     const mimeType = response.headers.get("content-type") ?? "image/jpeg";
 
     if (!mimeType.startsWith("image/")) {
-      return null;
+      return { ok: false, reason: `unexpected content-type: ${mimeType}` };
     }
 
     const bytes = await response.arrayBuffer();
 
-    if (bytes.byteLength === 0 || bytes.byteLength > MAX_PHOTO_BYTES) {
-      return null;
+    if (bytes.byteLength === 0) {
+      return { ok: false, reason: "downloaded 0 bytes" };
     }
 
-    return { bytes, mimeType };
-  } catch {
-    return null;
+    if (bytes.byteLength > MAX_PHOTO_BYTES) {
+      return { ok: false, reason: `image too large (${bytes.byteLength} bytes)` };
+    }
+
+    return { ok: true, bytes, mimeType };
+  } catch (error) {
+    const reason =
+      error instanceof Error && error.name === "AbortError"
+        ? `image fetch timed out after ${FETCH_TIMEOUT_MS}ms`
+        : `image fetch threw: ${String(error)}`;
+    return { ok: false, reason };
   } finally {
     clearTimeout(timeout);
   }
@@ -118,7 +143,9 @@ async function downloadImage(
  * eventually break on an old report). Any failure along the way (network,
  * timeout, private account, Instagram blocking the request, no og:image)
  * just leaves the request without a photo -- the UI already renders that as
- * "no photo", never as an error.
+ * "no photo", never as an error. Every stop point is logged (never the
+ * bytes/content, just the reason) so a real failure is diagnosable from
+ * Vercel logs instead of being a silent, unexplained no-op.
  *
  * Deliberately not inserted into analysis_assets: this is a trust decoration
  * ("yes, this is really your profile"), never evidence content handed to the
@@ -129,33 +156,39 @@ export async function fetchAndStoreProfilePhotoBestEffort(params: {
   userId: string;
   instagramUrl: string;
 }): Promise<void> {
+  const log = (message: string) =>
+    console.log(`[profile-photo] request=${params.requestId} ${message}`);
+
   try {
     const username = extractInstagramUsername(params.instagramUrl);
 
     if (!username) {
+      log(`skipped: "${params.instagramUrl}" is not a recognizable Instagram profile URL`);
       return;
     }
 
-    const ogImageUrl = await fetchOgImageUrl(username);
+    const pageResult = await fetchOgImageUrl(username);
 
-    if (!ogImageUrl) {
+    if (!pageResult.ok) {
+      log(`stopped at page fetch for @${username}: ${pageResult.reason}`);
       return;
     }
 
-    const image = await downloadImage(ogImageUrl);
+    const imageResult = await downloadImage(pageResult.imageUrl);
 
-    if (!image) {
+    if (!imageResult.ok) {
+      log(`stopped at image download for @${username}: ${imageResult.reason}`);
       return;
     }
 
-    const extension = image.mimeType === "image/png" ? "png" : "jpg";
+    const extension = imageResult.mimeType === "image/png" ? "png" : "jpg";
     const storagePath = `${params.userId}/${params.requestId}/profile-photo/${crypto.randomUUID()}.${extension}`;
     const admin = createSupabaseAdminClient();
 
     const { error: uploadError } = await admin.storage
       .from(STORAGE_BUCKET)
-      .upload(storagePath, image.bytes, {
-        contentType: image.mimeType,
+      .upload(storagePath, imageResult.bytes, {
+        contentType: imageResult.mimeType,
         upsert: false,
       });
 
@@ -168,7 +201,7 @@ export async function fetchAndStoreProfilePhotoBestEffort(params: {
       .from("analysis_requests")
       .update({
         profile_photo_storage_path: storagePath,
-        profile_photo_mime_type: image.mimeType,
+        profile_photo_mime_type: imageResult.mimeType,
       })
       .eq("id", params.requestId);
 
@@ -177,7 +210,10 @@ export async function fetchAndStoreProfilePhotoBestEffort(params: {
         "[profile-photo] failed to record storage path:",
         updateError,
       );
+      return;
     }
+
+    log(`succeeded for @${username}`);
   } catch (error) {
     console.error("[profile-photo] unexpected failure:", error);
   }
