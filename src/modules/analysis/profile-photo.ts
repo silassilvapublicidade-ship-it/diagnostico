@@ -100,7 +100,7 @@ async function detectAvatarBoundingBox(params: {
     model,
     max_tokens: 500,
     system:
-      "Você recebe uma captura de tela do perfil do Instagram (feita no app ou no navegador). Localize a foto de perfil circular do usuário, que normalmente fica próxima ao topo da imagem. Responda com um retângulo delimitador (bounding box) ao redor apenas dessa foto circular, como frações da largura/altura da imagem (0 a 1) -- nunca em pixels. Se não conseguir identificar com clareza uma foto de perfil circular, defina avatar_found como false.",
+      'Você recebe uma captura de tela do perfil do Instagram (feita no app ou no navegador). Localize APENAS a foto de perfil PRINCIPAL do usuário -- a única foto circular que fica sozinha bem no topo da tela, ao lado ou acima do nome de usuário e da contagem de seguidores/seguindo/publicações.\n\nATENÇÃO, erro comum a evitar: NÃO confunda a foto de perfil com os "Destaques" (Stories em destaque) -- que também são círculos com foto, mas aparecem em FILEIRA HORIZONTAL de vários círculos MENORES, sempre ABAIXO da bio, mais para o meio da tela. Se você identificar uma fileira de vários círculos parecidos, nenhum deles é a foto de perfil -- ignore todos e continue procurando o único círculo isolado no topo. A foto de perfil verdadeira é sempre única (não faz parte de um grupo/fileira) e é a primeira coisa circular com foto que aparece na tela, de cima para baixo.\n\nResponda com um retângulo delimitador (bounding box) ao redor apenas dessa foto de perfil principal, como frações da largura/altura da imagem (0 a 1) -- nunca em pixels. Se não conseguir identificar com clareza a foto de perfil principal (por exemplo, se a captura começar já no meio da tela, sem mostrar o topo), defina avatar_found como false em vez de adivinhar.',
     messages: [
       {
         role: "user",
@@ -116,7 +116,7 @@ async function detectAvatarBoundingBox(params: {
           },
           {
             type: "text",
-            text: "Onde está a foto de perfil circular nesta captura de tela?",
+            text: "Onde está a foto de perfil PRINCIPAL (não um Destaque) nesta captura de tela?",
           },
         ],
       },
