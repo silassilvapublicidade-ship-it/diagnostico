@@ -293,34 +293,45 @@ function PricingCard() {
 }
 
 export default function Home() {
-  const serviceJsonLd = {
+  // "Service" is valid schema.org but not among Google's supported rich
+  // result types, so it never surfaces in the Rich Results Test regardless
+  // of correctness -- "Product" is supported, and Google's own requirement
+  // is name + one of {review, aggregateRating, offers}, so offers alone
+  // (no fabricated rating) is sufficient here.
+  const productJsonLd = {
     "@context": "https://schema.org",
-    "@type": "Service",
+    "@type": "Product",
     name: SITE_NAME,
     description: PAGE_DESCRIPTION,
-    provider: {
-      "@type": "Person",
-      name: "Silas Silva",
-      jobTitle: "Criador da Metodologia 8D",
-      description:
-        "Técnico em Marketing pelo SENAC, atua com estratégia de conteúdo, posicionamento digital e produção audiovisual.",
-      knowsAbout: [
-        "Marketing",
-        "Mídias Digitais",
-        "Branding & Growth",
-        "Audiovisual",
-        "Fotografia",
-      ],
-      image: `${SITE_URL}/silassilva.png`,
+    image: `${SITE_URL}/opengraph-image`,
+    brand: {
+      "@type": "Brand",
+      name: SITE_NAME,
     },
-    areaServed: "BR",
-    serviceType: "Consultoria de estratégia de perfil no Instagram",
     offers: {
       "@type": "Offer",
       price: PRICE_MACHINE,
       priceCurrency: "BRL",
       url: SITE_URL,
     },
+  };
+
+  const personJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: "Silas Silva",
+    jobTitle: "Criador da Metodologia 8D",
+    description:
+      "Técnico em Marketing pelo SENAC, atua com estratégia de conteúdo, posicionamento digital e produção audiovisual.",
+    knowsAbout: [
+      "Marketing",
+      "Mídias Digitais",
+      "Branding & Growth",
+      "Audiovisual",
+      "Fotografia",
+    ],
+    image: `${SITE_URL}/silassilva.png`,
+    url: SITE_URL,
   };
 
   const faqJsonLd = {
@@ -340,7 +351,13 @@ export default function Home() {
     <main className="min-h-screen bg-ink text-cream">
       <script
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(serviceJsonLd).replace(/</g, "\\u003c"),
+          __html: JSON.stringify(productJsonLd).replace(/</g, "\\u003c"),
+        }}
+        type="application/ld+json"
+      />
+      <script
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(personJsonLd).replace(/</g, "\\u003c"),
         }}
         type="application/ld+json"
       />
