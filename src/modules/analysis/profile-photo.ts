@@ -81,7 +81,32 @@ async function fetchOgImageUrl(username: string): Promise<FetchOgImageResult> {
       };
     }
 
-    return { ok: true, imageUrl: match[1]!.replace(/&amp;/g, "&") };
+    const imageUrl = match[1]!.replace(/&amp;/g, "&");
+
+    // Real per-user photos are always served from a "scontent*" CDN host.
+    // When Instagram can't/won't return the real photo for this request
+    // (observed happening specifically from cloud/datacenter IPs, even with
+    // the correct crawler UA -- confirmed by comparing an identical request
+    // from a residential IP, which got the real photo every time), it falls
+    // back to a generic asset (Instagram's own logo) served from a
+    // different, static host instead. Treating that as "no photo found"
+    // is the only way to guarantee we never store the wrong image.
+    let imageHost: string;
+
+    try {
+      imageHost = new URL(imageUrl).hostname;
+    } catch {
+      return { ok: false, reason: `og:image URL is not a valid URL: ${imageUrl}` };
+    }
+
+    if (!/^scontent[.-]/i.test(imageHost)) {
+      return {
+        ok: false,
+        reason: `og:image host "${imageHost}" is not a scontent CDN host -- likely Instagram's generic fallback, not the real photo`,
+      };
+    }
+
+    return { ok: true, imageUrl };
   } catch (error) {
     const reason =
       error instanceof Error && error.name === "AbortError"

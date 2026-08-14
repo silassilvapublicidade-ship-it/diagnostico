@@ -249,6 +249,42 @@ describe("fetchAndStoreProfilePhotoBestEffort", () => {
     ).toBeUndefined();
   });
 
+  it("never stores Instagram's generic fallback image (og:image from a non-scontent host)", async () => {
+    const request = seedRow(harness.store, "analysis_requests", {
+      user_id: "user-1",
+      instagram_url: "https://instagram.com/silassilva.click",
+    });
+
+    global.fetch = vi.fn(async (url: string | URL) => {
+      const href = url.toString();
+      if (href.includes("instagram.com/silassilva.click")) {
+        // Observed in production: when Instagram won't return the real
+        // photo, it serves its own generic logo from a static asset host
+        // instead of a "scontent*" CDN host.
+        return new Response(
+          htmlWithOgImage("https://static.cdninstagram.com/rsrc.php/logo.png"),
+          { status: 200, headers: { "content-type": "text/html" } },
+        );
+      }
+      throw new Error("should never fetch a non-scontent image URL");
+    }) as unknown as typeof fetch;
+
+    const { fetchAndStoreProfilePhotoBestEffort } = await import(
+      "@/modules/analysis/profile-photo"
+    );
+
+    await fetchAndStoreProfilePhotoBestEffort({
+      requestId: request.id as string,
+      userId: "user-1",
+      instagramUrl: "https://instagram.com/silassilva.click",
+    });
+
+    expect(
+      (harness.store.analysis_requests ?? [])[0]!.profile_photo_storage_path,
+    ).toBeUndefined();
+    expect(harness.store.__storage ?? []).toHaveLength(0);
+  });
+
   it("never throws when the Storage upload itself fails", async () => {
     const request = seedRow(harness.store, "analysis_requests", {
       user_id: "user-1",
