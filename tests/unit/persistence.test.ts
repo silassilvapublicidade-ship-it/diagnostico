@@ -46,13 +46,6 @@ vi.mock("@/modules/auth/session", () => ({
   },
 }));
 
-// This module makes a real Anthropic call by design -- never let a unit
-// test touch that. Its behavior is covered on its own in
-// profile-photo.test.ts.
-vi.mock("@/modules/analysis/profile-photo", () => ({
-  extractProfilePhotoBestEffort: vi.fn(async () => {}),
-}));
-
 describe("createDiagnosisFromForm", () => {
   beforeEach(() => {
     resetFakeStore(harness.store);

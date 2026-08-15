@@ -33,6 +33,13 @@ const profilePhotoMigration = readFileSync(
   ),
   "utf8",
 );
+const removeProfilePhotoMigration = readFileSync(
+  new URL(
+    "../../supabase/migrations/0008_remove_profile_photo.sql",
+    import.meta.url,
+  ),
+  "utf8",
+);
 
 describe("initial Supabase migration", () => {
   it("declares the expected enums, tables, function, triggers, indexes, and policies", () => {
@@ -240,5 +247,13 @@ describe("initial Supabase migration", () => {
     expect(profilePhotoMigration).not.toContain("not null");
     expect(profilePhotoMigration).not.toContain("drop table");
     expect(profilePhotoMigration).not.toContain("drop policy");
+  });
+
+  it("0008 rolls back exactly the two profile photo columns 0007 added, nothing else", () => {
+    expect(removeProfilePhotoMigration).toContain(
+      "alter table public.analysis_requests\n  drop column profile_photo_storage_path,\n  drop column profile_photo_mime_type;",
+    );
+    expect(removeProfilePhotoMigration).not.toContain("drop table");
+    expect(removeProfilePhotoMigration).not.toContain("drop policy");
   });
 });

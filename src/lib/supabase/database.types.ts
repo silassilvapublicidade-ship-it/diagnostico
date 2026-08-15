@@ -238,8 +238,6 @@ export type Database = {
           id: string;
           instagram_url: string | null;
           order_id: string | null;
-          profile_photo_mime_type: string | null;
-          profile_photo_storage_path: string | null;
           profile_type: Database["public"]["Enums"]["profile_type"];
           requires_review: boolean;
           review_reasons: string[];
@@ -254,8 +252,6 @@ export type Database = {
           id?: string;
           instagram_url?: string | null;
           order_id?: string | null;
-          profile_photo_mime_type?: string | null;
-          profile_photo_storage_path?: string | null;
           profile_type: Database["public"]["Enums"]["profile_type"];
           requires_review?: boolean;
           review_reasons?: string[];
@@ -270,8 +266,6 @@ export type Database = {
           id?: string;
           instagram_url?: string | null;
           order_id?: string | null;
-          profile_photo_mime_type?: string | null;
-          profile_photo_storage_path?: string | null;
           profile_type?: Database["public"]["Enums"]["profile_type"];
           requires_review?: boolean;
           review_reasons?: string[];

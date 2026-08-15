@@ -30,7 +30,6 @@ import {
   buildDevelopmentFixtureResult,
   isDevelopmentFixturesEnabled,
 } from "./development-fixture";
-import { extractProfilePhotoBestEffort } from "./profile-photo";
 import type { ResultOrigin } from "./result-origin";
 
 const STORAGE_BUCKET = "analysis-assets";
@@ -61,7 +60,6 @@ export type DiagnosisDetail = {
   request: DiagnosisListItem & {
     instagram_url: string | null;
     review_reasons: string[];
-    profile_photo_storage_path: string | null;
   };
   result: {
     id: string;
@@ -609,27 +607,6 @@ export async function completePreparedDiagnosisUpload(params: {
       }
     }
 
-    // Best-effort, awaited so it actually runs before this serverless
-    // invocation ends, but never allowed to fail or slow down submission --
-    // see extractProfilePhotoBestEffort's own doc comment for why this can
-    // never throw. Must run after the loop above: it needs the profile_top
-    // file to already exist in Storage, which this loop just confirmed.
-    const profileTopAsset = params.assets.find(
-      (asset) => asset.assetType === "profile_top",
-    );
-
-    await extractProfilePhotoBestEffort({
-      requestId: request.id,
-      userId: user.id,
-      profileTopAsset: profileTopAsset
-        ? {
-            storageBucket: profileTopAsset.storageBucket,
-            storagePath: profileTopAsset.storagePath,
-            mimeType: profileTopAsset.mimeType,
-          }
-        : undefined,
-    });
-
     await createInitialAnalysisJob({
       analysisRequestId: request.id,
       profileType: request.profile_type,
@@ -853,7 +830,7 @@ export async function getDiagnosis(
   const { data: request, error: requestError } = await supabase
     .from("analysis_requests")
     .select(
-      "id, profile_type, instagram_url, status, requires_review, review_reasons, created_at, completed_at, profile_photo_storage_path",
+      "id, profile_type, instagram_url, status, requires_review, review_reasons, created_at, completed_at",
     )
     .eq("id", id)
     .single();
