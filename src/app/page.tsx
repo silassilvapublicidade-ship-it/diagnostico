@@ -372,7 +372,7 @@ export default function Home() {
         type="application/ld+json"
       />
       <AmbientBackground />
-      <header className="sticky top-0 z-40 border-b border-white/10 bg-ink/85 backdrop-blur">
+      <header className="sticky top-0 z-40 border-b border-white/10 bg-ink/85 backdrop-blur-md">
         <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 px-6 py-3 sm:px-10 lg:px-16 xl:px-20">
           <Link className="flex items-center gap-3" href="/">
             <span className="relative h-12 w-12 shrink-0 sm:h-14 sm:w-14">
@@ -477,7 +477,7 @@ export default function Home() {
             <div className="mt-8 grid gap-3.5 sm:grid-cols-2">
               {RECEIVE_ITEMS.map((item) => (
                 <div
-                  className="card flex items-center gap-4 rounded-lg border border-white/10 bg-white/[0.03] p-4 backdrop-blur-sm"
+                  className="card flex items-center gap-4 rounded-lg border border-white/10 bg-white/[0.03] p-4 backdrop-blur-md"
                   key={item.title}
                 >
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-accent/30 bg-accent/10 text-accent">
@@ -506,7 +506,7 @@ export default function Home() {
             <div className="mt-10 grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
               {HOW_IT_WORKS.map((step, index) => (
                 <div
-                  className="card rounded-lg border border-white/10 bg-white/[0.03] p-5 backdrop-blur-sm"
+                  className="card rounded-lg border border-white/10 bg-white/[0.03] p-5 backdrop-blur-md"
                   key={step.title}
                 >
                   <div className="flex items-center gap-3">
@@ -538,7 +538,7 @@ export default function Home() {
             <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
               {DIMENSIONS.map((dimension) => (
                 <div
-                  className="card rounded-lg border border-white/10 bg-white/[0.03] p-4 text-center backdrop-blur-sm"
+                  className="card rounded-lg border border-white/10 bg-white/[0.03] p-4 text-center backdrop-blur-md"
                   key={dimension.code}
                 >
                   <span className="mx-auto flex h-10 w-10 items-center justify-center rounded-full border border-accent/30 bg-accent/10 text-accent">
@@ -578,7 +578,7 @@ export default function Home() {
               title="Empresa ou criador. Pesos diferentes."
             />
 
-            <div className="mt-8 grid overflow-hidden rounded-lg border border-cream/10 backdrop-blur-sm transition-shadow duration-300 hover:shadow-[0_25px_70px_-25px_rgba(255,90,0,0.3)] sm:grid-cols-2">
+            <div className="mt-8 grid overflow-hidden rounded-lg border border-cream/10 backdrop-blur-md transition-shadow duration-300 hover:shadow-[0_25px_70px_-25px_rgba(255,90,0,0.3)] sm:grid-cols-2">
               {PROFILE_TYPES.map((profile, index) => (
                 <div
                   className={
@@ -625,7 +625,7 @@ export default function Home() {
               title="Pare de tentar adivinhar. Comece a saber."
             />
 
-            <div className="mt-8 overflow-hidden rounded-lg border border-white/10 bg-white/[0.03] backdrop-blur-sm">
+            <div className="mt-8 overflow-hidden rounded-lg border border-white/10 bg-white/[0.03] backdrop-blur-md">
               <div className="grid grid-cols-2 border-b border-cream/10 bg-white/[0.03]">
                 <p className="kicker px-4 py-3 text-cream/45 sm:px-6">
                   Sem diagnóstico
@@ -662,7 +662,7 @@ export default function Home() {
             <div className="mt-8 grid gap-3.5 sm:grid-cols-3">
               {TRUST_POINTS.map((point) => (
                 <div
-                  className="card rounded-lg border border-white/10 bg-white/[0.03] p-5 backdrop-blur-sm"
+                  className="card rounded-lg border border-white/10 bg-white/[0.03] p-5 backdrop-blur-md"
                   key={point.title}
                 >
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-accent/30 bg-accent/10 text-accent">
@@ -731,7 +731,7 @@ export default function Home() {
             <div className="mt-8 grid gap-3">
               {FAQ_ITEMS.map((item) => (
                 <details
-                  className="card group rounded-lg border border-white/10 bg-white/[0.03] backdrop-blur-sm"
+                  className="card group rounded-lg border border-white/10 bg-white/[0.03] backdrop-blur-md"
                   key={item.question}
                 >
                   <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-5 text-sm font-semibold text-cream">

@@ -12,7 +12,8 @@ function ExampleScoreRing({
   const [ref, inView] = useInView<HTMLDivElement>(0.4);
   const animated = useCountUp(score, inView);
   const percentage = Math.max(0, Math.min(100, animated));
-  const dimensionClass = size === "sm" ? "h-20 w-20" : "h-24 w-24 sm:h-28 sm:w-28";
+  const dimensionClass =
+    size === "sm" ? "h-20 w-20" : "h-24 w-24 sm:h-28 sm:w-28";
   const numberClass = size === "sm" ? "text-2xl" : "text-3xl";
 
   return (
@@ -41,7 +42,10 @@ function ExampleScoreBar({ score }: { score: number }) {
   const width = Math.max(0, Math.min(100, grown));
 
   return (
-    <div className="h-1.5 w-full overflow-hidden rounded-full bg-cream/10" ref={ref}>
+    <div
+      className="h-1.5 w-full overflow-hidden rounded-full bg-cream/10"
+      ref={ref}
+    >
       <div
         className="h-full rounded-full bg-accent transition-[width] duration-[800ms] ease-out"
         style={{ width: `${width}%` }}
@@ -61,7 +65,7 @@ function MiniStat({ label, value }: { label: string; value: string }) {
 
 export function HeroResultPreview() {
   return (
-    <div className="dark-panel max-w-[26rem] p-4 sm:p-5">
+    <div className="dark-panel glow-halo max-w-[26rem] p-4 sm:p-5">
       <p className="kicker text-accent">Exemplo ilustrativo</p>
 
       <div className="mt-4 flex items-center gap-4">
@@ -98,8 +102,8 @@ export function HeroResultPreview() {
 
       <div className="mt-4 rounded-lg border border-accent/30 bg-accent/10 px-3 py-2.5">
         <p className="text-xs leading-5 font-medium text-cream/90">
-          <span className="text-accent">Ponto crítico:</span> Conversão
-          baixa apesar do bom alcance.
+          <span className="text-accent">Ponto crítico:</span> Conversão baixa
+          apesar do bom alcance.
         </p>
       </div>
     </div>
@@ -203,7 +207,13 @@ function ExampleList({
   );
 }
 
-function ExamplePlan({ timeframe, items }: { timeframe: string; items: string[] }) {
+function ExamplePlan({
+  timeframe,
+  items,
+}: {
+  timeframe: string;
+  items: string[];
+}) {
   return (
     <div className="lux-panel p-5">
       <span className="inline-block rounded-md bg-accent px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-ink">
@@ -250,21 +260,29 @@ export function FullResultPreview() {
       <div className="lux-panel p-5">
         <p className="kicker text-accent">Resumo executivo</p>
         <p className="mt-2.5 text-sm leading-6 text-cream/75">
-          Identidade e Primeira Impressão já sustentam o perfil. O gargalo
-          real está na Conversão: quem chega entende e confia, mas não sabe
-          qual é o próximo passo.
+          Identidade e Primeira Impressão já sustentam o perfil. O gargalo real
+          está na Conversão: quem chega entende e confia, mas não sabe qual é o
+          próximo passo.
         </p>
       </div>
 
       <ExampleList
         caption="Nunca mais de 2-3 por vez"
-        items={["Bio com proposta clara", "Prova de autoridade", "Uma chamada por post"]}
+        items={[
+          "Bio com proposta clara",
+          "Prova de autoridade",
+          "Uma chamada por post",
+        ]}
         title="Prioridades"
       />
 
       <div className="grid gap-4 sm:grid-cols-3">
         <ExamplePlan
-          items={["Reescrever a bio", "Fixar prova de autoridade", "Definir a chamada principal"]}
+          items={[
+            "Reescrever a bio",
+            "Fixar prova de autoridade",
+            "Definir a chamada principal",
+          ]}
           timeframe="24 horas"
         />
         <ExamplePlan

@@ -339,30 +339,30 @@ textarea {
 .bg-orb {
   position: absolute;
   border-radius: 9999px;
-  filter: blur(120px);
-  opacity: 0.35;
+  filter: blur(150px);
+  opacity: 0.55;
   will-change: transform;
 }
 
 .bg-orb--1 {
-  width: 38rem;
-  height: 38rem;
+  width: 42rem;
+  height: 42rem;
   top: -10%;
   left: 60%;
   background: radial-gradient(circle, #ff6a1a, transparent 70%);
   animation: float1 22s ease-in-out infinite;
 }
 .bg-orb--2 {
-  width: 30rem;
-  height: 30rem;
+  width: 34rem;
+  height: 34rem;
   bottom: -15%;
   left: -10%;
   background: radial-gradient(circle, #ff8c42, transparent 70%);
   animation: float2 26s ease-in-out infinite;
 }
 .bg-orb--3 {
-  width: 26rem;
-  height: 26rem;
+  width: 30rem;
+  height: 30rem;
   top: 40%;
   right: -10%;
   background: radial-gradient(circle, #ff3d00, transparent 70%);
@@ -375,7 +375,7 @@ textarea {
     transform: translate(0, 0) scale(1);
   }
   50% {
-    transform: translate(-60px, 80px) scale(1.1);
+    transform: translate(-110px, 130px) scale(1.18);
   }
 }
 @keyframes float2 {
@@ -384,7 +384,7 @@ textarea {
     transform: translate(0, 0) scale(1);
   }
   50% {
-    transform: translate(70px, -50px) scale(1.05);
+    transform: translate(120px, -90px) scale(1.12);
   }
 }
 @keyframes float3 {
@@ -393,7 +393,7 @@ textarea {
     transform: translate(0, 0) scale(1);
   }
   50% {
-    transform: translate(-40px, -60px) scale(0.95);
+    transform: translate(-80px, -100px) scale(0.9);
   }
 }
 
@@ -425,17 +425,32 @@ details[open]::details-content {
 }
 
 /* texto em gradiente para o titulo de maior destaque - reservado pra um
-   unico lugar (hero da landing) pra nao perder o impacto */
+   unico lugar (hero da landing) pra nao perder o impacto. Brilho lento e
+   continuo (desliza o gradiente) para reforcar a sensacao "premium/IA";
+   pausado para quem pediu menos movimento na tela. */
 .gradient-text {
   background: linear-gradient(
-    135deg,
+    100deg,
     var(--accent-soft),
-    var(--accent) 55%,
-    #ff3d00
+    var(--accent) 45%,
+    #ff3d00 65%,
+    var(--accent-soft)
   );
+  background-size: 250% auto;
   background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
+  animation: gradient-shift 6s ease-in-out infinite;
+}
+
+@keyframes gradient-shift {
+  0%,
+  100% {
+    background-position: 0% center;
+  }
+  50% {
+    background-position: 100% center;
+  }
 }
 
 /* hover elevado + glow, reutilizado pelos grids de card da landing */
@@ -446,9 +461,11 @@ details[open]::details-content {
     border-color 0.25s ease;
 }
 .card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(255, 106, 26, 0.4);
-  box-shadow: 0 12px 40px rgba(255, 106, 26, 0.15);
+  transform: translateY(-6px) scale(1.015);
+  border-color: rgba(255, 106, 26, 0.6);
+  box-shadow:
+    0 24px 70px rgba(255, 106, 26, 0.28),
+    0 0 0 1px rgba(255, 106, 26, 0.15) inset;
 }
 
 /* pulso continuo e sutil nos CTAs principais - nao aplicado ao botao fixo
@@ -456,14 +473,30 @@ details[open]::details-content {
 @keyframes pulse-glow {
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgba(255, 106, 26, 0.35);
+    box-shadow: 0 0 0 0 rgba(255, 106, 26, 0.45);
   }
   50% {
-    box-shadow: 0 0 0 10px rgba(255, 106, 26, 0);
+    box-shadow: 0 0 0 16px rgba(255, 106, 26, 0);
   }
 }
 .btn-pulse {
   animation: pulse-glow 2.5s ease-in-out infinite;
+}
+
+/* halo de luz por tras do card de exemplo do hero - o elemento mais
+   importante da primeira dobra ganha destaque extra */
+.glow-halo {
+  position: relative;
+}
+.glow-halo::before {
+  content: "";
+  position: absolute;
+  inset: -2.5rem;
+  z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(circle, rgba(255, 90, 0, 0.32), transparent 70%);
+  filter: blur(50px);
+  opacity: 0.85;
 }
 
 .pricing-card {
@@ -580,5 +613,9 @@ details[open]::details-content {
 
   .card:hover {
     transform: none;
+  }
+
+  .gradient-text {
+    animation: none;
   }
 }
