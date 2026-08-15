@@ -200,6 +200,61 @@ describe("generateAiDiagnosis", () => {
     expect(generated.usage.estimatedCostUsdCents).not.toBeNull();
   });
 
+  it("stops including assets once their combined base64 size would exceed the total request budget, even though each is individually within the per-asset limit", async () => {
+    const request = seedRow(harness.store, "analysis_requests", {
+      user_id: "user-1",
+      profile_type: "business",
+      instagram_url: "https://instagram.com/acme",
+      status: "ready",
+    });
+    seedRow(harness.store, "analysis_answers", {
+      analysis_request_id: request.id,
+      question_key: "mainObjective",
+      answer: "crescer com mais clareza",
+    });
+
+    // ~6.5MB raw each -> ~8.7MB base64 each (under the 9MB per-asset cap),
+    // but three of them together (~26MB) exceed the 24MB total budget --
+    // only the first two (by ASSET_TYPE_PRIORITY order) should be included.
+    const bigFile = new Uint8Array(6.5 * 1024 * 1024);
+    for (const [assetType, name] of [
+      ["profile_top", "topo.png"],
+      ["feed", "feed.png"],
+      ["highlights", "destaques.png"],
+    ] as const) {
+      const storagePath = `user-1/${request.id}/${assetType}/${name}`;
+      seedRow(harness.store, "analysis_assets", {
+        analysis_request_id: request.id,
+        user_id: "user-1",
+        asset_type: assetType,
+        storage_bucket: BUCKET,
+        storage_path: storagePath,
+        mime_type: "image/png",
+        processing_consent_at: new Date().toISOString(),
+      });
+      seedStorageFile(harness.store, BUCKET, storagePath, {
+        data: bigFile,
+        type: "image/png",
+      });
+    }
+
+    mockSuccessfulResponse();
+
+    await generateAiDiagnosis({
+      requestId: request.id as string,
+      userId: "user-1",
+    });
+
+    const callArgs = mockStream.mock.calls[0]![0] as {
+      messages: Array<{ content: Array<{ type: string }> }>;
+    };
+    const imageBlocks = callArgs.messages[0]!.content.filter(
+      (block) => block.type === "image",
+    );
+
+    expect(imageBlocks).toHaveLength(2);
+  });
+
   it("uses adaptive thinking and effort for an adaptive-capable model (claude-sonnet-5)", async () => {
     aiClientHarness.model = "claude-sonnet-5";
     const request = seedRequestWithAsset(harness.store, "user-1");

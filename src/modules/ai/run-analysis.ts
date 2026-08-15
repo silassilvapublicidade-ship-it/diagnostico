@@ -29,11 +29,20 @@ import {
 
 const MAX_ASSETS_SENT_TO_AI = 12;
 
-// Anthropic's per-image size limit applies to the base64-encoded payload, not
-// the raw file. Kept deliberately conservative here; confirm against
-// https://platform.claude.com/docs/en/build-with-claude/vision.md before
-// raising it.
-const MAX_ASSET_BASE64_BYTES = 5 * 1024 * 1024;
+// Confirmed against https://platform.claude.com/docs/en/build-with-claude/vision
+// (2026-08-14): the direct Claude API's per-image limit is 10MB base64-encoded
+// (not the raw file). Set just under that ceiling, never at it.
+const MAX_ASSET_BASE64_BYTES = 9 * 1024 * 1024;
+
+// Separate from the per-image cap: Anthropic also caps the *total* request
+// body at 32MB for standard endpoints, and up to MAX_ASSETS_SENT_TO_AI
+// images each sized close to MAX_ASSET_BASE64_BYTES could add up past that
+// on its own even though each individual image is within bounds. Stops
+// including further assets once the running total gets close, leaving
+// headroom for the system prompt, briefing text, and JSON schema that ride
+// in the same request -- same graceful "skip and note" pattern as an
+// individual oversized asset, never a hard failure of the whole analysis.
+const MAX_TOTAL_ASSET_BASE64_BYTES = 24 * 1024 * 1024;
 
 const ASSET_TYPE_PRIORITY: Record<string, number> = {
   profile_top: 0,
@@ -235,6 +244,7 @@ async function loadAssetContentBlocks(assets: AnalysisAssetRow[]) {
 
   const blocks: PromptAsset[] = [];
   const skipped: string[] = [];
+  let totalBase64Bytes = 0;
 
   for (const asset of prioritized) {
     const { data: blob, error } = await supabase.storage
@@ -256,6 +266,14 @@ async function loadAssetContentBlocks(assets: AnalysisAssetRow[]) {
       continue;
     }
 
+    if (totalBase64Bytes + data.length > MAX_TOTAL_ASSET_BASE64_BYTES) {
+      skipped.push(
+        `${asset.asset_type}: nao incluido por limite total de tamanho da requisicao a IA.`,
+      );
+      continue;
+    }
+
+    totalBase64Bytes += data.length;
     blocks.push({
       assetType: asset.asset_type,
       mimeType: asset.mime_type,

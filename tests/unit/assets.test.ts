@@ -48,6 +48,6 @@ describe("asset upload validation", () => {
           size: MAX_ASSET_SIZE_BYTES + 1,
         },
       ]),
-    ).toThrow(/10 MB/);
+    ).toThrow(new RegExp(`${MAX_ASSET_SIZE_BYTES / (1024 * 1024)} MB`));
   });
 });

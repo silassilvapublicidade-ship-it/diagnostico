@@ -17,9 +17,15 @@ export const ALLOWED_ASSET_MIME_TYPES = [
   "application/pdf",
 ] as const;
 
-export const MAX_ASSET_SIZE_BYTES = 10 * 1024 * 1024;
-export const MAX_FILES_PER_ASSET_TYPE = 4;
-export const MAX_FILES_PER_ANALYSIS = 20;
+// Raw upload ceiling -- generous headroom for high-resolution phone
+// screenshots (a single scrolling/stitched screenshot can run well past
+// 10MB on modern devices). Deliberately looser than what actually reaches
+// the AI (see MAX_ASSET_BASE64_BYTES in modules/ai/run-analysis.ts): a file
+// between the two thresholds still uploads and stays as evidence, it's just
+// excluded from the AI call with a note, rather than being rejected outright.
+export const MAX_ASSET_SIZE_BYTES = 20 * 1024 * 1024;
+export const MAX_FILES_PER_ASSET_TYPE = 6;
+export const MAX_FILES_PER_ANALYSIS = 30;
 
 export const assetTypeSchema = z.enum(ASSET_TYPES);
 export const assetMimeTypeSchema = z.enum(ALLOWED_ASSET_MIME_TYPES);
@@ -70,7 +76,9 @@ export function validateUploadCandidates(
     }
 
     if (candidate.size <= 0 || candidate.size > MAX_ASSET_SIZE_BYTES) {
-      throw new Error("Cada arquivo deve ter ate 10 MB.");
+      throw new Error(
+        `Cada arquivo deve ter ate ${MAX_ASSET_SIZE_BYTES / (1024 * 1024)} MB.`,
+      );
     }
 
     return {
