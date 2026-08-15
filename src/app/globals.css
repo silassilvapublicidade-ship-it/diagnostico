@@ -404,6 +404,40 @@ textarea {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
+/* abertura/fechamento suave do <details> nativo (FAQ, dimensoes) - sem
+   JS, sem trocar a semantica/acessibilidade nativa. Degrada graciosamente:
+   navegadores sem suporte a ::details-content simplesmente abrem/fecham
+   sem animacao, exatamente como hoje. */
+details {
+  interpolate-size: allow-keywords;
+}
+
+details::details-content {
+  overflow: hidden;
+  height: 0;
+  transition:
+    height 0.3s ease,
+    content-visibility 0.3s allow-discrete;
+}
+
+details[open]::details-content {
+  height: auto;
+}
+
+/* texto em gradiente para o titulo de maior destaque - reservado pra um
+   unico lugar (hero da landing) pra nao perder o impacto */
+.gradient-text {
+  background: linear-gradient(
+    135deg,
+    var(--accent-soft),
+    var(--accent) 55%,
+    #ff3d00
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
 /* hover elevado + glow, reutilizado pelos grids de card da landing */
 .card {
   transition:

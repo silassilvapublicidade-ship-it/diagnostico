@@ -199,7 +199,10 @@ const PROFILE_TYPES = [
 
 const COMPARISON_ROWS = [
   { without: "Vou mudar a bio e ver.", with: "Sei o que mudar e por quê." },
-  { without: "Preciso postar mais.", with: "O problema é conversão, não volume." },
+  {
+    without: "Preciso postar mais.",
+    with: "O problema é conversão, não volume.",
+  },
   { without: "Feed mais bonito.", with: "Identidade forte, gargalo é outro." },
   {
     without: "Uma IA genérica já faz isso.",
@@ -419,12 +422,12 @@ export default function Home() {
       <div className="mx-auto w-full max-w-[1440px] px-6 sm:px-10 lg:px-16 xl:px-20">
         <section className="grid gap-10 py-14 sm:py-20 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-12">
           <div>
-            <h1 className="display-title text-balance text-4xl leading-[1.08] text-cream sm:text-5xl">
+            <h1 className="display-title gradient-text text-balance text-4xl leading-[1.08] sm:text-5xl">
               Descubra o que está travando seu&nbsp;Instagram.
             </h1>
             <p className="mt-6 max-w-md text-lg leading-8 text-cream/70">
-              Não mostra só o que está errado. Mostra o que mudar, por que
-              mudar e como começar.
+              Não mostra só o que está errado. Mostra o que mudar, por que mudar
+              e como começar.
             </p>
           </div>
 
@@ -466,7 +469,10 @@ export default function Home() {
         <section className="py-16 sm:py-24" id="o-que-voce-recebe">
           <div className="hairline" />
           <Reveal className="mt-10 sm:mt-14">
-            <SectionHeading kicker="O que você recebe" title="Clareza sobre o que fazer." />
+            <SectionHeading
+              kicker="O que você recebe"
+              title="Clareza sobre o que fazer."
+            />
 
             <div className="mt-8 grid gap-3.5 sm:grid-cols-2">
               {RECEIVE_ITEMS.map((item) => (
@@ -481,9 +487,7 @@ export default function Home() {
                     <p className="text-base font-semibold text-cream">
                       {item.title}
                     </p>
-                    <p className="mt-0.5 text-xs text-cream/50">
-                      {item.hint}
-                    </p>
+                    <p className="mt-0.5 text-xs text-cream/50">{item.hint}</p>
                   </div>
                 </div>
               ))}
@@ -559,8 +563,8 @@ export default function Home() {
                 As 8 dimensões não são analisadas isoladamente. Um perfil com
                 Identidade forte, boa Primeira Impressão e Conteúdo relevante,
                 mas Conversão baixa, não tem oito notas soltas. Tem um
-                diagnóstico: o problema não é chamar atenção, é transformar
-                essa atenção em ação.
+                diagnóstico: o problema não é chamar atenção, é transformar essa
+                atenção em ação.
               </p>
             </div>
           </Reveal>
@@ -650,7 +654,10 @@ export default function Home() {
         <section className="py-16 sm:py-24">
           <div className="hairline" />
           <Reveal className="mt-10 sm:mt-14">
-            <SectionHeading kicker="Privacidade" title="Privado, do seu jeito." />
+            <SectionHeading
+              kicker="Privacidade"
+              title="Privado, do seu jeito."
+            />
 
             <div className="mt-8 grid gap-3.5 sm:grid-cols-3">
               {TRUST_POINTS.map((point) => (
@@ -688,13 +695,13 @@ export default function Home() {
                 <p className="mt-4 max-w-2xl text-justify text-sm leading-6 text-cream/65">
                   A Metodologia 8D surgiu da prática, analisando perfis que
                   produzem conteúdo, mas nem sempre conseguem enxergar o que
-                  funciona, o que está limitando seus resultados e o que
-                  deveria mudar primeiro.
+                  funciona, o que está limitando seus resultados e o que deveria
+                  mudar primeiro.
                 </p>
                 <p className="mt-4 max-w-2xl text-justify text-sm leading-6 text-cream/65">
-                  Essa experiência foi transformada em uma leitura
-                  estruturada por 8 Dimensões Estratégicas, hoje
-                  potencializada por inteligência artificial.
+                  Essa experiência foi transformada em uma leitura estruturada
+                  por 8 Dimensões Estratégicas, hoje potencializada por
+                  inteligência artificial.
                 </p>
                 <p className="mt-4 text-xs font-medium text-cream/40">
                   Marketing · Mídias Digitais · Branding &amp; Growth ·
@@ -716,7 +723,10 @@ export default function Home() {
         <section className="py-16 sm:py-24">
           <div className="hairline" />
           <Reveal className="mt-10 sm:mt-14">
-            <SectionHeading kicker="Perguntas frequentes" title="Antes de perguntar, leia aqui." />
+            <SectionHeading
+              kicker="Perguntas frequentes"
+              title="Antes de perguntar, leia aqui."
+            />
 
             <div className="mt-8 grid gap-3">
               {FAQ_ITEMS.map((item) => (
@@ -753,8 +763,8 @@ export default function Home() {
               </p>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-cream/60">
                 Você não paga para saber uma nota. O score é só o ponto de
-                partida. Você paga para entender por que ele é esse, o que
-                está causando isso e como corrigir.
+                partida. Você paga para entender por que ele é esse, o que está
+                causando isso e como corrigir.
               </p>
               <div className="mt-8">
                 <PricingCard />
@@ -767,8 +777,12 @@ export default function Home() {
           <div className="hairline" />
           <Reveal className="mt-16 sm:mt-24">
             <h2 className="display-title text-2xl leading-[1.15] text-cream sm:text-4xl lg:text-5xl">
-              <span className="block whitespace-nowrap">Seu perfil pode estar</span>
-              <span className="block whitespace-nowrap">perdendo oportunidades.</span>
+              <span className="block whitespace-nowrap">
+                Seu perfil pode estar
+              </span>
+              <span className="block whitespace-nowrap">
+                perdendo oportunidades.
+              </span>
             </h2>
             <div className="mt-10">
               <Link className="action-primary action-accent" href="/comecar">
