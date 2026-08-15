@@ -85,11 +85,6 @@ export default async function DiagnosisDetailPage({
       ? webPayloadSchema.safeParse(diagnosis.report.web_payload)
       : null;
   const webPayload = parsedWebPayload?.success ? parsedWebPayload.data : null;
-  const profileTopAsset = diagnosis.assets.find(
-    (asset) =>
-      asset.asset_type === "profile_top" &&
-      asset.mime_type.startsWith("image/"),
-  );
   const instagramUsername = diagnosis.request.instagram_url
     ? extractInstagramUsername(diagnosis.request.instagram_url)
     : null;
@@ -205,26 +200,6 @@ export default async function DiagnosisDetailPage({
         />
         <Metric label="Evidências" value={String(diagnosis.assets.length)} />
       </section>
-
-      {profileTopAsset ? (
-        <section className="dark-panel flex flex-col gap-5 p-4 text-cream sm:flex-row sm:items-start">
-          {/* eslint-disable-next-line @next/next/no-img-element -- private,
-              per-owner evidence served through our own authenticated route,
-              not a static/remote asset next/image can optimize. */}
-          <img
-            alt="Topo do perfil enviado como evidência"
-            className="w-full max-w-[240px] border border-accent/35"
-            src={`/app/diagnosticos/${diagnosis.request.id}/assets/${profileTopAsset.id}`}
-          />
-          <div>
-            <p className="kicker text-accent">Perfil enviado</p>
-            <p className="mt-2 max-w-md text-sm leading-6 text-cream/68">
-              Topo do perfil enviado como evidência - foto e bio ficam aqui como
-              referência enquanto você lê o diagnóstico.
-            </p>
-          </div>
-        </section>
-      ) : null}
 
       {result ? (
         <>
