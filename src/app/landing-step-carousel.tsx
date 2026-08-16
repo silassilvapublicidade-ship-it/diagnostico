@@ -11,6 +11,7 @@ export type StepCarouselItem = {
   icon: ReactNode;
   title: string;
   description: string;
+  details: readonly string[];
 };
 
 export function StepCarousel({
@@ -43,6 +44,18 @@ export function StepCarousel({
         <p className="mt-3 max-w-md text-sm leading-6 text-cream/65 sm:text-base">
           {current.description}
         </p>
+
+        <ul className="mt-6 grid w-full max-w-lg gap-2.5 text-left sm:grid-cols-2">
+          {current.details.map((detail) => (
+            <li
+              className="flex gap-2.5 rounded-lg border border-white/10 bg-black/20 px-3.5 py-2.5 text-sm leading-5 text-cream/75"
+              key={detail}
+            >
+              <span className="mt-0.5 shrink-0 text-accent">&rarr;</span>
+              <span>{detail}</span>
+            </li>
+          ))}
+        </ul>
       </div>
 
       <div className="mt-8 flex items-center justify-center gap-4">

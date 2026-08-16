@@ -127,24 +127,48 @@ const HOW_IT_WORKS = [
     title: "Conte sobre seu perfil",
     description:
       "Perguntas rápidas sobre objetivo, tipo de perfil e principal desafio — leva menos de 2 minutos.",
+    details: [
+      "Objetivo do perfil: vender, atrair clientes, construir autoridade ou outro foco",
+      "Tipo de perfil: comercial (Business) ou criador de conteúdo (Creator) — muda os pesos da análise",
+      "Principal desafio que você já percebe hoje",
+      "Sem letra miúda: só o que é usado no diagnóstico",
+    ],
   },
   {
     icon: Upload,
     title: "Envie as evidências",
     description:
       "Prints do perfil: topo, feed, destaques e insights. Cada print vira evidência real analisada — nunca acesso automático à sua conta.",
+    details: [
+      "Topo do perfil: foto, bio e destaques",
+      "Feed: a grade de posts",
+      "Destaques (Highlights) abertos",
+      "Insights, se você tiver acesso — não é obrigatório",
+    ],
   },
   {
     icon: ScanSearch,
     title: "Receba sua leitura",
     description:
       "Análise em profundidade pelas 8 Dimensões Estratégicas, cruzando o que você contou com o que as evidências mostram.",
+    details: [
+      "As 8 Dimensões avaliadas uma a uma, não uma nota solta",
+      "Cruzamento entre o briefing e o que as evidências mostram",
+      "Falta de evidência vira limitação registrada, nunca é inventada",
+      "Leitura ajustada ao seu tipo de perfil (Business ou Creator)",
+    ],
   },
   {
     icon: CheckCircle2,
     title: "Veja o que mudar",
     description:
       "Diagnóstico, prioridades e plano de ação em 24h, 7 dias e 30 dias — sem achismo, com evidência.",
+    details: [
+      "Diagnóstico e evidência por dimensão",
+      "Prioridades: o que resolver primeiro, não 20 itens soltos",
+      "Plano de ação em 24h, 7 dias e 30 dias",
+      "Sugestões de conteúdo que nascem do seu diagnóstico",
+    ],
   },
 ] as const;
 
