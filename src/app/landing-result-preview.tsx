@@ -2,30 +2,21 @@
 
 import { useCountUp, useGrowIn, useInView } from "./landing-motion";
 
-function ExampleScoreRing({
-  score,
-  size = "lg",
-}: {
-  score: number;
-  size?: "sm" | "lg";
-}) {
+function ExampleScoreRing({ score }: { score: number }) {
   const [ref, inView] = useInView<HTMLDivElement>(0.4);
   const animated = useCountUp(score, inView);
   const percentage = Math.max(0, Math.min(100, animated));
-  const dimensionClass =
-    size === "sm" ? "h-20 w-20" : "h-24 w-24 sm:h-28 sm:w-28";
-  const numberClass = size === "sm" ? "text-2xl" : "text-3xl";
 
   return (
     <div
-      className={`relative flex shrink-0 items-center justify-center rounded-full ${dimensionClass}`}
+      className="relative flex h-24 w-24 shrink-0 items-center justify-center rounded-full sm:h-28 sm:w-28"
       ref={ref}
       style={{
         background: `conic-gradient(var(--accent) ${percentage * 3.6}deg, color-mix(in srgb, var(--graphite) 12%, transparent) 0deg)`,
       }}
     >
       <div className="flex h-[calc(100%-11px)] w-[calc(100%-11px)] flex-col items-center justify-center rounded-full bg-panel">
-        <span className={`display-title leading-none ${numberClass}`}>
+        <span className="display-title text-3xl leading-none">
           {animated}
         </span>
         <span className="mt-1 font-mono text-[8px] uppercase tracking-[0.14em] text-graphite/46">
@@ -59,53 +50,6 @@ function MiniStat({ label, value }: { label: string; value: string }) {
     <div className="rounded-lg border border-cream/10 bg-black/20 px-4 py-3">
       <p className="kicker text-[10px] text-accent">{label}</p>
       <p className="mt-2 text-base font-black text-cream">{value}</p>
-    </div>
-  );
-}
-
-export function HeroResultPreview() {
-  return (
-    <div className="dark-panel glow-halo max-w-[26rem] p-4 sm:p-5">
-      <p className="kicker text-accent">Exemplo ilustrativo</p>
-
-      <div className="mt-4 flex items-center gap-4">
-        <ExampleScoreRing score={65} size="sm" />
-        <div>
-          <p className="text-base font-black text-cream">Consistente</p>
-          <p className="mt-1 text-xs text-cream/50">Score estratégico</p>
-        </div>
-      </div>
-
-      <div className="mt-4 space-y-2.5">
-        {(
-          [
-            { label: "Conversão", score: 38, tag: "Maior gargalo" },
-            { label: "Identidade", score: 82, tag: "Maior força" },
-          ] as const
-        ).map((row) => (
-          <div key={row.label}>
-            <div className="flex items-center justify-between text-xs">
-              <span className="flex items-center gap-1.5 font-semibold text-cream/80">
-                {row.label}
-                <span className="font-mono text-[9px] font-normal tracking-[0.06em] text-accent/70 uppercase">
-                  {row.tag}
-                </span>
-              </span>
-              <span className="text-cream/50">{row.score}</span>
-            </div>
-            <div className="mt-1.5">
-              <ExampleScoreBar score={row.score} />
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-4 rounded-lg border border-accent/30 bg-accent/10 px-3 py-2.5">
-        <p className="text-xs leading-5 font-medium text-cream/90">
-          <span className="text-accent">Ponto crítico:</span> Conversão baixa
-          apesar do bom alcance.
-        </p>
-      </div>
     </div>
   );
 }

@@ -32,7 +32,8 @@ import {
 } from "@/modules/billing";
 
 import { AmbientBackground, Reveal } from "./landing-motion";
-import { FullResultPreview, HeroResultPreview } from "./landing-result-preview";
+import { FullResultPreview } from "./landing-result-preview";
+import { StepCarousel } from "./landing-step-carousel";
 import { SITE_NAME, SITE_URL } from "./site-config";
 
 const PAGE_TITLE =
@@ -62,6 +63,12 @@ export const metadata: Metadata = {
 
 const PRICE_DISPLAY = formatPriceDisplay(INITIAL_PRICE_AMOUNT_CENTS);
 const PRICE_MACHINE = formatPriceMachine(INITIAL_PRICE_AMOUNT_CENTS);
+
+const HERO_BADGES = [
+  { icon: Gauge, label: "Score por evidência" },
+  { icon: FileCheck, label: "Nada inventado" },
+  { icon: Lock, label: "Evidências privadas" },
+] as const;
 
 const OFFER_INCLUDES = [
   "Score Estratégico por dimensão",
@@ -118,18 +125,26 @@ const HOW_IT_WORKS = [
   {
     icon: ClipboardList,
     title: "Conte sobre seu perfil",
-    hint: "Perguntas rápidas",
+    description:
+      "Perguntas rápidas sobre objetivo, tipo de perfil e principal desafio — leva menos de 2 minutos.",
   },
-  { icon: Upload, title: "Envie as evidências", hint: "Prints do perfil" },
+  {
+    icon: Upload,
+    title: "Envie as evidências",
+    description:
+      "Prints do perfil: topo, feed, destaques e insights. Cada print vira evidência real analisada — nunca acesso automático à sua conta.",
+  },
   {
     icon: ScanSearch,
     title: "Receba sua leitura",
-    hint: "Análise em profundidade",
+    description:
+      "Análise em profundidade pelas 8 Dimensões Estratégicas, cruzando o que você contou com o que as evidências mostram.",
   },
   {
     icon: CheckCircle2,
     title: "Veja o que mudar",
-    hint: "Diagnóstico e plano",
+    description:
+      "Diagnóstico, prioridades e plano de ação em 24h, 7 dias e 30 dias — sem achismo, com evidência.",
   },
 ] as const;
 
@@ -420,18 +435,37 @@ export default function Home() {
       </header>
 
       <div className="mx-auto w-full max-w-[1440px] px-6 sm:px-10 lg:px-16 xl:px-20">
-        <section className="grid gap-10 py-14 sm:py-20 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-12">
-          <div>
-            <h1 className="display-title gradient-text text-balance text-4xl leading-[1.08] sm:text-5xl">
-              Descubra o que está travando seu&nbsp;Instagram.
-            </h1>
-            <p className="mt-6 max-w-md text-lg leading-8 text-cream/70">
-              Não mostra só o que está errado. Mostra o que mudar, por que mudar
-              e como começar.
-            </p>
+        <section className="mx-auto max-w-3xl py-16 text-center sm:py-24">
+          <h1 className="display-title gradient-text text-balance text-5xl leading-[1.05] sm:text-6xl lg:text-7xl">
+            Descubra o que está travando seu&nbsp;Instagram.
+          </h1>
+          <p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-cream/70 sm:text-xl">
+            Não mostra só o que está errado. Mostra o que mudar, por que mudar
+            e como começar.
+          </p>
+
+          <div className="mt-10 flex justify-center">
+            <Link
+              className="action-primary action-accent btn-pulse px-8 py-4 text-sm"
+              href="/comecar"
+            >
+              Analisar meu perfil
+            </Link>
           </div>
 
-          <HeroResultPreview />
+          <div className="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
+            {HERO_BADGES.map(({ icon: Icon, label }) => (
+              <div
+                className="flex items-center gap-2 text-cream/55"
+                key={label}
+              >
+                <Icon aria-hidden className="h-4 w-4 text-accent" />
+                <span className="text-xs font-semibold uppercase tracking-[0.08em]">
+                  {label}
+                </span>
+              </div>
+            ))}
+          </div>
         </section>
 
         <section className="py-16 sm:py-24">
@@ -503,26 +537,19 @@ export default function Home() {
               title="Simples de enviar, profundo de receber."
             />
 
-            <div className="mt-10 grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
-              {HOW_IT_WORKS.map((step, index) => (
-                <div
-                  className="card rounded-lg border border-white/10 bg-white/[0.03] p-5 backdrop-blur-md"
-                  key={step.title}
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-accent/30 bg-accent/10 text-accent">
-                      <step.icon aria-hidden className="h-[18px] w-[18px]" />
-                    </span>
-                    <span className="font-mono text-xs text-accent/70">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                  </div>
-                  <p className="mt-3 text-base font-black text-cream">
-                    {step.title}
-                  </p>
-                  <p className="mt-1 text-sm text-cream/55">{step.hint}</p>
-                </div>
-              ))}
+            <div className="mt-10">
+              <StepCarousel
+                steps={HOW_IT_WORKS.map((step) => ({
+                  ...step,
+                  icon: (
+                    <step.icon
+                      aria-hidden
+                      className="h-10 w-10"
+                      strokeWidth={1.8}
+                    />
+                  ),
+                }))}
+              />
             </div>
           </Reveal>
         </section>
