@@ -275,7 +275,7 @@ const NAV_LINKS = [
 
 function SectionHeading({ kicker, title }: { kicker: string; title: string }) {
   return (
-    <div>
+    <div className="mx-auto max-w-2xl text-center">
       <p className="kicker text-accent">{kicker}</p>
       <h2 className="display-title mt-3 text-2xl leading-[1.1] text-cream sm:text-3xl">
         {title}
@@ -476,12 +476,10 @@ export default function Home() {
               title="Talvez o problema não seja postar pouco."
             />
 
-            <div className="mt-8 grid border-t border-cream/10 sm:grid-cols-2">
+            <div className="mx-auto mt-8 grid max-w-3xl border-t border-cream/10 sm:grid-cols-2">
               {PAIN_POINTS.map((point, index) => (
                 <div
-                  className={`flex items-center gap-4 border-b border-cream/10 py-3.5 ${
-                    index % 2 === 0 ? "sm:pr-5" : "sm:pl-5"
-                  }`}
+                  className="flex items-center justify-center gap-4 border-b border-cream/10 py-3.5"
                   key={point}
                 >
                   <span className="font-mono text-sm font-black text-accent/60">
@@ -494,7 +492,7 @@ export default function Home() {
               ))}
             </div>
 
-            <p className="mt-8 text-base font-semibold text-cream/90">
+            <p className="mt-8 text-center text-base font-semibold text-cream/90">
               É isso que a análise identifica.
             </p>
           </Reveal>
@@ -511,7 +509,7 @@ export default function Home() {
             <div className="mt-8 grid gap-3.5 sm:grid-cols-2">
               {RECEIVE_ITEMS.map((item) => (
                 <div
-                  className="card flex items-center gap-4 rounded-lg border border-white/10 bg-white/[0.03] p-4 backdrop-blur-md"
+                  className="card flex flex-col items-center gap-3 rounded-lg border border-white/10 bg-white/[0.03] p-5 text-center backdrop-blur-md"
                   key={item.title}
                 >
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-accent/30 bg-accent/10 text-accent">
@@ -610,8 +608,8 @@ export default function Home() {
                 <div
                   className={
                     index === 0
-                      ? "border-b border-cream/10 p-6 transition-colors duration-300 hover:bg-white/[0.02] sm:border-r sm:border-b-0 sm:p-8"
-                      : "p-6 transition-colors duration-300 hover:bg-white/[0.02] sm:p-8"
+                      ? "border-b border-cream/10 p-6 text-center transition-colors duration-300 hover:bg-white/[0.02] sm:border-r sm:border-b-0 sm:p-8"
+                      : "p-6 text-center transition-colors duration-300 hover:bg-white/[0.02] sm:p-8"
                   }
                   key={profile.code}
                 >
@@ -654,10 +652,10 @@ export default function Home() {
 
             <div className="mt-8 overflow-hidden rounded-lg border border-white/10 bg-white/[0.03] backdrop-blur-md">
               <div className="grid grid-cols-2 border-b border-cream/10 bg-white/[0.03]">
-                <p className="kicker px-4 py-3 text-cream/45 sm:px-6">
+                <p className="kicker px-4 py-3 text-center text-cream/45 sm:px-6">
                   Sem diagnóstico
                 </p>
-                <p className="kicker border-l border-cream/10 px-4 py-3 text-accent sm:px-6">
+                <p className="kicker border-l border-cream/10 px-4 py-3 text-center text-accent sm:px-6">
                   Com o diagnóstico
                 </p>
               </div>
@@ -666,10 +664,10 @@ export default function Home() {
                   className="grid grid-cols-2 border-b border-cream/10 last:border-b-0"
                   key={row.without}
                 >
-                  <p className="px-4 py-5 text-base leading-6 text-cream/50 sm:px-6">
+                  <p className="px-4 py-5 text-center text-base leading-6 text-cream/50 sm:px-6">
                     {row.without}
                   </p>
-                  <p className="border-l border-cream/10 px-4 py-5 text-base font-medium leading-6 text-cream/90 sm:px-6">
+                  <p className="border-l border-cream/10 px-4 py-5 text-center text-base font-medium leading-6 text-cream/90 sm:px-6">
                     {row.with}
                   </p>
                 </div>
@@ -689,7 +687,7 @@ export default function Home() {
             <div className="mt-8 grid gap-3.5 sm:grid-cols-3">
               {TRUST_POINTS.map((point) => (
                 <div
-                  className="card rounded-lg border border-white/10 bg-white/[0.03] p-5 backdrop-blur-md"
+                  className="card flex flex-col items-center rounded-lg border border-white/10 bg-white/[0.03] p-5 text-center backdrop-blur-md"
                   key={point.title}
                 >
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-accent/30 bg-accent/10 text-accent">
@@ -708,41 +706,42 @@ export default function Home() {
         <section className="py-16 sm:py-24">
           <div className="hairline" />
           <Reveal className="mt-10 sm:mt-14">
-            <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-              <div>
-                <SectionHeading
-                  kicker="Metodologia 8D"
-                  title="Criada por quem já viveu esse problema na prática."
-                />
-                <p className="mt-4 max-w-2xl text-justify text-sm leading-6 text-cream/65">
-                  Silas Silva é Técnico em Marketing pelo SENAC e atua com
-                  estratégia de conteúdo, posicionamento digital e produção
-                  audiovisual.
-                </p>
-                <p className="mt-4 max-w-2xl text-justify text-sm leading-6 text-cream/65">
-                  A Metodologia 8D surgiu da prática, analisando perfis que
-                  produzem conteúdo, mas nem sempre conseguem enxergar o que
-                  funciona, o que está limitando seus resultados e o que deveria
-                  mudar primeiro.
-                </p>
-                <p className="mt-4 max-w-2xl text-justify text-sm leading-6 text-cream/65">
-                  Essa experiência foi transformada em uma leitura estruturada
-                  por 8 Dimensões Estratégicas, hoje potencializada por
-                  inteligência artificial.
-                </p>
-                <p className="mt-4 text-xs font-medium text-cream/40">
-                  Marketing · Mídias Digitais · Branding &amp; Growth ·
-                  Audiovisual · Fotografia
-                </p>
-              </div>
-
+            <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
               <Image
                 alt="Silas Silva, criador da Metodologia 8D"
-                className="h-auto w-full rounded-lg border border-white/10"
+                className="h-36 w-36 rounded-full border border-white/10 object-cover sm:h-44 sm:w-44"
                 height={627}
                 src="/silassilva.png"
                 width={627}
               />
+
+              <div className="mt-8">
+                <SectionHeading
+                  kicker="Metodologia 8D"
+                  title="Criada por quem já viveu esse problema na prática."
+                />
+              </div>
+
+              <p className="mt-4 text-sm leading-6 text-cream/65">
+                Silas Silva é Técnico em Marketing pelo SENAC e atua com
+                estratégia de conteúdo, posicionamento digital e produção
+                audiovisual.
+              </p>
+              <p className="mt-4 text-sm leading-6 text-cream/65">
+                A Metodologia 8D surgiu da prática, analisando perfis que
+                produzem conteúdo, mas nem sempre conseguem enxergar o que
+                funciona, o que está limitando seus resultados e o que deveria
+                mudar primeiro.
+              </p>
+              <p className="mt-4 text-sm leading-6 text-cream/65">
+                Essa experiência foi transformada em uma leitura estruturada
+                por 8 Dimensões Estratégicas, hoje potencializada por
+                inteligência artificial.
+              </p>
+              <p className="mt-4 text-xs font-medium text-cream/40">
+                Marketing · Mídias Digitais · Branding &amp; Growth ·
+                Audiovisual · Fotografia
+              </p>
             </div>
           </Reveal>
         </section>

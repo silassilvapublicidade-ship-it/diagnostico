@@ -180,20 +180,20 @@ function ExamplePlan({
 export function FullResultPreview() {
   return (
     <div className="space-y-5">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center justify-center gap-2">
         <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
         <p className="kicker text-cream/50">Exemplo ilustrativo</p>
       </div>
 
       <div className="dark-panel grid gap-6 p-6 sm:p-8 lg:grid-cols-[auto_1fr] lg:items-center">
-        <div className="flex items-center gap-5">
+        <div className="flex flex-col items-center gap-3 text-center lg:flex-row lg:gap-5 lg:text-left">
           <ExampleScoreRing score={65} />
           <div>
             <p className="text-2xl font-black text-cream">Consistente</p>
             <p className="mt-1 text-xs text-cream/45">Score estratégico</p>
           </div>
         </div>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-3 text-center sm:grid-cols-2 lg:grid-cols-4">
           <MiniStat label="Classificação" value="Consistente" />
           <MiniStat label="Maior força" value="Identidade · 82" />
           <MiniStat label="Maior gargalo" value="Conversão · 38" />
@@ -201,7 +201,7 @@ export function FullResultPreview() {
         </div>
       </div>
 
-      <div className="lux-panel p-5">
+      <div className="lux-panel p-5 text-center">
         <p className="kicker text-accent">Resumo executivo</p>
         <p className="mt-2.5 text-sm leading-6 text-cream/75">
           Identidade e Primeira Impressão já sustentam o perfil. O gargalo real
