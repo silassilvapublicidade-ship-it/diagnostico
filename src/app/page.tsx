@@ -546,12 +546,9 @@ export default function Home() {
                     {dimension.whyItMatters}
                   </p>
 
-                  <ul className="mt-5 w-full space-y-2 text-left">
+                  <ul className="mx-auto mt-5 w-full max-w-[15rem] space-y-2 border-t border-cream/10 pt-4 text-left">
                     {dimension.evaluates.map((item) => (
-                      <li
-                        className="flex gap-2 rounded-lg border border-white/10 bg-black/20 px-3 py-2.5 text-xs leading-5 text-cream/70"
-                        key={item}
-                      >
+                      <li className="flex gap-2 text-xs leading-5 text-cream/70" key={item}>
                         <span className="mt-0.5 shrink-0 text-accent">
                           &rarr;
                         </span>
