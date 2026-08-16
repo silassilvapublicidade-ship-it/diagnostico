@@ -39,7 +39,7 @@ export function StepCarousel({
     <div className="card rounded-2xl border border-white/10 bg-white/[0.03] p-6 backdrop-blur-md sm:p-10">
       <div className="flex flex-col items-center text-center">
         {current.image ? (
-          <div className="w-full max-w-[280px] overflow-hidden rounded-xl border border-white/10 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.6)] sm:max-w-[320px]">
+          <div className="w-full max-w-sm overflow-hidden rounded-xl border border-white/10 shadow-[0_20px_60px_-20px_rgba(0,0,0,0.6)] sm:max-w-md">
             <Image
               alt={current.image.alt}
               className="h-auto w-full"

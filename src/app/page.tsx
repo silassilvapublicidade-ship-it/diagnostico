@@ -157,6 +157,12 @@ const HOW_IT_WORKS = [
       "Falta de evidência vira limitação registrada, nunca é inventada",
       "Leitura ajustada ao seu tipo de perfil (Business ou Creator)",
     ],
+    image: {
+      src: "/mockups/como-funciona/passo3-leitura.png",
+      alt: "Tela de leitura inicial com o score das 8 Dimensões Estratégicas em barras",
+      width: 1074,
+      height: 720,
+    },
   },
   {
     icon: CheckCircle2,
@@ -169,6 +175,12 @@ const HOW_IT_WORKS = [
       "Plano de ação em 24h, 7 dias e 30 dias",
       "Sugestões de conteúdo que nascem do seu diagnóstico",
     ],
+    image: {
+      src: "/mockups/como-funciona/passo4-plano.png",
+      alt: "Card expandido de Posicionamento com diagnóstico, evidência, consequência, correção, exemplo aplicado e primeiro passo",
+      width: 1069,
+      height: 760,
+    },
   },
 ] as const;
 
