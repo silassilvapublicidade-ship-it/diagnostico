@@ -114,10 +114,10 @@ const HOW_IT_WORKS = [
     icon: ClipboardList,
     title: "Conte sobre seu perfil",
     description:
-      "Perguntas rápidas sobre objetivo, tipo de perfil e principal desafio — leva menos de 2 minutos.",
+      "Perguntas rápidas sobre objetivo, tipo de perfil e principal desafio. Leva menos de 2 minutos.",
     details: [
       "Objetivo do perfil: vender, atrair clientes, construir autoridade ou outro foco",
-      "Tipo de perfil: comercial (Business) ou criador de conteúdo (Creator) — muda os pesos da análise",
+      "Tipo de perfil: comercial (Business) ou criador de conteúdo (Creator), o que muda os pesos da análise",
       "Principal desafio que você já percebe hoje",
       "Sem letra miúda: só o que é usado no diagnóstico",
     ],
@@ -126,12 +126,12 @@ const HOW_IT_WORKS = [
     icon: Upload,
     title: "Envie as evidências",
     description:
-      "Prints do perfil: topo, feed, destaques e insights. Cada print vira evidência real analisada — nunca acesso automático à sua conta.",
+      "Prints do perfil: topo, feed, destaques e insights. Cada print vira evidência real analisada, nunca acesso automático à sua conta.",
     details: [
       "Topo do perfil: foto, bio e destaques",
       "Feed: a grade de posts",
       "Destaques (Highlights) abertos",
-      "Insights, se você tiver acesso — não é obrigatório",
+      "Insights, se você tiver acesso (não é obrigatório)",
     ],
   },
   {
@@ -150,7 +150,7 @@ const HOW_IT_WORKS = [
     icon: CheckCircle2,
     title: "Veja o que mudar",
     description:
-      "Diagnóstico, prioridades e plano de ação em 24h, 7 dias e 30 dias — sem achismo, com evidência.",
+      "Diagnóstico, prioridades e plano de ação em 24h, 7 dias e 30 dias, sem achismo e com evidência.",
     details: [
       "Diagnóstico e evidência por dimensão",
       "Prioridades: o que resolver primeiro, não 20 itens soltos",
@@ -503,7 +503,7 @@ export default function Home() {
 
             <p className="mx-auto mt-4 max-w-2xl text-center text-sm leading-6 text-cream/60">
               A Metodologia 8D nasceu da prática, analisando perfis reais.
-              Cada dimensão isola uma causa específica de resultado travado —
+              Cada dimensão isola uma causa específica de resultado travado,
               nunca um sintoma isolado.
             </p>
 
