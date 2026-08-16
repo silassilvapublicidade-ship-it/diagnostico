@@ -476,7 +476,7 @@ export default function Home() {
       </header>
 
       <div className="mx-auto w-full max-w-[1440px] px-6 sm:px-10 lg:px-16 xl:px-20">
-        <section className="mx-auto max-w-3xl py-16 text-center sm:py-24">
+        <section className="mx-auto max-w-3xl py-8 text-center sm:py-12">
           <h1 className="display-title gradient-text text-balance text-5xl leading-[1.05] sm:text-6xl lg:text-7xl">
             Descubra o que está travando seu&nbsp;Instagram.
           </h1>
@@ -509,7 +509,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="py-16 sm:py-24" id="dimensoes">
+        <section className="py-8 sm:py-12" id="dimensoes">
           <div className="hairline" />
           <Reveal className="mt-10 sm:mt-14">
             <SectionHeading
@@ -523,30 +523,30 @@ export default function Home() {
               nunca um sintoma isolado.
             </p>
 
-            <div className="mt-8 grid gap-4">
+            <div className="mt-8 grid gap-4 sm:grid-cols-2">
               {DIMENSIONS.map((dimension) => (
                 <div
-                  className="card flex flex-col items-center rounded-lg border border-white/10 bg-white/[0.03] p-6 text-center backdrop-blur-md sm:p-8"
+                  className="card flex flex-col items-center rounded-lg border border-white/10 bg-white/[0.03] p-5 text-center backdrop-blur-md sm:p-6"
                   key={dimension.code}
                 >
-                  <span className="flex h-12 w-12 items-center justify-center rounded-full border border-accent/30 bg-accent/10 text-accent">
+                  <span className="flex h-11 w-11 items-center justify-center rounded-full border border-accent/30 bg-accent/10 text-accent">
                     <dimension.icon aria-hidden className="h-5 w-5" />
                   </span>
                   <p className="mt-3 font-mono text-[10px] font-black text-cream/30">
                     {dimension.code}
                   </p>
-                  <p className="mt-1 text-xl font-semibold text-cream">
+                  <p className="mt-1 text-lg font-semibold text-cream">
                     {dimension.label}
                   </p>
-                  <p className="mt-1.5 text-sm font-medium text-accent/80">
+                  <p className="mt-1 text-sm font-medium text-accent/80">
                     {dimension.description}
                   </p>
 
-                  <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-cream/65">
+                  <p className="mt-4 text-sm leading-6 text-cream/65">
                     {dimension.whyItMatters}
                   </p>
 
-                  <ul className="mx-auto mt-5 grid w-full max-w-xl gap-2 text-left sm:grid-cols-3">
+                  <ul className="mt-5 w-full space-y-2 text-left">
                     {dimension.evaluates.map((item) => (
                       <li
                         className="flex gap-2 rounded-lg border border-white/10 bg-black/20 px-3 py-2.5 text-xs leading-5 text-cream/70"
@@ -576,7 +576,7 @@ export default function Home() {
           </Reveal>
         </section>
 
-        <section className="py-16 sm:py-24">
+        <section className="py-8 sm:py-12">
           <div className="hairline" />
           <Reveal className="mt-10 sm:mt-14">
             <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
@@ -619,7 +619,7 @@ export default function Home() {
           </Reveal>
         </section>
 
-        <section className="py-16 sm:py-24" id="como-funciona">
+        <section className="py-8 sm:py-12" id="como-funciona">
           <div className="hairline" />
           <Reveal className="mt-10 sm:mt-14">
             <SectionHeading
@@ -644,7 +644,7 @@ export default function Home() {
           </Reveal>
         </section>
 
-        <section className="py-16 sm:py-24" id="o-que-voce-recebe">
+        <section className="py-8 sm:py-12" id="o-que-voce-recebe">
           <div className="hairline" />
           <Reveal className="mt-10 sm:mt-14">
             <SectionHeading
@@ -673,7 +673,7 @@ export default function Home() {
           </Reveal>
         </section>
 
-        <section className="py-16 sm:py-24">
+        <section className="py-8 sm:py-12">
           <div className="hairline" />
           <Reveal className="mt-10 sm:mt-14">
             <SectionHeading
@@ -707,7 +707,7 @@ export default function Home() {
           </Reveal>
         </section>
 
-        <section className="py-20 sm:py-28">
+        <section className="py-10 sm:py-14">
           <div className="hairline" />
           <Reveal className="mt-10 sm:mt-14">
             <div className="dark-panel flex flex-col items-center px-6 py-14 text-center sm:px-12 sm:py-20">
@@ -731,7 +731,7 @@ export default function Home() {
           </Reveal>
         </section>
 
-        <section className="py-16 sm:py-24">
+        <section className="py-8 sm:py-12">
           <div className="hairline" />
           <Reveal className="mt-10 sm:mt-14">
             <SectionHeading
@@ -745,7 +745,7 @@ export default function Home() {
           </Reveal>
         </section>
 
-        <section className="py-16 sm:py-24">
+        <section className="py-8 sm:py-12">
           <div className="hairline" />
           <Reveal className="mt-10 sm:mt-14">
             <SectionHeading
@@ -774,7 +774,7 @@ export default function Home() {
           </Reveal>
         </section>
 
-        <section className="py-20 text-center sm:py-32">
+        <section className="py-10 text-center sm:py-16">
           <div className="hairline" />
           <Reveal className="mt-16 sm:mt-24">
             <h2 className="display-title text-2xl leading-[1.15] text-cream sm:text-4xl lg:text-5xl">
