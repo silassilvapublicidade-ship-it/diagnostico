@@ -166,6 +166,8 @@ const DIMENSIONS = [
     icon: Compass,
     label: "Posicionamento",
     description: "Quem você é, para quem fala e por que escolher você.",
+    whyItMatters:
+      "É a base de tudo: se não fica claro quem você é e para quem fala, nenhuma outra dimensão consegue compensar. Perfis com posicionamento confuso atraem o público errado, mesmo com bom conteúdo.",
     evaluates: [
       "Proposta de valor clara na bio",
       "Público e nicho bem definidos",
@@ -177,6 +179,8 @@ const DIMENSIONS = [
     icon: Eye,
     label: "Primeira Impressão",
     description: "O que fica claro nos primeiros segundos de visita.",
+    whyItMatters:
+      "Você tem poucos segundos para reter quem chega. Se o topo do perfil não comunica de forma imediata, a pessoa sai antes de conhecer o resto, por melhor que seja o conteúdo mais abaixo.",
     evaluates: [
       "Clareza visual do topo do perfil",
       "Bio, destaques e post fixado alinhados entre si",
@@ -188,6 +192,8 @@ const DIMENSIONS = [
     icon: BadgeCheck,
     label: "Autoridade",
     description: "Sinais de confiança, credibilidade e prova social.",
+    whyItMatters:
+      "Confiança precede decisão. Sem sinais claros de credibilidade, mesmo um bom produto ou serviço enfrenta resistência antes de qualquer conversa de venda.",
     evaluates: [
       "Provas de resultado, experiência ou especialização",
       "Depoimentos, cases ou credenciais visíveis",
@@ -199,6 +205,8 @@ const DIMENSIONS = [
     icon: PenLine,
     label: "Conteúdo",
     description: "Direção, consistência e utilidade do que é publicado.",
+    whyItMatters:
+      "Não é sobre postar mais, é sobre postar com direção. Conteúdo sem linha editorial dispersa a audiência e dilui a mensagem central do perfil.",
     evaluates: [
       "Linha editorial e frequência de publicação",
       "Utilidade real para quem consome",
@@ -210,6 +218,8 @@ const DIMENSIONS = [
     icon: Layers,
     label: "Identidade",
     description: "Reconhecimento visual e de linguagem do perfil.",
+    whyItMatters:
+      "É o que torna o perfil reconhecível fora do feed, num story compartilhado ou numa captura de tela. Identidade fraca faz o perfil se misturar com a concorrência.",
     evaluates: [
       "Padrão visual: cores, tipografia, composição",
       "Tom de voz consistente entre bio, posts e stories",
@@ -221,6 +231,8 @@ const DIMENSIONS = [
     icon: MousePointerClick,
     label: "Conversão",
     description: "Se a atenção vira próxima ação: seguir, comprar, agendar.",
+    whyItMatters:
+      "Atenção sem conversão é oportunidade perdida. Um perfil pode ter ótimo alcance e ainda assim não gerar resultado, se não houver um caminho claro até a próxima ação.",
     evaluates: [
       "Chamadas para ação claras e presentes",
       "Caminho até a próxima etapa: link, DM, agendamento",
@@ -232,6 +244,8 @@ const DIMENSIONS = [
     icon: Handshake,
     label: "Relacionamento",
     description: "Proximidade, interação e vínculo com a audiência.",
+    whyItMatters:
+      "Audiência não é comunidade. Perfis que interagem de verdade criam proximidade que sustenta decisão de compra a médio prazo, não apenas engajamento passageiro.",
     evaluates: [
       "Uso de stories, enquetes e respostas",
       "Frequência real de interação com quem acompanha",
@@ -243,6 +257,8 @@ const DIMENSIONS = [
     icon: Lightbulb,
     label: "Oportunidades",
     description: "Ativos e potenciais ainda pouco explorados.",
+    whyItMatters:
+      "Todo perfil tem ativos subaproveitados: formatos, canais ou conteúdos que já funcionaram e podem ser escalados. Essa dimensão mapeia o que já existe e ainda não foi explorado.",
     evaluates: [
       "Formatos e canais ainda não testados",
       "Ativos existentes e subaproveitados",
@@ -507,28 +523,35 @@ export default function Home() {
               nunca um sintoma isolado.
             </p>
 
-            <div className="mt-8 grid gap-4 sm:grid-cols-2">
+            <div className="mt-8 grid gap-4">
               {DIMENSIONS.map((dimension) => (
                 <div
-                  className="card flex flex-col items-center rounded-lg border border-white/10 bg-white/[0.03] p-5 text-center backdrop-blur-md"
+                  className="card flex flex-col items-center rounded-lg border border-white/10 bg-white/[0.03] p-6 text-center backdrop-blur-md sm:p-8"
                   key={dimension.code}
                 >
-                  <span className="flex h-10 w-10 items-center justify-center rounded-full border border-accent/30 bg-accent/10 text-accent">
-                    <dimension.icon aria-hidden className="h-[18px] w-[18px]" />
+                  <span className="flex h-12 w-12 items-center justify-center rounded-full border border-accent/30 bg-accent/10 text-accent">
+                    <dimension.icon aria-hidden className="h-5 w-5" />
                   </span>
-                  <p className="mt-3 font-mono text-[9px] font-black text-cream/30">
+                  <p className="mt-3 font-mono text-[10px] font-black text-cream/30">
                     {dimension.code}
                   </p>
-                  <p className="mt-1 text-base font-semibold text-cream">
+                  <p className="mt-1 text-xl font-semibold text-cream">
                     {dimension.label}
                   </p>
-                  <p className="mt-1.5 text-sm leading-5 text-cream/55">
+                  <p className="mt-1.5 text-sm font-medium text-accent/80">
                     {dimension.description}
                   </p>
 
-                  <ul className="mt-4 w-full space-y-1.5 text-left text-xs leading-5 text-cream/65">
+                  <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-cream/65">
+                    {dimension.whyItMatters}
+                  </p>
+
+                  <ul className="mx-auto mt-5 grid w-full max-w-xl gap-2 text-left sm:grid-cols-3">
                     {dimension.evaluates.map((item) => (
-                      <li className="flex gap-2" key={item}>
+                      <li
+                        className="flex gap-2 rounded-lg border border-white/10 bg-black/20 px-3 py-2.5 text-xs leading-5 text-cream/70"
+                        key={item}
+                      >
                         <span className="mt-0.5 shrink-0 text-accent">
                           &rarr;
                         </span>
