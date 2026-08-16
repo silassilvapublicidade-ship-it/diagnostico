@@ -121,6 +121,12 @@ const HOW_IT_WORKS = [
       "Principal desafio que você já percebe hoje",
       "Sem letra miúda: só o que é usado no diagnóstico",
     ],
+    image: {
+      src: "/mockups/como-funciona/passo1-tipo-perfil.png",
+      alt: "Tela do briefing perguntando qual é o tipo de perfil: negócio, imagem pessoal ou criador de conteúdo",
+      width: 769,
+      height: 736,
+    },
   },
   {
     icon: Upload,
@@ -133,6 +139,12 @@ const HOW_IT_WORKS = [
       "Destaques (Highlights) abertos",
       "Insights, se você tiver acesso (não é obrigatório)",
     ],
+    image: {
+      src: "/mockups/como-funciona/passo2-evidencias.png",
+      alt: "Tela de upload das evidências: tela inicial do perfil, feed, destaques e insights",
+      width: 771,
+      height: 885,
+    },
   },
   {
     icon: ScanSearch,
