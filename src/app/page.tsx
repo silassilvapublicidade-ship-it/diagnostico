@@ -18,7 +18,6 @@ import {
   Sparkles,
   Target,
   Upload,
-  UserCheck,
   Wrench,
 } from "lucide-react";
 import type { Metadata } from "next";
@@ -75,17 +74,6 @@ const OFFER_INCLUDES = [
   "Pontos críticos com evidência",
   "Prioridades e plano de ação",
   "Leitura ajustada ao seu tipo de perfil",
-] as const;
-
-const PAIN_POINTS = [
-  "Posicionamento confuso",
-  "1ª impressão fraca",
-  "Pouca autoridade",
-  "Conteúdo sem direção",
-  "Identidade inconsistente",
-  "Conversão fraca",
-  "Relacionamento raso",
-  "Oportunidades perdidas",
 ] as const;
 
 const RECEIVE_ITEMS = [
@@ -178,61 +166,88 @@ const DIMENSIONS = [
     icon: Compass,
     label: "Posicionamento",
     description: "Quem você é, para quem fala e por que escolher você.",
+    evaluates: [
+      "Proposta de valor clara na bio",
+      "Público e nicho bem definidos",
+      "Diferencial frente a quem faz algo parecido",
+    ],
   },
   {
     code: "IMP",
     icon: Eye,
     label: "Primeira Impressão",
     description: "O que fica claro nos primeiros segundos de visita.",
+    evaluates: [
+      "Clareza visual do topo do perfil",
+      "Bio, destaques e post fixado alinhados entre si",
+      "Tempo que leva pra entender do que se trata o perfil",
+    ],
   },
   {
     code: "AUT",
     icon: BadgeCheck,
     label: "Autoridade",
     description: "Sinais de confiança, credibilidade e prova social.",
+    evaluates: [
+      "Provas de resultado, experiência ou especialização",
+      "Depoimentos, cases ou credenciais visíveis",
+      "Consistência entre o que se diz e o que se entrega",
+    ],
   },
   {
     code: "CON",
     icon: PenLine,
     label: "Conteúdo",
     description: "Direção, consistência e utilidade do que é publicado.",
+    evaluates: [
+      "Linha editorial e frequência de publicação",
+      "Utilidade real para quem consome",
+      "Equilíbrio entre atrair, educar e vender",
+    ],
   },
   {
     code: "IDE",
     icon: Layers,
     label: "Identidade",
     description: "Reconhecimento visual e de linguagem do perfil.",
+    evaluates: [
+      "Padrão visual: cores, tipografia, composição",
+      "Tom de voz consistente entre bio, posts e stories",
+      "Reconhecimento do perfil mesmo sem ver o nome",
+    ],
   },
   {
     code: "CVR",
     icon: MousePointerClick,
     label: "Conversão",
     description: "Se a atenção vira próxima ação: seguir, comprar, agendar.",
+    evaluates: [
+      "Chamadas para ação claras e presentes",
+      "Caminho até a próxima etapa: link, DM, agendamento",
+      "Atrito entre interesse e decisão",
+    ],
   },
   {
     code: "REL",
     icon: Handshake,
     label: "Relacionamento",
     description: "Proximidade, interação e vínculo com a audiência.",
+    evaluates: [
+      "Uso de stories, enquetes e respostas",
+      "Frequência real de interação com quem acompanha",
+      "Senso de comunidade, não só de audiência",
+    ],
   },
   {
     code: "OPR",
     icon: Lightbulb,
     label: "Oportunidades",
     description: "Ativos e potenciais ainda pouco explorados.",
-  },
-] as const;
-
-const PROFILE_TYPES = [
-  {
-    code: "BUSINESS",
-    title: "Perfil comercial",
-    keywords: "Posicionamento · Autoridade · Conversão",
-  },
-  {
-    code: "CREATOR",
-    title: "Imagem pessoal e conteúdo",
-    keywords: "Conteúdo · Identidade · Relacionamento",
+    evaluates: [
+      "Formatos e canais ainda não testados",
+      "Ativos existentes e subaproveitados",
+      "Potencial que o que já funciona ainda não capturou",
+    ],
   },
 ] as const;
 
@@ -247,20 +262,6 @@ const COMPARISON_ROWS = [
     without: "Uma IA genérica já faz isso.",
     with: "Nada é inventado. É evidência cruzada entre as dimensões.",
   },
-] as const;
-
-const TRUST_POINTS = [
-  {
-    icon: Lock,
-    title: "Evidências privadas",
-    hint: "Nunca publicadas ou compartilhadas",
-  },
-  {
-    icon: FileCheck,
-    title: "Sem inventar dado",
-    hint: "Falta de evidência fica clara",
-  },
-  { icon: UserCheck, title: "Você decide", hint: "A aplicação é sua escolha" },
 ] as const;
 
 const FAQ_ITEMS = [
@@ -292,9 +293,9 @@ const FAQ_ITEMS = [
 ] as const;
 
 const NAV_LINKS = [
-  { href: "#o-que-voce-recebe", label: "O que você recebe" },
-  { href: "#como-funciona", label: "Como funciona" },
   { href: "#dimensoes", label: "8 Dimensões" },
+  { href: "#como-funciona", label: "Como funciona" },
+  { href: "#o-que-voce-recebe", label: "O que você recebe" },
 ] as const;
 
 function SectionHeading({ kicker, title }: { kicker: string; title: string }) {
@@ -492,90 +493,6 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="py-16 sm:py-24">
-          <div className="hairline" />
-          <Reveal className="mt-10 sm:mt-14">
-            <SectionHeading
-              kicker="Antes de mudar mais alguma coisa"
-              title="Talvez o problema não seja postar pouco."
-            />
-
-            <div className="mx-auto mt-8 grid max-w-3xl border-t border-cream/10 sm:grid-cols-2">
-              {PAIN_POINTS.map((point, index) => (
-                <div
-                  className="flex items-center justify-center gap-4 border-b border-cream/10 py-3.5"
-                  key={point}
-                >
-                  <span className="font-mono text-sm font-black text-accent/60">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <span className="text-base font-medium text-cream/80">
-                    {point}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            <p className="mt-8 text-center text-base font-semibold text-cream/90">
-              É isso que a análise identifica.
-            </p>
-          </Reveal>
-        </section>
-
-        <section className="py-16 sm:py-24" id="o-que-voce-recebe">
-          <div className="hairline" />
-          <Reveal className="mt-10 sm:mt-14">
-            <SectionHeading
-              kicker="O que você recebe"
-              title="Clareza sobre o que fazer."
-            />
-
-            <div className="mt-8 grid gap-3.5 sm:grid-cols-2">
-              {RECEIVE_ITEMS.map((item) => (
-                <div
-                  className="card flex flex-col items-center gap-3 rounded-lg border border-white/10 bg-white/[0.03] p-5 text-center backdrop-blur-md"
-                  key={item.title}
-                >
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-accent/30 bg-accent/10 text-accent">
-                    <item.icon aria-hidden className="h-[18px] w-[18px]" />
-                  </span>
-                  <div>
-                    <p className="text-base font-semibold text-cream">
-                      {item.title}
-                    </p>
-                    <p className="mt-0.5 text-xs text-cream/50">{item.hint}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Reveal>
-        </section>
-
-        <section className="py-16 sm:py-24" id="como-funciona">
-          <div className="hairline" />
-          <Reveal className="mt-10 sm:mt-14">
-            <SectionHeading
-              kicker="Como funciona"
-              title="Simples de enviar, profundo de receber."
-            />
-
-            <div className="mt-10">
-              <StepCarousel
-                steps={HOW_IT_WORKS.map((step) => ({
-                  ...step,
-                  icon: (
-                    <step.icon
-                      aria-hidden
-                      className="h-10 w-10"
-                      strokeWidth={1.8}
-                    />
-                  ),
-                }))}
-              />
-            </div>
-          </Reveal>
-        </section>
-
         <section className="py-16 sm:py-24" id="dimensoes">
           <div className="hairline" />
           <Reveal className="mt-10 sm:mt-14">
@@ -584,24 +501,41 @@ export default function Home() {
               title="Um perfil, vários ângulos."
             />
 
-            <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <p className="mx-auto mt-4 max-w-2xl text-center text-sm leading-6 text-cream/60">
+              A Metodologia 8D nasceu da prática, analisando perfis reais.
+              Cada dimensão isola uma causa específica de resultado travado —
+              nunca um sintoma isolado.
+            </p>
+
+            <div className="mt-8 grid gap-4 sm:grid-cols-2">
               {DIMENSIONS.map((dimension) => (
                 <div
-                  className="card rounded-lg border border-white/10 bg-white/[0.03] p-4 text-center backdrop-blur-md"
+                  className="card flex flex-col items-center rounded-lg border border-white/10 bg-white/[0.03] p-5 text-center backdrop-blur-md"
                   key={dimension.code}
                 >
-                  <span className="mx-auto flex h-10 w-10 items-center justify-center rounded-full border border-accent/30 bg-accent/10 text-accent">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full border border-accent/30 bg-accent/10 text-accent">
                     <dimension.icon aria-hidden className="h-[18px] w-[18px]" />
                   </span>
                   <p className="mt-3 font-mono text-[9px] font-black text-cream/30">
                     {dimension.code}
                   </p>
-                  <p className="mt-1 text-sm font-semibold text-cream">
+                  <p className="mt-1 text-base font-semibold text-cream">
                     {dimension.label}
                   </p>
-                  <p className="mt-1.5 text-xs leading-4 text-cream/50">
+                  <p className="mt-1.5 text-sm leading-5 text-cream/55">
                     {dimension.description}
                   </p>
+
+                  <ul className="mt-4 w-full space-y-1.5 text-left text-xs leading-5 text-cream/65">
+                    {dimension.evaluates.map((item) => (
+                      <li className="flex gap-2" key={item}>
+                        <span className="mt-0.5 shrink-0 text-accent">
+                          &rarr;
+                        </span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               ))}
             </div>
@@ -615,114 +549,6 @@ export default function Home() {
                 diagnóstico: o problema não é chamar atenção, é transformar essa
                 atenção em ação.
               </p>
-            </div>
-          </Reveal>
-        </section>
-
-        <section className="py-16 sm:py-24">
-          <div className="hairline" />
-          <Reveal className="mt-10 sm:mt-14">
-            <SectionHeading
-              kicker="Leitura personalizada"
-              title="Empresa ou criador. Pesos diferentes."
-            />
-
-            <div className="mt-8 grid overflow-hidden rounded-lg border border-cream/10 backdrop-blur-md transition-shadow duration-300 hover:shadow-[0_25px_70px_-25px_rgba(255,90,0,0.3)] sm:grid-cols-2">
-              {PROFILE_TYPES.map((profile, index) => (
-                <div
-                  className={
-                    index === 0
-                      ? "border-b border-cream/10 p-6 text-center transition-colors duration-300 hover:bg-white/[0.02] sm:border-r sm:border-b-0 sm:p-8"
-                      : "p-6 text-center transition-colors duration-300 hover:bg-white/[0.02] sm:p-8"
-                  }
-                  key={profile.code}
-                >
-                  <p className="font-mono text-xs font-black text-accent">
-                    {profile.code}
-                  </p>
-                  <p className="mt-2.5 text-xl font-semibold text-cream">
-                    {profile.title}
-                  </p>
-                  <p className="mt-2 text-sm font-medium text-cream/55">
-                    {profile.keywords}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </Reveal>
-        </section>
-
-        <section className="py-16 sm:py-24">
-          <div className="hairline" />
-          <Reveal className="mt-10 sm:mt-14">
-            <SectionHeading
-              kicker="Prova, não promessa"
-              title="Você não recebe apenas uma nota."
-            />
-
-            <div className="mt-8">
-              <FullResultPreview />
-            </div>
-          </Reveal>
-        </section>
-
-        <section className="py-16 sm:py-24">
-          <div className="hairline" />
-          <Reveal className="mt-10 sm:mt-14">
-            <SectionHeading
-              kicker="Achismo x direção"
-              title="Pare de tentar adivinhar. Comece a saber."
-            />
-
-            <div className="mt-8 overflow-hidden rounded-lg border border-white/10 bg-white/[0.03] backdrop-blur-md">
-              <div className="grid grid-cols-2 border-b border-cream/10 bg-white/[0.03]">
-                <p className="kicker px-4 py-3 text-center text-cream/45 sm:px-6">
-                  Sem diagnóstico
-                </p>
-                <p className="kicker border-l border-cream/10 px-4 py-3 text-center text-accent sm:px-6">
-                  Com o diagnóstico
-                </p>
-              </div>
-              {COMPARISON_ROWS.map((row) => (
-                <div
-                  className="grid grid-cols-2 border-b border-cream/10 last:border-b-0"
-                  key={row.without}
-                >
-                  <p className="px-4 py-5 text-center text-base leading-6 text-cream/50 sm:px-6">
-                    {row.without}
-                  </p>
-                  <p className="border-l border-cream/10 px-4 py-5 text-center text-base font-medium leading-6 text-cream/90 sm:px-6">
-                    {row.with}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </Reveal>
-        </section>
-
-        <section className="py-16 sm:py-24">
-          <div className="hairline" />
-          <Reveal className="mt-10 sm:mt-14">
-            <SectionHeading
-              kicker="Privacidade"
-              title="Privado, do seu jeito."
-            />
-
-            <div className="mt-8 grid gap-3.5 sm:grid-cols-3">
-              {TRUST_POINTS.map((point) => (
-                <div
-                  className="card flex flex-col items-center rounded-lg border border-white/10 bg-white/[0.03] p-5 text-center backdrop-blur-md"
-                  key={point.title}
-                >
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-accent/30 bg-accent/10 text-accent">
-                    <point.icon aria-hidden className="h-[18px] w-[18px]" />
-                  </span>
-                  <p className="mt-3 text-base font-semibold text-cream">
-                    {point.title}
-                  </p>
-                  <p className="mt-1.5 text-sm text-cream/55">{point.hint}</p>
-                </div>
-              ))}
             </div>
           </Reveal>
         </section>
@@ -770,30 +596,89 @@ export default function Home() {
           </Reveal>
         </section>
 
+        <section className="py-16 sm:py-24" id="como-funciona">
+          <div className="hairline" />
+          <Reveal className="mt-10 sm:mt-14">
+            <SectionHeading
+              kicker="Como funciona"
+              title="Simples de enviar, profundo de receber."
+            />
+
+            <div className="mt-10">
+              <StepCarousel
+                steps={HOW_IT_WORKS.map((step) => ({
+                  ...step,
+                  icon: (
+                    <step.icon
+                      aria-hidden
+                      className="h-10 w-10"
+                      strokeWidth={1.8}
+                    />
+                  ),
+                }))}
+              />
+            </div>
+          </Reveal>
+        </section>
+
+        <section className="py-16 sm:py-24" id="o-que-voce-recebe">
+          <div className="hairline" />
+          <Reveal className="mt-10 sm:mt-14">
+            <SectionHeading
+              kicker="O que você recebe"
+              title="Clareza sobre o que fazer."
+            />
+
+            <div className="mt-8 grid gap-3.5 sm:grid-cols-2">
+              {RECEIVE_ITEMS.map((item) => (
+                <div
+                  className="card flex flex-col items-center gap-3 rounded-lg border border-white/10 bg-white/[0.03] p-5 text-center backdrop-blur-md"
+                  key={item.title}
+                >
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-accent/30 bg-accent/10 text-accent">
+                    <item.icon aria-hidden className="h-[18px] w-[18px]" />
+                  </span>
+                  <div>
+                    <p className="text-base font-semibold text-cream">
+                      {item.title}
+                    </p>
+                    <p className="mt-0.5 text-xs text-cream/50">{item.hint}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Reveal>
+        </section>
+
         <section className="py-16 sm:py-24">
           <div className="hairline" />
           <Reveal className="mt-10 sm:mt-14">
             <SectionHeading
-              kicker="Perguntas frequentes"
-              title="Antes de perguntar, leia aqui."
+              kicker="Achismo x direção"
+              title="Pare de tentar adivinhar. Comece a saber."
             />
 
-            <div className="mt-8 grid gap-3">
-              {FAQ_ITEMS.map((item) => (
-                <details
-                  className="card group rounded-lg border border-white/10 bg-white/[0.03] backdrop-blur-md"
-                  key={item.question}
+            <div className="mt-8 overflow-hidden rounded-lg border border-white/10 bg-white/[0.03] backdrop-blur-md">
+              <div className="grid grid-cols-2 border-b border-cream/10 bg-white/[0.03]">
+                <p className="kicker px-4 py-3 text-center text-cream/45 sm:px-6">
+                  Sem diagnóstico
+                </p>
+                <p className="kicker border-l border-cream/10 px-4 py-3 text-center text-accent sm:px-6">
+                  Com o diagnóstico
+                </p>
+              </div>
+              {COMPARISON_ROWS.map((row) => (
+                <div
+                  className="grid grid-cols-2 border-b border-cream/10 last:border-b-0"
+                  key={row.without}
                 >
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-5 text-sm font-semibold text-cream">
-                    {item.question}
-                    <span className="shrink-0 font-mono text-lg leading-none text-accent transition-transform group-open:rotate-45">
-                      +
-                    </span>
-                  </summary>
-                  <p className="px-5 pb-5 text-sm leading-6 text-cream/65">
-                    {item.answer}
+                  <p className="px-4 py-5 text-center text-base leading-6 text-cream/50 sm:px-6">
+                    {row.without}
                   </p>
-                </details>
+                  <p className="border-l border-cream/10 px-4 py-5 text-center text-base font-medium leading-6 text-cream/90 sm:px-6">
+                    {row.with}
+                  </p>
+                </div>
               ))}
             </div>
           </Reveal>
@@ -819,6 +704,49 @@ export default function Home() {
               <div className="mt-8">
                 <PricingCard />
               </div>
+            </div>
+          </Reveal>
+        </section>
+
+        <section className="py-16 sm:py-24">
+          <div className="hairline" />
+          <Reveal className="mt-10 sm:mt-14">
+            <SectionHeading
+              kicker="Prova, não promessa"
+              title="Você não recebe apenas uma nota."
+            />
+
+            <div className="mt-8">
+              <FullResultPreview />
+            </div>
+          </Reveal>
+        </section>
+
+        <section className="py-16 sm:py-24">
+          <div className="hairline" />
+          <Reveal className="mt-10 sm:mt-14">
+            <SectionHeading
+              kicker="Perguntas frequentes"
+              title="Antes de perguntar, leia aqui."
+            />
+
+            <div className="mt-8 grid gap-3">
+              {FAQ_ITEMS.map((item) => (
+                <details
+                  className="card group rounded-lg border border-white/10 bg-white/[0.03] backdrop-blur-md"
+                  key={item.question}
+                >
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-5 text-sm font-semibold text-cream">
+                    {item.question}
+                    <span className="shrink-0 font-mono text-lg leading-none text-accent transition-transform group-open:rotate-45">
+                      +
+                    </span>
+                  </summary>
+                  <p className="px-5 pb-5 text-sm leading-6 text-cream/65">
+                    {item.answer}
+                  </p>
+                </details>
+              ))}
             </div>
           </Reveal>
         </section>
